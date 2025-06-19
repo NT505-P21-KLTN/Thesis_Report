@@ -1089,8 +1089,7 @@ và 7.7 xe tương ứng. Phần bên phải tóm tắt mức cải thiện đ�
         \multirow{2}{*}{Giao thông thấp} & Single Intersection & 31.5 & 6.7 & 400 \\
         & 4-Intersection Sync & 23.2 & 5.4 & 450 \\
         \midrule
-        \multirow{2}{*}{Giao thông \\ 
-        trung bình} & Single Intersection & 45.0 & 9.5 & 350 \\
+        \multirow{2}{*}{\parbox{2cm}{\centering Giao thông \\ trung bình}} & Single Intersection & 45.0 & 9.5 & 350 \\
         & 4-Intersection Sync & 32.8 & 7.5 & 398 \\
         \midrule
         \multirow{2}{*}{Giao thông cao} & Single Intersection & 63.0 & 13.3 & 290 \\
@@ -1145,7 +1144,7 @@ Dựa trên các giá trị thực tế đã trình bày trong các bảng và b
 ta có thể kết luận:
 \begin{itemize}
     \item \textbf{Thời gian chờ:} Từ 45.0s xuống 34.3s (cải thiện 23.8\%)
-    \item \textbf{Độ dài hàng đợi:} Từ 9.5 xe xuống 7.7 xe (giảm 18.7\%)
+    \item \textbf{Độ dài hàng đợi:} Từ 9.5 xe xuống 7.7 xe (cải thiện 18.7\%)
     \item \textbf{Hiệu suất hệ thống:} Ổn định và consistent trên mọi tình huống
     \item \textbf{Số lần hội tụ:} Đạt được tại episode 100
 \end{itemize}
@@ -1285,24 +1284,24 @@ Hình \ref{fig:performance_dashboard} cung cấp dashboard toàn diện bao gồ
 \begin{itemize}
     \item \textbf{Hội tụ:} Tiến bộ ổn định, nhất quán qua 110 episodes
     \item \textbf{Hiệu suất:} Tỉ lệ cải thiện tốt (25.1\%)
-    \item \textbf{Độ biến động:} Trung bình ($\sigma$ = 3.9s)
+    \item \textbf{Độ biến động:} Trung bình ($\sigma = 3.9$s)
     \item \textbf{Khả năng triển khai:} Tốt - Hiệu suất đáng tin cậy, thời gian huấn luyện hợp lý
 \end{itemize}
 
 \subsubsection{Kịch bản giao thông cao (900 xe/h)}
 \begin{itemize}
-    \item \textbf{Hội tụ:} Học chậm với setbacks thỉnh thoảng
-    \item \textbf{Hiệu suất:} Tỉ lệ cải thiện vừa phải (21.1\%)
-    \item \textbf{Độ biến động:} Cao hơn ($\sigma$ = 5.3s)
-    \item \textbf{Khả năng triển khai:} Thách thức - Cần huấn luyện mở rộng, quản lý kỳ vọng
+    \item \textbf{Hội tụ:} Học chậm với nhiều setback, hội tụ sau 130 episodes
+    \item \textbf{Hiệu suất:} Tỉ lệ cải thiện khá (21.1\%)
+    \item \textbf{Độ biến động:} Cao hơn ($\sigma = 5.3$s)
+    \item \textbf{Khả năng triển khai:} Khó khăn - Cần thời gian huấn luyện dài
 \end{itemize}
 
 \subsubsection{Kịch bản giờ cao điểm (1200 xe/h)}
 \begin{itemize}
-    \item \textbf{Hội tụ:} Rất chậm với nhiều plateau và setbacks
-    \item \textbf{Hiệu suất:} Tỉ lệ cải thiện hạn chế (12.4\%)
-    \item \textbf{Độ biến động:} Cao nhất ($\sigma$ = 7.6s)
-    \item \textbf{Khả năng triển khai:} Khó khăn - Cần mô hình chuyên biệt, khả năng chịu độ biến động cao
+    \item \textbf{Hội tụ:} Rất chậm với nhiều plateau, cần 140+ episodes
+    \item \textbf{Hiệu suất:} Tỉ lệ cải thiện thấp (12.4\%)
+    \item \textbf{Độ biến động:} Cao nhất ($\sigma = 7.6$s)
+    \item \textbf{Khả năng triển khai:} Không khuyến khích - Chi phí cao, hiệu quả thấp
 \end{itemize}
 
 \subsection{Phân tích thống kê}
@@ -1343,7 +1342,7 @@ Thời gian hội tụ tăng theo cấp số nhân với độ phức tạp giao
 Phối hợp đa giao lộ cung cấp lợi ích bổ sung nhất quán:
 \begin{itemize}
     \item Chia sẻ kinh nghiệm học qua các giao lộ
-    \item Giảm độ biến động toàn hệ thống
+    \item Cải thiện độ ổn định toàn hệ thống
     \item Xử lý tốt hơn độ phức tạp giao thông thông qua tối ưu hóa phân tán
 \end{itemize}
 
@@ -1386,64 +1385,86 @@ cho các điều kiện giao thông khác nhau:
 
 \subsection{So sánh với các phương pháp điều khiển giao thông hiện tại}
 
+\subsubsection{Phương pháp đánh giá và cơ sở tham chiếu}
+
+Để đánh giá hiệu quả của hệ thống Sync Agent, nghiên cứu tiến hành so sánh với các phương pháp điều khiển giao thông được sử dụng rộng rãi. Cơ sở tham chiếu (baseline) được thiết lập dựa trên hệ thống điều khiển đèn giao thông thời gian cố định (Fixed-time Control):
+
+\paragraph{Thông số cơ sở tham chiếu:}
+\begin{itemize}
+    \item \textbf{Thời gian chờ trung bình:} 45.0 giây (đo trong điều kiện giao thông trung bình)
+    \item \textbf{Độ dài hàng đợi trung bình:} 9.5 xe (đo tại các làn xe chính)
+    \item \textbf{Chu kỳ đèn:} 90 giây (30s xanh mỗi hướng, 5s vàng, 5s đỏ toàn hướng)
+    \item \textbf{Điều kiện đo:} Mô phỏng SUMO với 600 xe/giờ trong 1 giờ
+    \item \textbf{Địa điểm tham chiếu:} Giao lộ 4 nhánh tiêu chuẩn (2 làn mỗi hướng)
+\end{itemize}
+
+\paragraph{Phương pháp so sánh:}
+Tất cả các tỷ lệ cải thiện được tính dựa trên công thức:
+\begin{equation}
+\text{Tỷ lệ cải thiện} = \frac{\text{Giá trị cơ sở} - \text{Giá trị đo được}}{\text{Giá trị cơ sở}} \times 100\%
+\end{equation}
+
+Dữ liệu từ các nghiên cứu khác được chuẩn hóa theo cùng phương pháp tính toán.
+
 \begin{table}[!htp]
     \centering
     \caption{So sánh hiệu suất với các phương pháp điều khiển giao thông}
     \label{tab:final_comparison}
     \resizebox{\textwidth}{!}{%
     \begin{tabular}{@{}lccccc@{}}
-        \toprule 
+        \toprule
         \textbf{Phương pháp} & 
         \textbf{Thời gian chờ} & 
         \textbf{Độ dài hàng đợi} & 
         \textbf{Đồng bộ} & 
         \textbf{Trạng thái} & 
         \textbf{Nguồn} \\
-        \midrule 
+        \midrule
         Fixed-time Control & 
-        Đường cơ sở & 
-        Đường cơ sở & 
-        Không có & 
+        0\% (cơ sở: 45.0s) & 
+        0\% (cơ sở: 9.5 xe) & 
+        Không & 
         Ổn định & 
         \cite{MultiAgentRL2025} \\
-        \midrule
+        
         Actuated Control & 
-        Giảm ~1.98\% & 
-        Giảm ~10\% & 
+        Cải thiện 2\% & 
+        Cải thiện 10\% & 
         Hạn chế & 
         Ổn định & 
         \cite{MultiAgentRL2025,AdaptiveVsActuated2025} \\
-        \midrule
+        
         SCOOT & 
-        Cải thiện ~12-20\% & 
-        Giảm ~24.2\% & 
+        Cải thiện 12–20\% & 
+        Cải thiện 24.2\% & 
         Có & 
         Triển khai & 
         \cite{AnaheimTraffic2025,SCOOTYunex,SCOOTIncidents2004} \\
-        \midrule
+        
         SCATS & 
-        Cải thiện ~16-42\% & 
-        Giảm ~35\% & 
+        Cải thiện 16–42\% & 
+        Cải thiện 35\% & 
         Có & 
         Triển khai & 
         \cite{SCOOTSCATSEvaluation2008,AdaptiveTrafficSignals2010} \\
-        \midrule
-        DQN Single Agent & 
-        \textbf{+14.3\%} & 
-        \textbf{-10.5\%} & 
-        Không có & 
-        Xác thực & 
+        
+        DQN (1 Agent) & 
+        Cải thiện 14.3\% & 
+        Cải thiện 10.5\% & 
+        Không & 
+        Thử nghiệm thành công & 
         Nghiên cứu này \\
-        \midrule
+
         \textbf{Sync Agent System} & 
-        \textbf{+27.0\%} & 
-        \textbf{-23.2\%} & 
-        \textbf{Xuất sắc} & 
-        \textbf{Sẵn sàng} & 
+        \textbf{Cải thiện 27.0\%} & 
+        \textbf{Cải thiện 23.2\%} & 
+        \textbf{Đồng bộ hoàn chỉnh} & 
+        \textbf{Sẵn sàng triển khai} & 
         \textbf{Nghiên cứu này} \\
         \bottomrule
     \end{tabular}%
     }
 \end{table}
 
-Bảng \ref{tab:final_comparison} thể hiện rằng hệ thống Sync Agent của nghiên cứu đạt hiệu suất vượt trội so với tất cả các phương pháp hiện tại, với cải thiện 27.0\% thời gian chờ và 23.2\% giảm hàng đợi.
+
+Bảng \ref{tab:final_comparison} cho thấy hệ thống Sync Agent đề xuất trong nghiên cứu đạt hiệu suất cạnh tranh so với các phương pháp điều khiển giao thông hiện có. Cụ thể, mô hình giúp cải thiện 27.0\% thời gian chờ và 23.2\% độ dài hàng đợi, đồng thời đảm bảo mức đồng bộ cao giữa các nút giao. Dù SCATS có thể đạt mức cải thiện cao hơn trong một số trường hợp, mô hình này thường dựa vào cấu hình phức tạp và dữ liệu lịch sử. Trong khi đó, hệ thống Sync Agent hoạt động theo thời gian thực, thích nghi linh hoạt với điều kiện giao thông thay đổi, và dễ dàng triển khai hơn. Điều này khẳng định tiềm năng ứng dụng thực tế và khả năng mở rộng của mô hình trong các hệ thống giao thông thông minh hiện đại.
