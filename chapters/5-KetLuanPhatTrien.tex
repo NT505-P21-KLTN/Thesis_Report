@@ -1,414 +1,60 @@
-Trong chương này, chúng tôi sẽ trình bày những gì mà khóa luận đã đạt được so
-với mục tiêu được đặt ra từ ban đầu khi bắt đầu thực hiện. Bên cạnh đó, chúng
-tôi cũng trình bày những hạn chế và đưa ra hướng phát triển kế tiếp của chúng
-tôi trong tương lai.
+Nghiên cứu này đã phát triển thành công một hệ thống điều khiển đèn giao thông thông minh sử dụng Deep Reinforcement Learning, đạt được những kết quả vượt trội so với các phương pháp truyền thống.
 
-\section{Kết luận}
+\section{Đóng góp chính của nghiên cứu}
 
-Nghiên cứu này đã thành công trong việc phát triển một hệ thống điều khiển đèn
-giao thông thông minh hoàn chỉnh sử dụng Học Tăng Cường Sâu (Deep Reinforcement Learning) và IoT. Hệ thống
-được thiết kế với kiến trúc phân tầng, bao gồm các tác nhân DQN để điều khiển
-từng giao lộ và một Tác nhân Đồng bộ (Sync Agent) sử dụng thuật toán SAC để phối hợp đồng bộ hóa
-giữa nhiều giao lộ.
-
-\subsection{Các thành tựu chính}
-
-\subsubsection{Hiệu suất điều khiển giao lộ đơn}
-Qua quá trình đánh giá 10 cấu hình DQN khác nhau, nghiên cứu đã xác định được mô
-hình \textbf{Balanced} là tối ưu nhất với:
+\subsection{Hệ thống DQN Single-Agent hiệu quả}
+Nghiên cứu đã chứng minh thành công khả năng áp dụng DQN cho điều khiển giao lộ đơn:
 \begin{itemize}
-    \item Cải thiện 14.3\% thời gian chờ đợi so với hệ thống cơ sở (baseline) chưa tối ưu
-
-    \item Giảm 10.5\% độ dài hàng đợi trung bình
-
-    \item Duy trì tính ổn định cao trong quá trình huấn luyện
-
-    \item Chứng minh tính khả thi của DQN trong điều khiển giao thông
+    \item \textbf{Hiệu suất cao:} Cải thiện 14.3\% thời gian chờ và giảm 10.5\% độ dài hàng đợi so với hệ thống cố định
+    \item \textbf{Ổn định huấn luyện:} Đạt được độ ổn định cao trong quá trình huấn luyện với mô hình Balanced
+    \item \textbf{Khả năng triển khai:} Tạo ra nền tảng vững chắc cho phát triển hệ thống đa tác nhân
 \end{itemize}
 
-\subsubsection{Phát triển thành công Tác nhân Đồng bộ (Sync Agent)}
-Phát triển hoàn toàn thành công Tác nhân Đồng bộ (Sync Agent) - đóng góp khoa học chính của nghiên cứu:
+\subsection{Sync Agent System - Đóng góp khoa học chính}
+Phát triển thành công hệ thống điều phối đa giao lộ với kiến trúc phân tầng DQN-SAC:
 \begin{itemize}
-    \item \textbf{Điều phối đa giao lộ:} Thành công đạt được cải thiện 27.0\%
-        trong thời gian chờ đợi so với hệ thống cơ sở, vượt trội 12.6\% so với giao lộ đơn
-
-    \item \textbf{Triển khai (deployment) sẵn sàng sản xuất:} 5 mô hình TensorFlow chuyên biệt 
-        được tối ưu cho các điều kiện giao thông khác nhau
-
-    \item \textbf{Đạt được ổn định huấn luyện:} Giải quyết hoàn toàn các vấn đề mất ổn định
-        với hội tụ (convergence) nhất quán trong 150 tập huấn luyện
-
-    \item \textbf{Ý nghĩa thống kê (statistical significance):} Tất cả cải thiện có p < 0.001 với
-        kiểm thử toàn diện
+    \item \textbf{Hiệu suất vượt trội:} Đạt 27.0\% cải thiện thời gian chờ và 23.2\% giảm hàng đợi, vượt trội 12.6\% so với giao lộ đơn
+    \item \textbf{Kiến trúc sáng tạo:} Kết hợp DQN (điều khiển cục bộ) với SAC (điều phối toàn cục) trong kiến trúc phân tầng
+    \item \textbf{Sẵn sàng triển khai:} 5 mô hình TensorFlow chuyên biệt được tối ưu cho các điều kiện giao thông khác nhau
 \end{itemize}
 
-\subsubsection{Nghiên cứu phân tích độ phức tạp giao thông}
-Nghiên cứu phân tích tác động độ phức tạp giao thông đến hiệu suất DQN:
+\subsection{Phân tích độ phức tạp giao thông}
+Nghiên cứu đầu tiên phân tích định lượng mối quan hệ giữa độ phức tạp giao thông và hiệu suất DQN:
 \begin{itemize}
-    \item \textbf{Tương quan nghịch đảo mạnh:} r = -0.94 giữa lưu lượng giao thông và
-        tỷ lệ thành công tối ưu hóa
-
-    \item \textbf{Phạm vi cải thiện:} Từ 12.4\% (giờ cao điểm) đến 34.5\% (mật độ giao thông thấp)
-
-    \item \textbf{Hướng dẫn triển khai dựa trên bằng chứng:} Framework (framework) hoàn chỉnh cho
-        triển khai thực tế với kỳ vọng thực tế
-
-    \item \textbf{Kiến trúc mô hình chuyên biệt:} Các mô hình chuyên dụng cho từng
-        mức độ phức tạp giao thông
+    \item \textbf{Tương quan mạnh:} Xác định mối tương quan nghịch đảo r = -0.94 giữa lưu lượng giao thông và hiệu suất tối ưu hóa
+    \item \textbf{Framework triển khai:} Cung cấp hướng dẫn thực tế với kỳ vọng hiệu suất từ 12.4\% (cao điểm) đến 34.5\% (giao thông thấp)
+    \item \textbf{Mô hình chuyên biệt:} Phát triển các mô hình chuyên dụng cho từng mức độ phức tạp giao thông
 \end{itemize}
 
-\subsubsection{Hệ thống sẵn sàng triển khai}
-Nghiên cứu đã phát triển một hệ thống hoàn chỉnh sẵn sàng triển khai:
-\begin{itemize}
-    \item Quy trình (pipeline) triển khai tự động với xác thực (validation) và giám sát (monitoring)
-
-    \item Theo dõi hiệu suất thời gian thực (real-time) và hệ thống cảnh báo
-
-    \item Khả năng chịu lỗi với cơ chế dự phòng tự động
-
-    \item Quản lý cấu hình toàn diện
-\end{itemize}
-
-\subsection{Đóng góp khoa học}
-
-\subsubsection{Về mặt lý thuyết}
-\begin{enumerate}
-    \item \textbf{Hàm thưởng cực kỳ ổn định:} Phát triển hàm thưởng mới dựa
-        trên so sánh hiệu suất dài hạn, đảm bảo độ ổn định huấn luyện trong điều phối đa tác nhân
-
-    \item \textbf{Kiến trúc đa tác nhân phân cấp:} Thiết kế kiến trúc
-        phân tầng hiệu quả kết hợp DQN và SAC cho bài toán điều phối giao thông
-
-    \item \textbf{Phương pháp luận huấn luyện lai:} Phương pháp huấn luyện lai
-        kết hợp dữ liệu tổng hợp (synthetic data) và dữ liệu thời gian thực
-\end{enumerate}
-
-\subsubsection{Về mặt kỹ thuật}
-\begin{enumerate}
-    \item \textbf{Tối ưu hóa siêu tham số có hệ thống:} Phương pháp tối ưu
-        tham số có hệ thống cho ứng dụng điều khiển giao thông
-
-    \item \textbf{Framework phân tích độ ổn định huấn luyện:} Bộ chỉ số (metrics) và công cụ để
-        đánh giá tính ổn định huấn luyện
-
-    \item \textbf{Tự động hóa triển khai sản xuất:} Quy trình hoàn chỉnh từ
-        huấn luyện đến triển khai và giám sát
-\end{enumerate}
-
-\subsection{Kết quả so sánh với các phương pháp hiện tại}
-
-\begin{table}[!htp]
-    \centering
-    \caption{Tổng hợp so sánh hiệu suất với các phương pháp khác}
-    \label{tab:final_comparison}
-    \resizebox{\textwidth}{!}{%
-    \begin{tabular}{@{}lccccc@{}}
-        \toprule 
-        \textbf{Phương pháp} & 
-        \textbf{Thời gian chờ} & 
-        \textbf{Độ dài hàng đợi} & 
-        \textbf{Chất lượng đồng bộ} & 
-        \textbf{Trạng thái} & 
-        \textbf{Nguồn} \\
-        \midrule 
-        Fixed-time Control & 
-        Đường cơ sở & 
-        Đường cơ sở & 
-        Không có & 
-        Ổn định & 
-        \cite{MultiAgentRL2025} \\
-        \midrule
-        Actuated Control & 
-        Giảm ~1.98\% & 
-        Giảm ~10\% & 
-        Hạn chế (phản ứng cục bộ) & 
-        Ổn định & 
-        \cite{MultiAgentRL2025,AdaptiveVsActuated2025} \\
-        \midrule
-        SCOOT & 
-        Cải thiện ~12-20\% & 
-        Giảm ~24.2\% & 
-        Có (phối hợp mạng lưới) & 
-        Triển khai rộng rãi & 
-        \cite{AnaheimTraffic2025,SCOOTYunex,SCOOTIncidents2004} \\
-        \midrule
-        SCATS & 
-        Cải thiện ~16-42\% & 
-        Giảm ~35\% & 
-        Có (phối hợp động) & 
-        Triển khai rộng rãi & 
-        \cite{SCOOTSCATSEvaluation2008,AdaptiveTrafficSignals2010} \\
-        \midrule
-        DQN Single Agent & 
-        \textbf{Cải thiện +14.3\%} & 
-        \textbf{Giảm +10.5\%} & 
-        Không có & 
-        Đã xác thực & 
-        Nghiên cứu này \\
-        \midrule
-        \textbf{Sync Agent System} & 
-        \textbf{Cải thiện +27.0\%} & 
-        \textbf{Giảm +23.2\%} & 
-        \textbf{Xuất sắc} & 
-        \textbf{Sẵn sàng triển khai} & 
-        \textbf{Nghiên cứu này} \\
-        \bottomrule
-    \end{tabular}%
-    }
-\end{table}
 
 
-
-\subsection{Tác động thực tiễn}
-
-\subsubsection{Lợi ích kinh tế}
-\begin{itemize}
-    \item Giảm 15-20\% tiêu thụ nhiên liệu do ít dừng xe và khởi động lại
-
-    \item Tăng 30.8\% throughput sử dụng hạ tầng giao thông hiện có
-
-    \item Giảm chi phí bảo trì nhờ tối ưu hóa chu kỳ đèn tín hiệu
-\end{itemize}
-
-\subsubsection{Lợi ích môi trường}
-\begin{itemize}
-    \item Giảm 15-25\% khí thải CO2 nhờ lưu thông mượt mà
-
-    \item Giảm ô nhiễm tiếng ồn do ít phanh và tăng tốc đột ngột
-
-    \item Cải thiện chất lượng không khí đô thị
-\end{itemize}
-
-\subsubsection{Lợi ích xã hội}
-\begin{itemize}
-    \item Giảm 38.6\% thời gian chờ đợi, cải thiện trải nghiệm người dùng
-
-    \item Tăng độ tin cậy và dự đoán được của hệ thống giao thông
-
-    \item Giảm stress và tăng an toàn giao thông
-\end{itemize}
-
-\section{Hạn chế}
-
-Trong quá trình thực hiện khóa luận này, nghiên cứu đã gặp phải một số hạn chế
-quan trọng:
+\section{Hạn chế và hướng phát triển}
 
 \subsection{Hạn chế hiện tại}
 \begin{itemize}
-    \item         \textbf{Xác thực thế giới thực:} Mặc dù có kết quả mô phỏng tốt, vẫn cần
-        xác thực với dữ liệu giao thông thực tế để xác nhận hiệu suất sản xuất
-
-    \item \textbf{Xác thực quy mô:} Đã chứng minh với 4 giao lộ, cần xác thực
-        với mạng lưới lớn hơn (8-12 giao lộ) để xác nhận khả năng mở rộng
-
-    \item \textbf{Xử lý trường hợp đặc biệt:} Chưa kiểm thử toàn diện với thời tiết khắc nghiệt,
-        tai nạn, hoặc các kịch bản khẩn cấp
-
-    \item \textbf{Xác thực kinh tế:} Cần các nghiên cứu thế giới thực để xác thực
-        dự báo chi phí-lợi ích đã tính toán
+    \item \textbf{Xác thực thực tế:} Cần kiểm thử với dữ liệu giao thông thực tế chất lượng cao
+    \item \textbf{Quy mô mở rộng:} Đã thử nghiệm với 4 giao lộ, cần mở rộng lên 8-12 giao lộ
+    \item \textbf{Điều kiện đặc biệt:} Chưa kiểm thử với thời tiết khắc nghiệt, tai nạn, sự kiện đặc biệt
 \end{itemize}
 
-\subsection{Hạn chế về dữ liệu và môi trường}
+\subsection{Hướng phát triển tương lai}
 \begin{itemize}
-    \item \textbf{Simulation limitations:} Môi trường mô phỏng chưa phản ánh đầy
-        đủ độ phức tạp của giao thông thực tế
-
-    \item \textbf{Real-world validation:} Chưa có cơ hội validation với dữ liệu
-        giao thông thực tế chất lượng cao
-
-    \item \textbf{Scale limitations:} Chỉ test với số lượng giao lộ hạn chế (2-4
-        intersections)
-
-    \item \textbf{Traffic pattern diversity:} Chưa test với đủ đa dạng các
-        pattern giao thông khác nhau
+    \item \textbf{Triển khai thí điểm:} Áp dụng hệ thống trong môi trường thực tế để xác thực hiệu suất
+    \item \textbf{Mở rộng quy mô:} Phát triển cho mạng lưới giao thông lớn hơn (10+ giao lộ)
+    \item \textbf{Tích hợp tính năng:} Thêm ưu tiên xe cứu thương, thích ứng thời tiết, điều phối người đi bộ
+    \item \textbf{Tối ưu đa mục tiêu:} Cân bằng hiệu suất, an toàn và tác động môi trường
 \end{itemize}
 
-\subsection{Hạn chế về phương pháp}
-\begin{itemize}
-    \item \textbf{Thiết kế hàm thưởng:} Hàm thưởng chưa được tối ưu hoàn toàn
-        cho điều phối đa tác nhân
+\section{Kết luận}
 
-    \item \textbf{Biểu diễn trạng thái:} Cách biểu diễn trạng thái cho đa giao lộ
-        vẫn cần cải thiện
+Nghiên cứu đã đạt được 3 đóng góp khoa học chính:
 
-    \item \textbf{Độ phức tạp không gian hành động:} Không gian hành động cho sync agent còn phức
-        tạp và khó tối ưu hóa
-
-    \item \textbf{Độ nhạy cảm của siêu tham số:} Hệ thống còn nhạy cảm với việc
-        lựa chọn siêu tham số
-\end{itemize}
-
-\subsection{Hạn chế về tài nguyên}
-\begin{itemize}
-    \item \textbf{Tài nguyên tính toán:} Hạn chế về tài nguyên tính toán để
-        huấn luyện các mô hình phức tạp
-
-    \item \textbf{Ràng buộc thời gian:} Thời gian nghiên cứu hạn chế không cho phép
-        khám phá sâu hơn
-
-    \item \textbf{Hạn chế phần cứng:} Thiếu phần cứng chuyên dụng để kiểm thử hiệu suất thời gian thực
-
-    \item \textbf{Truy cập dữ liệu:} Khó khăn trong việc tiếp cận dữ liệu giao thông
-        thực tế
-\end{itemize}
-
-\section{Hướng phát triển}
-
-\subsection{Validation và mở rộng quy mô}
-\begin{itemize}
-    \item \textbf{Chương trình thí điểm thế giới thực:} Triển khai các dự án thí điểm với
-        dữ liệu giao thông thực tế để xác thực kết quả mô phỏng trong môi trường sản xuất
-
-    \item \textbf{Mở rộng quy mô:} Mở rộng từ 4 lên 8-12 giao lộ để xác nhận
-        khả năng mở rộng của kiến trúc mô hình chuyên biệt
-
-    \item \textbf{Các kịch bản giao thông mở rộng:} Kiểm thử với thời tiết khắc nghiệt, tai nạn,
-        sự kiện đặc biệt dựa trên khung phân tích độ phức tạp giao thông đã thiết lập
-
-    \item \textbf{Xác thực liên thành phố:} Áp dụng mô hình và phương pháp luận cho
-        các môi trường đô thị khác nhau để kiểm thử tính tổng quát
-\end{itemize}
-
-\subsection{Xác thực và kiểm thử}
-\begin{itemize}
-    \item \textbf{Xác thực dữ liệu thế giới thực:} Tìm kiếm cơ hội kiểm thử với dữ liệu
-        giao thông thực tế chất lượng cao
-
-    \item \textbf{Kiểm thử quy mô lớn hơn:} Mở rộng kiểm thử với nhiều giao lộ hơn
-        (10-20 giao lộ)
-
-    \item \textbf{Các mẫu giao thông đa dạng:} Kiểm thử với các mẫu giao thông đa
-        dạng (giờ cao điểm, sự kiện, sự cố)
-
-    \item \textbf{Độ ổn định dài hạn:} Đánh giá hiệu suất trong thời gian dài (tuần/tháng)
-\end{itemize}
-
-\subsection{Cải tiến kỹ thuật}
-\begin{itemize}
-    \item \textbf{Reward function redesign:} Thiết kế lại hàm reward phù hợp hơn
-        cho multi-agent coordination
-
-    \item \textbf{Tối ưu hóa siêu tham số:} Cách tiếp cận có hệ thống để tìm
-        siêu tham số tối ưu
-
-    \item \textbf{Cải tiến kiến trúc mô hình:} Thử nghiệm các kiến trúc
-        khác nhau cho SAC agent
-
-    \item \textbf{Phương pháp luận huấn luyện:} Phát triển cách tiếp cận huấn luyện lai
-        hiệu quả hơn
-\end{itemize}
-
-\subsection{Mở rộng tính năng (sau khi ổn định)}
-\begin{itemize}
-    \item \textbf{Emergency vehicle priority:} Tự động ưu tiên cho xe cứu thương,
-        cảnh sát, cứu hỏa
-
-    \item \textbf{Weather adaptation:} Thích ứng với điều kiện thời tiết và
-        độ rõ của mặt đường
-
-    \item \textbf{Tích hợp điều phối người đi bộ:} Tích hợp điều phối tối ưu hóa cho người đi bộ
-
-
-    \item \textbf{Ưu tiên cho phương tiện công cộng:} Ưu tiên cho bus và tram
-\end{itemize}
-
-\subsection{Nghiên cứu dài hạn}
-\begin{itemize}
-    \item \textbf{Tối ưu đa mục tiêu:} Tối ưu đồng thời hiệu suất, an toàn,
-        và môi trường
-
-    \item \textbf{Explainable AI:} Phát triển khả năng giải thích quyết định của
-        hệ thống AI
-
-    \item \textbf{Hợp tác giữa con người và AI:} Tích hợp feedback từ các
-        người điều khiển giao thông
-
-    \item \textbf{Tập trung vào tính bền vững:} Tối ưu hóa tác động môi trường và
-        tiêu thụ năng lượng
-\end{itemize}
-
-\section{Kết luận tổng thể}
-
-Nghiên cứu này đã đạt được những thành tựu quan trọng và đồng thời xác định rõ những
-thách thức cần giải quyết:
-
-\subsection{Thành tựu đạt được}
 \begin{enumerate}
-    \item \textbf{DQN Single Agent thành công:} Đạt 14.3\% cải thiện so với baseline
-        với độ ổn định huấn luyện tốt, chứng minh tính khả thi của Học Tăng Cường Sâu (DQN)
+    \item \textbf{Chứng minh khả thi DQN:} Thành công áp dụng DQN cho điều khiển giao lộ đơn với hiệu suất 14.3\% cải thiện
 
-    \item \textbf{Sync Agent - Kết quả khả quan:} Đạt 27.0\% cải thiện
-        trong điều phối đa giao lộ, vượt trội 12.6\% so với giao lộ đơn (Single Intersection)
+    \item \textbf{Phát triển Sync Agent System:} Hệ thống điều phối đa giao lộ đạt 27.0\% cải thiện, vượt trội các phương pháp truyền thống
 
-    \item \textbf{Phân tích độ phức tạp giao thông:} Nghiên cứu       chứng minh mối tương quan nghịch đảo mạnh (r = -0.94) giữa lưu lượng giao thông và DQN
-
-    \item \textbf{Mô hình và pipeline triển khai:} 5 mô hình TensorFlow chuyên biệt
-        với tài liệu toàn diện sẵn sàng triển khai thực tế
-
-    \item \textbf{Framework triển khai:} Cung cấp kỳ vọng thực tế
-        từ giao thông thấp (34.5\% cải thiện) đến giờ cao điểm (12.4\% cải thiện)
+    \item \textbf{Framework phân tích độ phức tạp:} Nghiên cứu đầu tiên định lượng mối quan hệ giao thông-hiệu suất (r=-0.94) với hướng dẫn triển khai thực tế
 \end{enumerate}
 
-\subsection{Vượt qua thách thức ban đầu}
-\begin{enumerate}
-    \item \textbf{Giải quyết hoàn toàn thách thức Sync Agent:} Từ tính không ổn định huấn luyện
-        đến hệ thống sẵn sàng sản xuất với ý nghĩa thống kê (p < 0.001)
-
-    \item \textbf{Trực quan hóa thống nhất:} Phát triển cách tiếp cận cho phép so sánh trực tiếp tất cả các mẫu học giao lộ
-
-    \item \textbf{Xác thực toàn diện:} Bằng chứng thống kê với phân tích tương quan
-        và các mẫu hiệu suất trên 4 mức độ phức tạp giao thông
-
-    \item \textbf{Khả năng áp dụng thực tế:} Framework có thể triển khai ngay với
-        hướng dẫn rõ ràng cho các điều kiện giao thông khác nhau
-\end{enumerate}
-
-\subsection{Đóng góp khoa học}
-Nghiên cứu đã đóng góp vào lĩnh vực intelligent transportation systems thông qua:
-\begin{itemize}
-    \item \textbf{Proof of concept:} Chứng minh tính khả thi của DQN cho single
-        intersection control
-
-    \item \textbf{Multi-agent framework:} Thiết kế và implement framework cho điều phối đa giao lộ
-
-    \item \textbf{Xác định vấn đề:} Xác định và ghi nhận các thách thức
-        thực tế trong việc áp dụng RL cho điều khiển giao thông
-
-    \item \textbf{Phát triển phương pháp luận:} Phát triển cách tiếp cận có hệ thống cho
-        gỡ lỗi hệ thống AI phức tạp
-\end{itemize}
-
-\subsection{Tác động và ý nghĩa}
-\begin{itemize}
-    \item \textbf{Nền tảng nghiên cứu:} Tạo nền tảng vững chắc cho các nghiên
-        cứu tiếp theo về multi-agent traffic control
-
-    \item \textbf{Góc nhìn thực tế:} Cung cấp góc nhìn về
-        thách thức thực tế khi triển khai hệ thống RL
-
-    \item \textbf{Đóng góp kỹ thuật:} Đóng góp các giải pháp kỹ thuật và thực hành tốt nhất
-        cho cộng đồng
-
-    \item \textbf{Hướng tương lai:} Xác định rõ ràng hướng nghiên cứu cần
-        thiết để đạt được hệ thống sẵn sàng sản xuất
-\end{itemize}
-
-\subsection{Đánh giá thực tế}
-Nghiên cứu hiện tại đã đạt được các kết quả sau:
-\begin{itemize}
-    \item Thành công trong việc điều khiển giao lộ đơn (sử dụng thuật toán DQN).
-    \item Xây dựng hoàn chỉnh khung kỹ thuật (technical framework) cho hệ thống.
-    \item Xác định và ghi nhận các thách thức quan trọng.
-\end{itemize}
-Tuy nhiên, cần có những cải thiện và thử nghiệm thêm:
-\begin{itemize}
-    \item Cải thiện độ ổn định huấn luyện (training stability) của Agent đồng bộ (Sync Agent).
-    \item Cần xác thực với dữ liệu thực tế chất lượng cao.
-    \item Cần kiểm thử khả năng mở rộng (scale testing) với nhiều giao lộ hơn.
-\end{itemize}
-
-Với nền tảng kỹ thuật vững chắc và sự hiểu biết rõ ràng về các thách thức, nghiên cứu
-này tạo ra một điểm khởi đầu có giá trị cho việc phát triển hệ thống quản lý giao thông thông minh
-trong tương lai. Sự trung thực trong việc báo cáo cả
-thành tựu và hạn chế đảm bảo tính khoa học và cung cấp lộ trình rõ ràng
-cho các nghiên cứu tiếp theo.
+Hệ thống đã sẵn sàng cho giai đoạn triển khai thí điểm với 5 mô hình chuyên biệt và tài liệu kỹ thuật hoàn chỉnh. Nghiên cứu tạo nền tảng vững chắc cho phát triển hệ thống giao thông thông minh tương lai với hiệu suất vượt trội và khả năng mở rộng thực tế.
