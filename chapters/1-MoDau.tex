@@ -1,36 +1,84 @@
 \section{Lý do chọn đề tài}
 
-Trong bối cảnh đô thị hóa nhanh chóng tại Thành phố Hồ Chí Minh, hệ thống giao thông đang đối mặt với những thách thức nghiêm trọng:
-
-\begin{itemize}
-    \item Số lượng phương tiện tăng nhanh (9,4 triệu phương tiện vào tháng 11/2024)
-    \item Tình trạng ùn tắc giao thông gia tăng (tăng 17\% tại khu trung tâm)
-    \item Ô nhiễm môi trường nghiêm trọng (13 triệu tấn CO$_2$ mỗi năm)
-    \item Mức độ ô nhiễm không khí cao gấp 4 lần tiêu chuẩn WHO
-\end{itemize}
-
-Các phương pháp điều khiển giao thông truyền thống không còn phù hợp, do đó việc nghiên cứu các giải pháp công nghệ tiên tiến như \ac{drl} là hết sức cần thiết.
-
+Sự gia tăng nhanh chóng của phương tiện giao thông trên đường đã dẫn đến nhiều thách
+thức nghiêm trọng như tắc nghẽn giao thông, vấn đề an toàn và tác động tiêu cực
+đến môi trường. Điều khiển tín hiệu giao thông đóng vai trò quan trọng trong việc
+giải quyết các thách thức này thông qua việc cải thiện an toàn giao thông đường bộ,
+giảm thiểu tắc nghẽn và giảm khí thải từ phương tiện. Theo truyền thống, hệ
+thống điều khiển đèn giao thông dựa trên phương pháp thời gian cố định sử dụng
+phương pháp Webster, dựa vào dữ liệu giao thông lịch sử để xác định thời gian tín
+hiệu cố định, không thay đổi theo điều kiện giao thông thực tế. Các hệ thống điều
+khiển biến động cung cấp sự linh hoạt hơn bằng cách điều chỉnh thời gian tín hiệu
+dựa trên sự hiện diện của phương tiện theo thời gian thực, nhưng vẫn phụ thuộc
+vào kế hoạch thời gian được xác định trước. Hệ thống điều khiển tín hiệu giao thông
+thích ứng - \ac{atsc} đã xuất hiện như một giải pháp hiệu quả hơn bằng cách điều
+chỉnh thời gian tín hiệu theo thời gian thực để thích ứng với nhu cầu giao thông
+động. Các hệ thống ATSC truyền thống như \ac{scats} và \ac{scoot} đã chứng minh hiệu
+quả, nhưng vẫn bị hạn chế bởi việc phụ thuộc vào thời gian cài đặt trước và các
+mô hình giao thông đơn giản hóa. Để khắc phục những hạn chế này, phương pháp \ac{drl}
+đã được đề xuất. Khác với các phương pháp truyền thống, \ac{drl} không yêu cầu
+kiến thức trước về các kịch bản giao thông cụ thể mà học hỏi chính sách tối ưu
+thông qua tương tác liên tục với môi trường giao thông. Các hệ thống \ac{atsc}
+dựa trên \ac{drl} được phát triển chủ yếu để giải quyết tình trạng ùn tắc giao thông
+và tối ưu thời gian chờ của các phương tiện tham gia giao thông.
 \section{Mục tiêu, đối tượng và phạm vi nghiên cứu}
 \subsection{Mục tiêu nghiên cứu}
+Mục tiêu nghiên cứu của đề tài bao gồm:
+\begin{itemize}
+    \item Tích hợp thuật toán nhận diện vật thể \ac{yl} vào hệ thống camera để
+        thu thập các dữ liệu cần thiết cho mô hình \ac{drl}
 
+    \item Xây dựng mô hình \ac{drl} điều khiển đèn giao thông thông minh, có khả
+        năng điều phối hiệu quả với các điều kiện giao thông khác nhau
+
+    \item Xây dựng giao diện để người quản lý có thể chủ động điều phối và theo dõi
+        luồng giao thông
+\end{itemize}
 
 \subsection{Đối tượng nghiên cứu}
+\begin{itemize}
+    \item Hệ thống điều khiển đèn giao thông
 
+    \item Thuật toán học tăng cường \ac{drl}
 
+    \item Thuật toán nhận diện vật thể \ac{yl}
+
+    \item Môi trường giả lập giao đông đô thị - \ac{sumo}
+\end{itemize}
 \subsection{Phạm vi nghiên cứu}
 
-
 \section{Phương pháp nghiên cứu}
-
+Phương pháp nghiên cứu của nhóm là sử dụng môi trường giả lập giao thông đô thị \ac{sumo}
+từ dữ liệu thu thập được từ hệ thống camera tại các giao lộ được tích hợp thuật
+toán nhận diện vật thể \ac{yl}. Ngoài ra, nhóm cũng sử dụng môi trường giả lập \ac{sumo}
+làm môi trường huấn luyện cho mô hình \ac{drl}. Tiếp theo, nhóm sẽ tiến hành với
+2 kịch bản kịch bản. Trong kịch bản nghiên cứu đầu tiên, nhóm nghiên cứu tập trung
+vào việc giả lập môi trường giao thông tại một giao lộ và tiến hành so sánh phương
+pháp sử dụng mô hình \ac{drl} với phương pháp điều khiển truyền thống. Ngoài ra,
+kịch bản này còn được dùng để kiểm chứng tính hiệu quả của quá trình mô phỏng dữ
+liệu từ môi trường giao thông thực tế sang môi trường giả lập thông qua thuật
+toán nhận diện vật thể \ac{yl}. Trong kịch bản thứ hai, nhóm sẽ triển khai trên 4
+giao lộ có liên kết với nhau. Mỗi giao lộ sẽ hoạt động tương tự như trong kịch
+bản thứ nhất tuy nhiên sẽ có một server trung tâm thực hiện để trao đổi thông
+tin giữa các agent và cung cấp một giao diện quản lý cho người dùng có thể quan
+sát tình trạng của các Agent.
 
 \section{Cấu trúc Khoá luận tốt nghiệp}
-\label{sec:CauTruc}
-Khóa luận được trình bày bao gồm 5 chương. Nội dung của tóm tắt từng chương được trình bày như sau:
+\label{sec:CauTruc} Khóa luận được trình bày bao gồm 5 chương. Nội dung của tóm tắt
+từng chương được trình bày như sau:
 \begin{itemize}
-    \item \textbf{Chương 1: Mở đầu}: Thông tin tổng quan về đề tài mà chúng tôi đã thực hiện
-    \item \textbf{Chương 2: Cơ sở lý thuyết}: Các thông tin về định nghĩa, cơ sở lý thuyết liên quan tới các thành phần trong đề tài
-    \item \textbf{Chương 3: Phương pháp thực hiện}: Mô tả các mô hình, quy trình và các phương pháp thực hiện
-    \item \textbf{Chương 4: Thực nghiệm, đánh gía và thảo luận}:Trình bày các bước thực hiện đề tài qua đó đưa ra đánh dựa trên kết quả đạt được 
-    \item \textbf{Chương 5: Kết luận và định hướng phát triển}:Đưa ra kết luận từ các đánh giá và định hướng phát triển cho đề tài
+    \item \textbf{Chương 1: Mở đầu}: Thông tin tổng quan về đề tài mà chúng tôi đã
+        thực hiện
+
+    \item \textbf{Chương 2: Cơ sở lý thuyết}: Các thông tin về định nghĩa, cơ sở
+        lý thuyết liên quan tới các thành phần trong đề tài
+
+    \item \textbf{Chương 3: Phương pháp thực hiện}: Mô tả các mô hình, quy trình
+        và các phương pháp thực hiện
+
+    \item \textbf{Chương 4: Thực nghiệm, đánh gía và thảo luận}:Trình bày các
+        bước thực hiện đề tài qua đó đưa ra đánh dựa trên kết quả đạt được
+
+    \item \textbf{Chương 5: Kết luận và định hướng phát triển}:Đưa ra kết luận
+        từ các đánh giá và định hướng phát triển cho đề tài
 \end{itemize}
