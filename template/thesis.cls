@@ -316,44 +316,42 @@ sorting=none, bibencoding=utf8, natbib=true, maxbibnames=99]{biblatex}
 
 \def\afterpreface{
     \pagestyle{customfancy}
-
-    \newpage
+    
+    \cleardoublepage
     \phantomsection
     \addcontentsline{toc}{chapter}{Thông tin hội đồng bảo vệ khóa luận}
     \input{chapters/council}
 
-    \newpage
+    \cleardoublepage
     \phantomsection
     \addcontentsline{toc}{chapter}{Lời cảm ơn}
     \input{chapters/ack.tex}
 
-    \newpage
+    \cleardoublepage
     \phantomsection
     \addcontentsline{toc}{chapter}{Tóm tắt}
     \input{chapters/abstract.tex}
 
-    \newpage
+    \cleardoublepage
     \phantomsection
 	\addcontentsline{toc}{chapter}{\contentsname}
 	\tableofcontents
+	\clearpage
 
-
-
-    \newpage
     \phantomsection
 	\addcontentsline{toc}{chapter}{\listtablename}
     \iftablespage
         \listoftables
     \fi
+    \clearpage
  
-    \newpage
     \phantomsection
 	\addcontentsline{toc}{chapter}{\listfigurename}
     \iffigurespage
         \listoffigures
     \fi
+    \clearpage
     
-    \newpage
     \phantomsection
     \addcontentsline{toc}{chapter}{\abbrevname}
     \printacronyms[name=\abbrevname]
