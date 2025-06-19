@@ -444,20 +444,20 @@ Chế độ này sử dụng synthetic data generator để tạo ra dữ liệu
 % \end{algorithm}
 
 \begin{algorithm}[!htp]
-    \caption{Synthetic Data Generation}
-    \begin{algorithmic}
-        \State \textbf{Input:} config\_parameters
-        \State base\_volume = config['base\_traffic\_volume'] 
-        \State time\_factor = $\sin(\frac{\text{current\_time}}{period\_length} \times 2\pi)$
-        \State traffic\_volume = base\_volume $\times$ (1 + amplitude $\times$ time\_factor) 
+    \caption{Sinh dữ liệu tổng hợp}
+    \begin{algorithmic}[1]
+        \State \textbf{Đầu vào:} config\_parameters
+        \State base\_volume $\leftarrow$ config['base\_traffic\_volume'] 
+        \State time\_factor $\leftarrow$ $\sin(\frac{\text{current\_time}}{period\_length} \times 2\pi)$
+        \State traffic\_volume $\leftarrow$ base\_volume $\times$ (1 + amplitude $\times$ time\_factor) 
         
-        \For{each intersection $i$}
-            \State waiting\_time[$i$] = generate\_waiting\_time(traffic\_volume, intersection\_config[$i$])
-            \State queue\_length[$i$] = generate\_queue\_length(traffic\_volume, intersection\_config[$i$])
-            \State speed[$i$] = uniform\_random(25.0, 45.0) \Comment{Urban speed range}
+        \For{mỗi giao lộ $i$}
+            \State waiting\_time[$i$] $\leftarrow$ generate\_waiting\_time(traffic\_volume, intersection\_config[$i$])
+            \State queue\_length[$i$] $\leftarrow$ generate\_queue\_length(traffic\_volume, intersection\_config[$i$])
+            \State speed[$i$] $\leftarrow$ uniform\_random(25.0, 45.0) \Comment{Phạm vi tốc độ đô thị}
         \EndFor 
         
-        \Return intersection\_data
+        \State \Return intersection\_data
     \end{algorithmic}
 \end{algorithm}
 
@@ -603,29 +603,29 @@ Hệ thống sử dụng kiến trúc hierarchical với:
 % \end{algorithm}
 
 \begin{algorithm}[!htp]
-    \caption{Multi-Agent Communication Protocol}
+    \caption{Giao thức truyền thông đa tác nhân}
     \begin{algorithmic}[1] 
-        \State \textbf{For each timestep:}
+        \State \textbf{Với mỗi bước thời gian:}
         
-        \State \textbf{Phase 1: Data Collection}
-        \For{each intersection\_agent $i$} 
-            \State local\_metrics[$i$] = collect\_local\_metrics($i$)
+        \State \textbf{Giai đoạn 1: Thu thập dữ liệu}
+        \For{mỗi intersection\_agent $i$} 
+            \State local\_metrics[$i$] $\leftarrow$ collect\_local\_metrics($i$)
             \State send\_to\_central\_server(local\_metrics[$i$]) 
         \EndFor
         
-        \State \textbf{Phase 2: Sync Coordination}
-        \State global\_state = aggregate\_all\_metrics()
-        \State sync\_action = sync\_agent.predict(global\_state) 
-        \State coordination\_signals = compute\_offsets(sync\_action)
+        \State \textbf{Giai đoạn 2: Điều phối đồng bộ}
+        \State global\_state $\leftarrow$ aggregate\_all\_metrics()
+        \State sync\_action $\leftarrow$ sync\_agent.predict(global\_state) 
+        \State coordination\_signals $\leftarrow$ compute\_offsets(sync\_action)
         
-        \State \textbf{Phase 3: Action Execution} 
-        \For{each intersection\_agent $i$} 
-            \State local\_action[$i$] = local\_agent[$i$].predict(local\_state[$i$]) 
+        \State \textbf{Giai đoạn 3: Thực thi hành động} 
+        \For{mỗi intersection\_agent $i$} 
+            \State local\_action[$i$] $\leftarrow$ local\_agent[$i$].predict(local\_state[$i$]) 
             \State apply\_coordination(local\_action[$i$], coordination\_signals[$i$]) 
             \State execute\_action(local\_action[$i$]) 
         \EndFor
     \end{algorithmic}
-\end{algorithm}
+\end{algorithm>
 
 \subsubsection{Thiết lập môi trường giả lập}
 \begin{itemize}
