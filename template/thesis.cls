@@ -336,24 +336,22 @@ sorting=none, bibencoding=utf8, natbib=true, maxbibnames=99]{biblatex}
     \phantomsection
 	\addcontentsline{toc}{chapter}{\contentsname}
 	\tableofcontents
+	\clearpage
 
-
-
-    \newpage
     \phantomsection
 	\addcontentsline{toc}{chapter}{\listtablename}
     \iftablespage
         \listoftables
     \fi
+    \clearpage
  
-    \newpage
     \phantomsection
 	\addcontentsline{toc}{chapter}{\listfigurename}
     \iffigurespage
         \listoffigures
     \fi
+    \clearpage
     
-    \newpage
     \phantomsection
     \addcontentsline{toc}{chapter}{\abbrevname}
     \printacronyms[name=\abbrevname]
