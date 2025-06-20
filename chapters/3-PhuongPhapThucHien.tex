@@ -1,5 +1,53 @@
 Chương này tập trung vào việc mô tả hệ thống điều khiển đèn giao thông thông minh sử dụng thuật toán học tăng cường sâu (\ac{drl}). Hệ thống sẽ được huấn luyện và đánh giá trong môi trường giả lập \ac{sumo}, với dữ liệu đầu vào có thể được thu thập từ thực tế thông qua các camera tích hợp thuật toán nhận diện vật thể \ac{yl}.
 
+\section{Kiến trúc tổng thể hệ thống}
+Để có cái nhìn toàn diện về hệ thống điều khiển đèn giao thông thông minh, trước tiên, chúng ta cần tìm hiểu kiến trúc tổng thể của nó. Hệ thống này được thiết kế theo mô hình phân tầng, cho phép khả năng mở rộng linh hoạt từ việc điều khiển một giao lộ đơn lẻ đến việc điều phối đồng bộ nhiều giao lộ cùng lúc.
+
+\subsection{Kiến trúc tổng quan}
+
+\begin{figure*}[!htp]
+    \centering
+    \includegraphics[width=\textwidth]{img/overview_architecture.png}
+    \caption{Kiến trúc tổng quan hệ thống điều khiển đèn giao thông thông minh}
+    \label{fig:overview_architecture}
+\end{figure*}
+
+Hình \ref{fig:overview_architecture} thể hiện kiến trúc tổng quan của hệ thống,
+bao gồm các thành phần chính:
+
+\begin{itemize}
+    \item \textbf{Lớp thu thập dữ liệu:} Thu thập dữ liệu từ camera và sensors
+
+    \item \textbf{Lớp xử lý:} Xử lý dữ liệu và nhận diện đối tượng
+
+    \item \textbf{Lớp quyết định:} Các agent AI ra quyết định điều khiển
+
+    \item \textbf{Lớp đồng bộ:} Đồng bộ hóa giữa các giao lộ
+
+    \item \textbf{Lớp điều khiển:} Điều khiển đèn giao thông thực tế
+\end{itemize}
+
+\subsection{Kiến trúc chi tiết hệ thống}
+
+\begin{figure*}[!htp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/detailed_architecture.png}
+    \caption{Kiến trúc chi tiết hệ thống với các thành phần}
+    \label{fig:detailed_architecture}
+\end{figure*}
+
+Mô tả chi tiết các thành phần và luồng dữ liệu trong hệ thống:
+
+\begin{enumerate}
+    \item \textbf{Lớp thiết bị:} Thu thập video từ các camera giám sát giao thông
+    \item \textbf{Lớp xử lý biên}
+    \begin{itemize}
+        \item \textbf{Nhận diện phương tiện tham gia giao thông:} Dữ liệu video sẽ được dùng để nhận diện các phương tiện tham gia giao thông cũng như xác định khoảng cách và làn đường mà phương tiện đang di chuyển
+        \item \textbf{Các tác nhân DQN :} Các tác nhân ngoài việc điều khiển đèn tín hiệu từng giao lộ thì còn có nhiệm vụ nhận các thông tin từ YOLO và giả lập tình trạng giao thông tại nút giao. Sau đó, gửi các thông tin cần thiết đến centtral server để dự doán và ra quyết định 
+    \end{itemize}
+    \item \textbf{Central Server:} Thu thập từ các tác nhân và chạy các mô hình DQN và Sync Agent để ra quyết định. Đồng thời, cung cấp giao diện để quan sát và điều khiển
+\end{enumerate}
+
 \section{Phương pháp mô phỏng dữ liệu từ camera}
 \subsection{Mô hình nhận diện vật thể}
 Để phát hiện và nhận diện phương tiện trong các luồng video giao thông, sử dụng mô hình \textbf{YOLO11}, phiên bản mới nhất trong chuỗi mô hình phát hiện đối tượng thời gian thực của \textbf{Ultralytics}. YOLO11 mang đến những cải tiến đáng kể về kiến trúc và phương pháp huấn luyện, giúp nâng cao độ chính xác, tốc độ và hiệu quả so với các phiên bản tiền nhiệm.
@@ -232,63 +280,7 @@ Mô hình được huấn luyện sử dụng thuật toán tối ưu hóa Adam,
 
 Để mở rộng khả năng của hệ thống từ điều khiển giao lộ đơn lẻ sang điều khiển phối hợp nhiều giao lộ, nghiên cứu đã phát triển một thành phần Sync Agent sử dụng thuật toán \ac{sac}. Hệ thống này hoạt động như một lớp điều phối cấp cao, tối ưu hóa việc đồng bộ thời gian tín hiệu giữa các giao lộ để tạo ra "green wave" - hiệu ứng sóng xanh giúp xe cộ di chuyển liên tục qua nhiều giao lộ mà không phải dừng lại.
 
-\section{Kiến trúc tổng thể hệ thống}
-Để có cái nhìn toàn diện về hệ thống điều khiển đèn giao thông thông minh, trước tiên, chúng ta cần tìm hiểu kiến trúc tổng thể của nó. Hệ thống này được thiết kế theo mô hình phân tầng, cho phép khả năng mở rộng linh hoạt từ việc điều khiển một giao lộ đơn lẻ đến việc điều phối đồng bộ nhiều giao lộ cùng lúc.
-\subsection{Kiến trúc tổng quan}
 
-\begin{figure}[!htp]
-    \centering
-    \includegraphics[width=\textwidth]{img/overview_architecture.png}
-    \caption{Kiến trúc tổng quan hệ thống điều khiển đèn giao thông thông minh}
-    \label{fig:overview_architecture}
-\end{figure}
-
-Hình \ref{fig:overview_architecture} thể hiện kiến trúc tổng quan của hệ thống,
-bao gồm các thành phần chính:
-
-\begin{itemize}
-    \item \textbf{Lớp thu thập dữ liệu:} Thu thập dữ liệu từ camera và sensors
-
-    \item \textbf{Lớp xử lý:} Xử lý dữ liệu và nhận diện đối tượng
-
-    \item \textbf{Lớp quyết định:} Các agent AI ra quyết định điều khiển
-
-    \item \textbf{Lớp đồng bộ:} Đồng bộ hóa giữa các giao lộ
-
-    \item \textbf{Lớp điều khiển:} Điều khiển đèn giao thông thực tế
-\end{itemize}
-\newpage
-\subsection{Kiến trúc chi tiết hệ thống}
-
-\begin{figure}[!htp]
-    \centering
-    \includegraphics[width=0.7\textwidth]{img/detailed_architecture.png}
-    \caption{Kiến trúc chi tiết hệ thống với các thành phần}
-    \label{fig:detailed_architecture}
-\end{figure}
-
-Mô tả chi tiết các thành phần và luồng dữ liệu trong hệ thống:
-
-\begin{enumerate}
-    \item \textbf{Lớp thiết bị:} Thu thập video từ các camera giám sát giao thông
-    \item \textbf{Lớp xử lý biên}
-    \begin{itemize}
-        \item \textbf{Nhận diện phương tiện tham gia giao thông:} Dữ liệu video sẽ được dùng để nhận diện các phương tiện tham gia giao thông cũng như xác định khoảng cách và làn đường mà phương tiện đang di chuyển
-        \item \textbf{Các tác nhân DQN :} Các tác nhân ngoài việc điều khiển đèn tín hiệu từng giao lộ thì còn có nhiệm vụ nhận các thông tin từ YOLO và giả lập tình trạng giao thông tại nút giao. Sau đó, gửi các thông tin cần thiết đến centtral server để dự doán và ra quyết định 
-    \end{itemize}
-    \item \textbf{Central Server:} Thu thập từ các tác nhân và chạy các mô hình DQN và Sync Agent để ra quyết định. Đồng thời, cung cấp giao diện để quan sát và điều khiển
-\end{enumerate}
-
-% \subsection{Kiến trúc codebase}
-
-% Hình \ref{fig:codebase_architecture} thể hiện cách tổ chức code và các module trong hệ thống, giúp hiểu rõ cấu trúc implementation và mối quan hệ giữa các thành phần.
-
-% \begin{figure}[!htp]
-%     \centering
-%     \includegraphics[width=\textwidth]{img/codebase_architecture.drawio.png}
-%     \caption{Kiến trúc codebase và tổ chức module}
-%     \label{fig:codebase_architecture}
-% \end{figure}
 
 \section{Thiết kế hệ thống đồng bộ hóa giao lộ (Sync Agent)}
 
