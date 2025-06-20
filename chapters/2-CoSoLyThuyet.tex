@@ -23,7 +23,15 @@ hoạch tín hiệu (Thế hệ 2), và các hệ thống điều khiển thời
 trên chu kỳ cố định (Thế hệ 3).
 
 \subsection{Nguyên lý hoạt động}
-Về cơ bản, \ac{atsc} hoạt động theo một vòng lặp gồm ba bước chính:
+Về cơ bản, \ac{atsc} hoạt động theo một vòng lặp gồm ba bước chính được minh họa trong Hình \ref{fig:atsc_operation}:
+
+\begin{figure*}[!htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/atsc_operation_diagram.png}
+    \caption{Sơ đồ nguyên lý hoạt động của hệ thống ATSC}
+    \label{fig:atsc_operation}
+\end{figure*}
+
 \begin{enumerate}
     \item \textbf{Thu thập dữ liệu (Data Collection):} Các cảm biến được lắp đặt
         tại các vị trí chiến lược trên mạng lưới đường phố để thu thập dữ liệu
@@ -46,7 +54,7 @@ Về cơ bản, \ac{atsc} hoạt động theo một vòng lặp gồm ba bước
         đèn tín hiệu tại các nút giao để thực thi. Vòng lặp này được lặp lại liên
         tục, cho phép hệ thống liên tục "thích ứng" với sự thay đổi của luồng
         giao thông.
-\end{enumerate}
+\end{enumerate>
 
 \subsection{Các hệ thống tiêu biểu đã được triển khai}
 Trên thế giới, có nhiều hệ thống \ac{atsc} đã được thương mại hóa và triển khai
@@ -130,13 +138,12 @@ Một bài toán \ac{rl} điển hình được định nghĩa bởi các thành
 
 \subsubsection{Vòng lặp học tập}
 
-\begin{figure}[!htp]
+\begin{figure*}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{img/RL_components.png}
-    \caption{Vòng lặp học tập của RL \footnotemark{}}
+    \includegraphics[width=0.8\textwidth]{img/RL_components.png}
+    \caption{Vòng lặp học tập của Reinforcement Learning \cite{IBM2024}}
     \label{fig:RL-components}
-\end{figure}
-\footnotetext{{What is reinforcement learning? \url{https://www.ibm.com/think/topics/reinforcement-learning}}}
+\end{figure*}
 Quá trình học của \ac{rl} diễn ra theo một vòng lặp liên tục:
 
 \begin{enumerate}
