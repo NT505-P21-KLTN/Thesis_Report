@@ -55,13 +55,13 @@ Mô tả chi tiết các thành phần và luồng dữ liệu trong hệ thốn
 \begin{figure}[!htp]
     \centering
     \includegraphics[width=\textwidth]{img/yolo_models}
-    \caption{So sánh hiệu suất giữa các mô hình YOLO \cite{Ultralytics2024}}
+    \caption{So sánh hiệu suất giữa các mô hình \footnotemark[1]}
     \label{fig:yolo_models}
 \end{figure}
 Cụ thể, nghiên cứu này sử dụng mô hình đã được huấn luyện trước (pre-trained) có tên là \textbf{\texttt{yolov11s.pt}}. Đây là phiên bản thu nhỏ của YOLO11, được lựa chọn dựa trên các ưu điểm nổi bật sau:
 
 \begin{itemize}
-    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47.0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2.5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực \cite{Ultralytics2024}.
+    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47.0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2.5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực\footnote[1]{Ultralytics Documents: \url{https://docs.ultralytics.com/models/yolo11}}.
     \item \textbf{Kiến trúc hiệu quả:} YOLO11 được cải tiến về kiến trúc backbone và neck, giúp tăng cường khả năng trích xuất đặc trưng. Nhờ đó, các mô hình như YOLO11 đạt được độ chính xác cao hơn với số lượng tham số ít hơn, làm cho chúng hiệu quả hơn về mặt tính toán. Phiên bản \texttt{yolov11s.pt} chỉ có 9.4 triệu tham số.
     \item \textbf{Huấn luyện trên tập dữ liệu COCO:} Giống như các phiên bản trước, mô hình được huấn luyện sẵn trên tập dữ liệu COCO, bao gồm các lớp đối tượng giao thông quan trọng như \texttt{car}, \texttt{motorcycle}, \texttt{bus}, và \texttt{truck}. Điều này cho phép áp dụng mô hình trực tiếp vào bài toán mà không cần huấn luyện lại, giúp tiết kiệm thời gian và tài nguyên.
 \end{itemize}
@@ -206,23 +206,29 @@ bao gồm hai loại thông tin chính được lấy từ \ac{sumo} tại mỗi
 Việc kết hợp hai loại thông tin này cho phép agent có một cái nhìn toàn diện về
 tình hình giao thông tại giao lộ.
 
-\subsection{Thiết kế hành động (Action)}
-Không gian hành động của agent bao gồm việc lựa chọn một trong các pha đèn xanh
-đã được định nghĩa trước cho giao lộ. Trong mô hình này, có 4 hành động, tương ứng
-với 4 pha đèn xanh chính:
-\begin{enumerate}
-    \item \textbf{Hành động 0:} Kích hoạt pha đèn xanh cho hướng Bắc-Nam (NS).
+\subsection{Thiết kế không gian hành động}
+Không gian hành động được định nghĩa như một tập hợp hữu hạn các hành động rời rạc:
 
-    \item \textbf{Hành động 1:} Kích hoạt pha đèn xanh cho hướng rẽ trái của Bắc-Nam
-        (NSL).
+\[
+    \mathcal{A} = \{a_0, a_1, a_2, a_3\}
+\]
 
-    \item \textbf{Hành động 2:} Kích hoạt pha đèn xanh cho hướng Đông-Tây (EW).
+Trong đó mỗi hành động $a_i \in \mathcal{A}$ tương ứng với việc kích hoạt một pha đèn tín hiệu cụ thể:
 
-    \item \textbf{Hành động 3:} Kích hoạt pha đèn xanh cho hướng rẽ trái của
-        Đông-Tây (EWL).
-\end{enumerate}
+\begin{align}
+    a_0 &: \text{North-South Green (NSG)} \\
+    a_1 &: \text{North-South Left (NSL)} \\
+    a_2 &: \text{East-West Green (EWG)} \\
+    a_3 &: \text{East-West Left (EWL)}
+\end{align}
 
-Khi agent chọn một hành động, ví dụ hành động 2, hệ thống sẽ gửi lệnh qua TraCI để kích hoạt pha đèn PHASE EW GREEN. Nếu hành động này khác với hành động trước đó, pha đèn hiện tại sẽ chuyển sang đèn vàng trong một khoảng thời gian ngắn (yellow duration), sau đó chuyển sang đèn đỏ và cuối cùng kích hoạt pha xanh mới theo hành động được chọn.
+Tại mỗi bước thời gian $t$, agent quan sát trạng thái $s_t$ và chọn hành động $a_t \in \mathcal{A}$ dựa trên chính sách $\pi(a_t|s_t)$. Việc ánh xạ từ hành động trừu tượng sang điều khiển đèn tín hiệu được thực hiện thông qua giao diện TraCI:
+
+\[
+    \text{TraCI Command} = \phi(a_t)
+\]
+
+Trong đó $\phi: \mathcal{A} \rightarrow \{\text{PHASE\_NSG}, \text{PHASE\_NSL}, \text{PHASE\_EWG}, \text{PHASE\_EWL}\}$ là hàm ánh xạ từ không gian hành động trừu tượng sang các lệnh điều khiển cụ thể.
 
 \subsection{Thiết kế hàm thưởng (Reward Function)}
 Hàm thưởng được thiết kế để định hướng cho agent học được hành vi giúp giảm thiểu ùn tắc. Phần thưởng được tính toán dựa trên \textbf{sự thay đổi của tổng thời gian chờ đợi tích lũy} của tất cả các phương tiện trong các làn đường dẫn vào giao lộ. Công thức tính phần thưởng tại bước thời gian $t$ là:
@@ -267,25 +273,18 @@ thành phần sau:
         kích hoạt \textit{Linear} để tạo ra các giá trị Q cho mỗi hành động.
 \end{itemize}
 
-\begin{figure}[!htp]
+\begin{figure*}[!htp]
     \centering
     \includegraphics[width=0.3\textwidth]{img/model_structure}
     \caption{Kiến trúc mạng neural}
     \label{fig:model_structure}
-\end{figure}
+\end{figure*}
 
 Mô hình được huấn luyện sử dụng thuật toán tối ưu hóa Adam, với hàm mất mát (loss function) là Sai số bình phương trung bình (Mean Squared Error). Mục tiêu của việc này là tối thiểu hóa sự khác biệt giữa giá trị Q dự đoán và giá trị Q mục tiêu, vốn được tính toán từ phương trình Bellman.
 
 \section{Thiết kế hệ thống đồng bộ hóa giao lộ (Sync Agent)}
 
 Để mở rộng khả năng của hệ thống từ điều khiển giao lộ đơn lẻ sang điều khiển phối hợp nhiều giao lộ, nghiên cứu đã phát triển một thành phần Sync Agent sử dụng thuật toán \ac{sac}. Hệ thống này hoạt động như một lớp điều phối cấp cao, tối ưu hóa việc đồng bộ thời gian tín hiệu giữa các giao lộ để tạo ra "green wave" - hiệu ứng sóng xanh giúp xe cộ di chuyển liên tục qua nhiều giao lộ mà không phải dừng lại.
-
-
-
-\section{Thiết kế hệ thống đồng bộ hóa giao lộ (Sync Agent)}
-
-Để mở rộng khả năng của hệ thống từ điều khiển giao lộ đơn lẻ sang điều khiển phối hợp nhiều giao lộ, nghiên cứu đã phát triển một thành phần Sync Agent sử dụng thuật toán Soft Actor-Critic (\ac{sac}). Hệ thống này hoạt động như một lớp điều phối cấp cao, tối ưu hóa việc đồng bộ thời gian tín hiệu giữa các giao lộ để tạo
-ra "green wave" - hiệu ứng sóng xanh giúp xe cộ di chuyển liên tục qua nhiều giao lộ mà không phải dừng lại.
 
 \subsection{Kiến trúc hệ thống đồng bộ}
 Hệ thống được thiết kế theo mô hình phân tầng với ba thành phần chính:
@@ -332,24 +331,6 @@ Hành động của Sync Agent là việc điều chỉnh độ lệch thời gi
 \subsubsection{Hàm thưởng cho đồng bộ hóa}
 Để giải quyết vấn đề bất ổn định trong huấn luyện, nghiên cứu đã phát triển một hàm thưởng ultra-stable dựa trên so sánh hiệu suất dài hạn:
 
-% \begin{algorithm}[!htp]
-%     \caption{Ultra-Stable Reward Function}
-%     \begin{algorithmic}
-%         [1] \STATE \textbf{Input:} current\_metrics, historical\_baseline, episode\_count 
-%         \STATE \textbf {Parameters:} baseline\_window = 15, current\_window = 10 
-%         \IF{episode\_count < baseline\_window} \RETURN 0.0 \COMMENT{Không đánh giá trong giai đoạn khởi tạo}
-%         \ENDIF \STATE baseline\_start = episode\_count - baseline\_window - current\_window \STATE baseline\_end = episode\_count - current\_window
-%         \STATE current\_start = episode\_count - current\_window \STATE 
-%         \STATE baseline\_performance = mean(historical\_metrics[baseline\_start:baseline\_end])
-%         \STATE current\_performance = mean(historical\_metrics[current\_start:episode\_count])
-%         \STATE 
-%         \STATE percentage\_improvement = $\frac{baseline\_performance - current\_performance}{|baseline\_performance| + \epsilon}$
-%         \STATE 
-%         \STATE reward = tanh(percentage\_improvement $\times$ scale\_factor)
-%         \RETURN reward
-%     \end{algorithmic}
-% \end{algorithm}
-
 \begin{algorithm}[!htp]
     \caption{Ultra-Stable Reward Function}
     \begin{algorithmic}[1]
@@ -359,16 +340,16 @@ Hành động của Sync Agent là việc điều chỉnh độ lệch thời gi
             \Return 0.0 \Comment{Không đánh giá trong giai đoạn khởi tạo}
         \EndIf
         
-        \State baseline\_start = episode\_count - baseline\_window - current\_window
-        \State baseline\_end = episode\_count - current\_window
-        \State current\_start = episode\_count - current\_window
+        \State baseline\_start $\leftarrow$ episode\_count - baseline\_window - current\_window
+        \State baseline\_end $\leftarrow$ episode\_count - current\_window
+        \State current\_start $\leftarrow$ episode\_count - current\_window
         
-        \State baseline\_performance = mean(historical\_metrics[baseline\_start:baseline\_end])
-        \State current\_performance = mean(historical\_metrics[current\_start:episode\_count])
+        \State baseline\_performance $\leftarrow$ mean(historical\_metrics[baseline\_start:baseline\_end])
+        \State current\_performance $\leftarrow$ mean(historical\_metrics[current\_start:episode\_count])
         
-        \State percentage\_improvement = $\frac{baseline\_performance - current\_performance}{|baseline\_performance| + \epsilon}$
+        \State percentage\_improvement $\leftarrow$ $\frac{baseline\_performance - current\_performance}{|baseline\_performance| + \epsilon}$
         
-        \State reward = tanh(percentage\_improvement $\times$ scale\_factor)
+        \State reward $\leftarrow$ tanh(percentage\_improvement $\times$ scale\_factor)
         \Return reward
     \end{algorithmic}
 \end{algorithm}
@@ -402,34 +383,36 @@ Sync Agent sử dụng thuật toán SAC với các đặc điểm:
 \end{itemize}
 
 \subsubsection{Hyperparameters tối ưu}
-Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã được xác định:
-\begin{itemize}
-    \item Learning rate: $1 \times 10^{-4}$ (conservative để đảm bảo ổn định)
-    \item Discount factor $\gamma$: 0.95
-    \item Batch size: 32
-    \item Buffer size: $5 \times 10^{4}$
-    \item Temperature parameter $\alpha$: Auto-tuned
-\end{itemize}
+Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã được xác định trong Bảng \ref{tab:sac_hyperparameters}:
+
+\begin{table}[!htp]
+\centering
+\caption{Hyperparameters tối ưu cho thuật toán SAC}
+\label{tab:sac_hyperparameters}
+\begin{tabular}{|l|c|p{5cm}|}
+\hline
+\textbf{Tham số} & \textbf{Giá trị} & \textbf{Mô tả} \\
+\hline
+Learning rate & $1 \times 10^{-4}$ & Conservative để đảm bảo ổn định \\
+\hline
+Discount factor $\gamma$ & 0.95 & Hệ số chiết khấu cho phần thưởng tương lai \\
+\hline
+Batch size & 32 & Kích thước lô cho mỗi lần cập nhật \\
+\hline
+Buffer size & $5 \times 10^{4}$ & Kích thước bộ đệm experience replay \\
+\hline
+Temperature $\alpha$ & Auto-tuned & Tham số kiểm soát entropy tự động \\
+\hline
+Target update $\tau$ & 0.001 & Tốc độ cập nhật soft cho target networks \\
+\hline
+\end{tabular}
+\end{table}
 
 \subsection{Phương pháp huấn luyện hybrid}
 Hệ thống hỗ trợ hai chế độ huấn luyện:
 
 \subsubsection{Synthetic Training Mode}
 Chế độ này sử dụng synthetic data generator để tạo ra dữ liệu giao thông giả lập:
-
-% \begin{algorithm}[!htp]
-%     \caption{Synthetic Data Generation}
-%     \begin{algorithmic}[1]
-%         \STATE \textbf{Input:} config\_parameters \STATE base\_volume = config['base\_traffic\_volume'] 
-%         \STATE time\_factor = sin(current\_time /period\_length $\times 2\pi$) \STATE traffic\_volume = base\_volume $\times$ (1 + amplitude $\times$ time\_factor) 
-%         \FOR{each intersection $i$}
-%             \STATE waiting\_time[i] = generate\_waiting\_time(traffic\_volume, intersection\_config[i])
-%             \STATE queue\_length[i] = generate\_queue\_length(traffic\_volume, intersection\_config[i])
-%             \STATE speed[i] = uniform\_random(25.0, 45.0) \COMMENT{Urban speed range}
-%         \ENDFOR 
-%         \RETURN intersection\_data
-%     \end{algorithmic}
-% \end{algorithm}
 
 \begin{algorithm}[!htp]
     \caption{Sinh dữ liệu tổng hợp}

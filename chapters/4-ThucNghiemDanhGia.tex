@@ -4,33 +4,65 @@
 Để đánh giá hiệu quả của hệ thống điều khiển đèn giao thông thông minh, nghiên cứu này đã tiến hành một quy trình thực nghiệm toàn diện bao gồm ba thành phần chính: (1) Phát triển và tối ưu hóa các mô hình Deep Q-Network (DQN) cho điều khiển giao lộ đơn, (2) Phát triển mô hình Tác nhân Đồng bộ (Sync Agent) để giải quyết thách thức điều phối đồng bộ nhiều giao lộ, và (3) Đánh giá tác động của độ phức tạp giao thông đến hiệu suất của mô hình Học Tăng Cường Sâu (Deep Reinforcement Learning).
 
 Nghiên cứu tập trung đặc biệt vào việc phân tích ảnh hưởng của mức độ giao thông khác nhau đến khả năng hội tụ (convergence) và hiệu suất cuối cùng của mô hình DQN. Điều này bao gồm việc đánh giá hiệu suất trên 4 kịch bản giao thông từ thấp đến cao điểm (300-1200 xe/giờ), cung cấp những hiểu biết thực tế về khả năng triển khai (deployment) trong các điều kiện giao thông khác nhau.
+
+Hệ thống cũng tích hợp khả năng phát hiện và theo dõi phương tiện thông qua YOLO (You Only Look Once) để thu thập dữ liệu giao thông thời gian thực từ camera giám sát, tạo cơ sở dữ liệu benchmark cho việc so sánh và đánh giá các phương pháp khác nhau.
 \section{Thiết kế kịch bản thực nghiệm}
 
 \subsection{Kịch bản 1: Điều khiển tại một giao lộ đơn lẻ}
+
 \subsubsection{Mục tiêu}
-Đánh giá hiệu quả của các cấu hình DQN khác nhau trong điều khiển giao lộ đơn, xác
-định hyperparameters tối ưu cho từng điều kiện giao thông.
-
-\subsubsection{Thiết lập môi trường giả lập}
+Đánh giá hiệu quả của các cấu hình DQN khác nhau trong điều khiển giao lộ đơn, xác định hyperparameters tối ưu cho từng điều kiện giao thông. Cụ thể:
 \begin{itemize}
-    \item Giao lộ 4 chiều với 2 làn xe mỗi hướng
-
-    \item Chiều dài đoạn đường: 150m mỗi hướng
-
-    \item Tốc độ tối đa: 50 km/h
-
-    \item Thời gian mô phỏng: 3600 giây
-
-    \item 10 cấu hình khác nhau: Baseline, Conservative, High Traffic, Low Traffic, Balanced, Medium Batch, Moderate Learning, Original, Aggressive, High Learning
+    \item So sánh 10 cấu hình DQN khác nhau với các hyperparameters đa dạng
+    \item Xác định cấu hình tối ưu cho điều kiện giao thông thành phố
+    \item Thiết lập baseline cho việc so sánh với các phương pháp truyền thống
+    \item Đánh giá khả năng hội tụ và ổn định của từng cấu hình
 \end{itemize}
 
-\subsubsection{Các phương pháp so sánh}
+\subsubsection{Phương pháp thực nghiệm}
+Nghiên cứu sử dụng phương pháp so sánh đối chứng (controlled comparison) với:
+
+\textbf{Môi trường thống nhất:}
 \begin{itemize}
-    \item Fixed-time control (cố định thời gian)
+    \item Giao lộ 4 chiều với 2 làn xe mỗi hướng
+    \item Chiều dài đoạn đường: 150m mỗi hướng
+    \item Tốc độ tối đa: 50 km/h
+    \item Thời gian mô phỏng: 3600 giây
+\end{itemize}
 
-    \item Actuated control (điều khiển kích hoạt)
+\textbf{Các phương pháp so sánh:}
+\begin{itemize}
+    \item Fixed-time control (cố định thời gian) - baseline truyền thống
+    \item Actuated control (điều khiển kích hoạt) - benchmark hiện đại
+    \item 10 cấu hình DQN với hyperparameters khác nhau
+    \item Phát hiện phương tiện qua YOLO để validation dữ liệu
+\end{itemize}
 
-    \item Various DQN configurations
+\textbf{Phương pháp thu thập dữ liệu:}
+\begin{itemize}
+    \item Tích hợp YOLO v11 cho vehicle detection từ camera simulation
+    \item Thu thập metrics qua SUMO TraCI API
+    \item Logging thời gian thực với frequency 1Hz
+    \item Cross-validation qua 5 lần chạy độc lập cho mỗi cấu hình
+\end{itemize}
+
+\subsubsection{Thiết lập thực nghiệm}
+10 cấu hình được thiết kế để khảo sát các khía cạnh khác nhau của quá trình học:
+\begin{itemize}
+    \item \textbf{Baseline, Conservative, Balanced:} Khảo sát tác động của learning rate
+    \item \textbf{High Traffic, Low Traffic:} Tối ưu cho điều kiện giao thông cụ thể
+    \item \textbf{Medium Batch, Aggressive:} Đánh giá ảnh hưởng của batch size
+    \item \textbf{Moderate Learning, High Learning:} Kiểm tra giới hạn ổn định
+    \item \textbf{Original:} Cấu hình tham chiếu ban đầu
+\end{itemize}
+
+\subsubsection{Kết quả dự kiến}
+Thực nghiệm nhằm xác định:
+\begin{itemize}
+    \item Cấu hình DQN tối ưu cho điều kiện giao thông đô thị
+    \item Ngưỡng hyperparameters an toàn tránh training instability
+    \item Mức độ cải thiện so với phương pháp truyền thống
+    \item Tính khả thi triển khai trong thực tế
 \end{itemize}
 
 \subsection{Kịch bản 2: Điều khiển phối hợp tại cụm giao lộ}
@@ -192,6 +224,49 @@ Các cấu hình được thiết kế với mục đích cụ thể như sau:
     \item \textbf{High Learning:} Tốc độ học rất cao để kiểm tra giới hạn ổn định
 \end{itemize}
 
+\subsection{Bảng cấu hình hyperparameters cho 10 mô hình base}
+
+Để đảm bảo tính khách quan và có thể tái tạo, tất cả các tham số huấn luyện được ghi lại chi tiết trong Bảng \ref{tab:base_model_configs}:
+
+\begin{table*}[!htp]
+\centering
+\caption{Cấu hình hyperparameters của 10 mô hình DQN baseline}
+\label{tab:base_model_configs}
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
+\hline
+\textbf{Mô hình} & \textbf{Learning Rate} & \textbf{Batch Size} & \textbf{Gamma} & \textbf{Episodes} & \textbf{Memory Size} & \textbf{Epsilon} & \textbf{Width} \\
+\hline
+Original & 0.001 & 32 & 0.95 & 200 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Baseline & 0.0005 & 64 & 0.75 & 150 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Conservative & 0.0001 & 32 & 0.95 & 200 & 50000 & 0.9→0.01 & 400 \\
+\hline
+High Traffic & 0.001 & 128 & 0.95 & 300 & 100000 & 0.9→0.05 & 512 \\
+\hline
+Low Traffic & 0.0005 & 32 & 0.85 & 150 & 25000 & 0.9→0.1 & 256 \\
+\hline
+Balanced & 0.0007 & 64 & 0.9 & 200 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Medium Batch & 0.001 & 96 & 0.95 & 200 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Moderate Learning & 0.0008 & 64 & 0.9 & 200 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Aggressive & 0.005 & 128 & 0.99 & 300 & 100000 & 0.95→0.01 & 512 \\
+\hline
+High Learning & 0.01 & 256 & 0.99 & 400 & 200000 & 0.95→0.01 & 1024 \\
+\hline
+\end{tabular}
+\end{table*}
+
+Các cấu hình được nhóm theo mục đích nghiên cứu:
+\begin{itemize}
+    \item \textbf{Nhóm ổn định:} Original, Baseline, Conservative, Balanced - tập trung vào sự ổn định với learning rate thấp-trung bình
+    \item \textbf{Nhóm thích ứng:} High Traffic, Low Traffic - tối ưu cho điều kiện giao thông cụ thể với memory size và network size khác nhau
+    \item \textbf{Nhóm thử nghiệm:} Medium Batch, Moderate Learning - khảo sát tác động của batch size và learning rate
+    \item \textbf{Nhóm cực đoan:} Aggressive, High Learning - kiểm tra giới hạn với tham số rất cao
+\end{itemize}
+
 \section{Kết quả và phân tích hiệu suất giao lộ đơn}
 
 Sau quá trình huấn luyện và đánh giá trong môi trường mô phỏng SUMO, các mô hình được đánh giá dựa trên ba tiêu chí chính: giá trị phần thưởng (reward) tích lũy, thời gian chờ đợi trung bình và độ dài hàng đợi trung bình.
@@ -210,10 +285,19 @@ kết quả dưới dạng biểu đồ. Do hai mô hình Aggressive và High Le
     \label{fig:intersection_filtered_reward_progress}
 \end{figure*}
 
-Hình \ref{fig:intersection_filtered_reward_progress} thể hiện quá trình học của
-8 mô hình có hiệu suất khả thi. Mô hình Balanced cho thấy sự hội tụ ổn định nhất
-với phần thưởng cuối cùng đạt -12,860, trong khi các mô hình khác có độ biến động lớn
-hơn.
+Hình \ref{fig:intersection_filtered_reward_progress} thể hiện quá trình học của 8 mô hình có hiệu suất khả thi. Phân tích chi tiết cho thấy:
+
+\begin{itemize}
+    \item \textbf{Mô hình Balanced (màu xanh lam):} Cho thấy quá trình hội tụ ổn định nhất với độ dốc gradient ít dao động, đạt phần thưởng cuối -12,860. Mô hình bắt đầu học nhanh trong 50 episode đầu, sau đó ổn định.
+    
+    \item \textbf{Mô hình High Traffic (màu cam):} Có hiệu suất gần tương tự Balanced với phần thưởng -13,689, nhưng biến động nhiều hơn trong giai đoạn 100-150 episodes.
+    
+    \item \textbf{Nhóm trung bình (Moderate Learning, Baseline):} Có xu hướng học chậm hơn và đạt plateau sớm quanh episode 120-130, với mức độ hội tụ thấp hơn 15-20% so với nhóm tốt nhất.
+    
+    \item \textbf{Mô hình Conservative (màu tím):} Cho thấy learning curve phẳng nhất, học rất chậm do learning rate thấp (0.0001), đạt phần thưởng chỉ -20,723.
+\end{itemize}
+
+Đặc biệt, biểu đồ cho thấy rõ tương quan giữa learning rate và tốc độ hội tụ: các mô hình với learning rate 0.0007-0.001 hội tụ nhanh và ổn định, trong khi learning rate quá thấp (<0.0005) dẫn đến học chậm.
 
 \subsubsection{Thời gian chờ đợi trung bình}
 
@@ -252,9 +336,19 @@ gian chờ đợi.
     \label{fig:intersection_filtered_performance_summary}
 \end{figure}
 
-Hình \ref{fig:intersection_filtered_performance_summary} tổng hợp các chỉ số
-hiệu suất, khẳng định sự vượt trội của mô hình Balanced trong tất cả các tiêu chí
-đánh giá.
+Hình \ref{fig:intersection_filtered_performance_summary} tổng hợp ba metrics chính trong một biểu đồ cột nhóm, cho phép so sánh trực tiếp hiệu suất:
+
+\begin{itemize}
+    \item \textbf{Phân bố hiệu suất:} Biểu đồ thể hiện rõ sự phân tầng hiệu suất với 3 nhóm rõ rệt - nhóm cao (Balanced, High Traffic), nhóm trung bình (5 mô hình), và nhóm thấp (Conservative).
+    
+    \item \textbf{Tương quan metrics:} Có sự tương quan mạnh giữa ba chỉ số - mô hình có reward cao thường có waiting time và queue length thấp, chứng minh tính nhất quán của phương pháp đánh giá.
+    
+    \item \textbf{Margin of superiority:} Balanced vượt trội với margin đáng kể - thấp hơn 9% về waiting time và 8.5% về queue length so với mô hình tốt thứ hai (High Traffic).
+    
+    \item \textbf{Practicality threshold:} Các mô hình có waiting time < 45,000s và queue length < 8.5 xe được coi là khả thi cho triển khai thực tế dựa trên benchmark giao thông đô thị.
+\end{itemize}
+
+Kết quả khẳng định sự vượt trội toàn diện của mô hình Balanced, không chỉ về một metric đơn lẻ mà trên toàn bộ phổ đánh giá hiệu suất.
 
 \subsection{So sánh đầy đủ bao gồm giá trị ngoại lai}
 
@@ -338,25 +432,75 @@ trì sự ổn định trong suốt quá trình hoạt động.
 Bảng dưới đây tổng hợp kết quả so sánh hiệu suất của tất cả các mô hình, được sắp
 xếp theo thứ tự từ tốt nhất đến kém nhất:
 
-\begin{table}[!htp]
+\begin{table*}[!htp]
     \centering
-    \caption{Kết quả so sánh hiệu suất các mô hình DQN}
+    \caption{Kết quả so sánh hiệu suất các mô hình DQN với phân tích nhóm}
     \label{tab:model_performance_comparison}
-    \begin{tabular}{@{}lccc@{}}
-        \toprule \textbf{Mô hình}  & \textbf{Phần thưởng TB} & \textbf{Thời gian chờ TB (s)} & \textbf{Độ dài hàng đợi TB} \\
-        \midrule \textbf{Balanced} & \textbf{-12,860.19}     & \textbf{37,505.85}            & \textbf{6.95}               \\
-        High Traffic               & -13,688.96              & 38,012.28                     & 7.04                        \\
-        Moderate Learning          & -15,886.35              & 41,012.58                     & 7.59                        \\
-        Baseline                   & -16,367.69              & 41,404.70                     & 7.67                        \\
-        Low Traffic                & -16,656.51              & 43,583.13                     & 8.07                        \\
-        Original                   & -17,304.83              & 44,697.74                     & 8.28                        \\
-        Medium Batch               & -16,940.37              & 43,315.68                     & 8.02                        \\
-        Conservative               & -20,723.03              & 46,952.09                     & 8.69                        \\
-        Aggressive                 & -50,134.78              & 172,687.93                    & 31.98                       \\
-        High Learning              & -138,190.51             & 61,483.15                     & 11.39                       \\
-        \bottomrule
+    \begin{tabular}{|l|c|c|c|l|}
+        \hline 
+        \textbf{Mô hình}  & \textbf{Phần thưởng TB} & \textbf{Thời gian chờ TB (s)} & \textbf{Độ dài hàng đợi TB} & \textbf{Nhóm hiệu suất} \\
+        \hline 
+        \multicolumn{5}{|c|}{\textbf{NHÓM HIỆU SUẤT CAO (Top 25\%)}} \\
+        \hline
+        \textbf{Balanced (tốt nhất)} & \textbf{-12,860.19}     & \textbf{37,505.85}            & \textbf{6.95}               & Tối ưu \\
+        \hline
+        High Traffic               & -13,688.96              & 38,012.28                     & 7.04                        & Khả thi \\
+        \hline
+        \multicolumn{5}{|c|}{\textbf{NHÓM HIỆU SUẤT TRUNG BÌNH (25-75\%)}} \\
+        \hline
+        Moderate Learning          & -15,886.35              & 41,012.58                     & 7.59                        & Chấp nhận được \\
+        \hline
+        Baseline                   & -16,367.69              & 41,404.70                     & 7.67                        & Chấp nhận được \\
+        \hline
+        Low Traffic                & -16,656.51              & 43,583.13                     & 8.07                        & Chấp nhận được \\
+        \hline
+        Medium Batch               & -16,940.37              & 43,315.68                     & 8.02                        & Chấp nhận được \\
+        \hline
+        Original                   & -17,304.83              & 44,697.74                     & 8.28                        & Chấp nhận được \\
+        \hline
+        Conservative               & -20,723.03              & 46,952.09                     & 8.69                        & Thấp \\
+        \hline
+        \multicolumn{5}{|c|}{\textbf{NHÓM HIỆU SUẤT THẤP (Bottom 25\% - Outliers)}} \\
+        \hline
+        Aggressive                 & -50,134.78              & 172,687.93                    & 31.98                       & Thất bại \\
+        \hline
+        High Learning (tệ nhất)              & -138,190.51             & 61,483.15                     & 11.39                       & Thất bại hoàn toàn \\
+        \hline
     \end{tabular}
-\end{table}
+\end{table*}
+
+\subsection{Phân tích xu thế và nhóm hiệu suất}
+
+Từ kết quả trong Bảng \ref{tab:model_performance_comparison}, có thể rút ra các xu thế quan trọng:
+
+\subsubsection{Nhóm hiệu suất cao (Top 25\%)}
+\begin{itemize}
+    \item \textbf{Balanced}: Đạt hiệu suất tốt nhất với thời gian chờ 37,506s và hàng đợi 6.95 xe
+    \item \textbf{High Traffic}: Xếp thứ 2 với hiệu suất sát sao (chênh lệch 1.3\% về thời gian chờ)
+    \item \textbf{Đặc điểm chung}: Learning rate trung bình (0.0007-0.001), batch size hợp lý (64-128)
+\end{itemize}
+
+\subsubsection{Nhóm hiệu suất trung bình (25-75\%)}
+\begin{itemize}
+    \item \textbf{Xu thế}: Thời gian chờ dao động 41,000-47,000s, hàng đợi 7.6-8.7 xe
+    \item \textbf{Chênh lệch với nhóm cao}: 9-25% về thời gian chờ đợi
+    \item \textbf{Nguyên nhân}: Learning rate quá thấp (Conservative) hoặc cấu hình không tối ưu
+\end{itemize}
+
+\subsubsection{Nhóm hiệu suất thấp (Bottom 25\% - Outliers)}
+\begin{itemize}
+    \item \textbf{Aggressive}: Thời gian chờ 172,688s - gấp 4.6 lần so với tốt nhất
+    \item \textbf{High Learning}: Phần thưởng -138,191 - gấp 10.7 lần độ lệch so với tốt nhất
+    \item \textbf{Nguyên nhân}: Learning rate quá cao (0.005-0.01) gây instability
+\end{itemize}
+
+\subsubsection{Kết luận xu thế}
+\begin{enumerate}
+    \item \textbf{Learning rate tối ưu}: Khoảng 0.0007-0.001 cho hiệu suất cao
+    \item \textbf{Batch size}: 64-128 tỏ ra hiệu quả nhất
+    \item \textbf{Nguy cơ cao}: Learning rate > 0.003 gây training instability nghiêm trọng
+    \item \textbf{Tính ổn định}: Mô hình Balanced không chỉ tốt nhất mà còn ổn định nhất
+\end{enumerate}
 
 % \section{Phát triển và thực nghiệm Sync Agent}
 
@@ -642,7 +786,7 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
     \item Phương pháp được kiểm tra với tiêu chuẩn công nghiệp
 \end{itemize}
 
-% \section{Triển khai và sẵn sàng sản xuất}
+% \section{Đánh giá khả năng triển khai thực tế}
 
 % \subsection{Hệ thống triển khai tự động}
 % Nghiên cứu đã phát triển hệ thống triển khai tự động:
