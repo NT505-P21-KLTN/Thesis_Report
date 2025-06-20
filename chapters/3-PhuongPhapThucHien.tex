@@ -282,6 +282,30 @@ thành phần sau:
 
 Mô hình được huấn luyện sử dụng thuật toán tối ưu hóa Adam, với hàm mất mát (loss function) là Sai số bình phương trung bình (Mean Squared Error). Mục tiêu của việc này là tối thiểu hóa sự khác biệt giữa giá trị Q dự đoán và giá trị Q mục tiêu, vốn được tính toán từ phương trình Bellman.
 
+\subsection{Lý do lựa chọn thuật toán DQN cho Intersection Agents}
+Việc lựa chọn thuật toán \ac{dqn} cho các intersection agents được dựa trên những lý do sau:
+
+\subsubsection{Phù hợp với bản chất bài toán điều khiển giao lộ}
+Điều khiển đèn tín hiệu giao thông có bản chất là một bài toán hành động rời rạc với số lượng hành động hữu hạn và được định nghĩa rõ ràng (4 pha đèn). \ac{dqn} được thiết kế đặc biệt cho loại bài toán này, khác với các thuật toán điều khiển liên tục như DDPG hay SAC. Mỗi intersection agent chỉ cần tối ưu hóa giao thông tại giao lộ của mình, đây là một bài toán tương đối đơn giản so với việc điều phối toàn cục. Do đó, \ac{dqn} với độ phức tạp tính toán thấp hơn so với các thuật toán actor-critic trở thành lựa chọn phù hợp cho việc triển khai song song nhiều agent.
+
+\subsubsection{Experience Replay phù hợp với đặc tính giao thông}
+Cơ chế Experience Replay của \ac{dqn} đặc biệt hiệu quả trong bối cảnh giao thông vì:
+\begin{itemize}
+    \item \textbf{Tái sử dụng kinh nghiệm:} Các mẫu giao thông có tính lặp lại theo chu kỳ (giờ cao điểm, giờ thấp điểm), việc lưu trữ và tái sử dụng kinh nghiệm giúp agent học nhanh hơn.
+    \item \textbf{Phá vỡ tương quan:} Dữ liệu giao thông liên tiếp có tính tương quan cao, Experience Replay giúp phá vỡ tương quan này, làm cho quá trình học ổn định hơn.
+\end{itemize}
+
+\subsubsection{Ổn định huấn luyện trong môi trường động}
+Cơ chế Target Network của \ac{dqn} đặc biệt quan trọng trong môi trường giao thông động. Bằng cách sử dụng một mạng mục tiêu riêng biệt được cập nhật định kỳ, \ac{dqn} tránh được hiện tượng "moving target" khi Q-values thay đổi liên tục, từ đó đảm bảo sự hội tụ ổn định trong môi trường có nhiều biến động như giao thông đô thị.
+
+\subsubsection{Khả năng mở rộng và triển khai thực tế}
+\ac{dqn} có những ưu điểm về khả năng triển khai:
+\begin{itemize}
+    \item \textbf{Tài nguyên tính toán thấp:} Phù hợp cho việc triển khai trên các thiết bị edge computing tại giao lộ
+    \item \textbf{Dễ dàng debug và giải thích:} Q-values có thể được giải thích trực tiếp, giúp việc kiểm tra và bảo trì hệ thống
+    \item \textbf{Khả năng mở rộng:} Mỗi giao lộ có thể hoạt động độc lập, dễ dàng thêm/bớt giao lộ mà không ảnh hưởng đến toàn hệ thống
+\end{itemize}
+
 \section{Thiết kế hệ thống đồng bộ hóa giao lộ (Sync Agent)}
 
 Để mở rộng khả năng của hệ thống từ điều khiển giao lộ đơn lẻ sang điều khiển phối hợp nhiều giao lộ, nghiên cứu đã phát triển một thành phần Sync Agent sử dụng thuật toán \ac{sac}. Hệ thống này hoạt động như một lớp điều phối cấp cao, tối ưu hóa việc đồng bộ thời gian tín hiệu giữa các giao lộ để tạo ra "green wave" - hiệu ứng sóng xanh giúp xe cộ di chuyển liên tục qua nhiều giao lộ mà không phải dừng lại.
@@ -296,6 +320,36 @@ Hệ thống được thiết kế theo mô hình phân tầng với ba thành p
 
     \item \textbf{Sync Agent:} Agent SAC cấp cao điều phối thời gian giữa các giao lộ để tối ưu hóa toàn cục.
 \end{enumerate}
+
+\subsubsection{Lý do lựa chọn kiến trúc phân tầng DQN-SAC}
+Việc kết hợp \ac{dqn} và \ac{sac} trong kiến trúc phân tầng được thiết kế dựa trên những nguyên lý sau:
+
+\paragraph{Phân tách trách nhiệm tối ưu hóa}
+\begin{itemize}
+    \item \textbf{Tối ưu hóa cục bộ (DQN):} Mỗi intersection agent tập trung vào việc giảm thiểu thời gian chờ tại giao lộ của mình, bài toán đơn giản với không gian trạng thái và hành động nhỏ.
+    \item \textbf{Tối ưu hóa toàn cục (SAC):} Sync agent xử lý bài toán phức tạp hơn - điều phối timing giữa các giao lộ để tạo green wave, yêu cầu khả năng xử lý không gian trạng thái lớn và hành động liên tục.
+\end{itemize}
+
+\paragraph{Khả năng mở rộng (Scalability)}
+Kiến trúc phân tầng cho phép:
+\begin{itemize}
+    \item \textbf{Thêm/bớt giao lộ dễ dàng:} Chỉ cần thêm intersection agent mới mà không cần thay đổi toàn bộ hệ thống
+    \item \textbf{Tính toán phân tán:} Intersection agents có thể chạy trên các thiết bị edge tại từng giao lộ
+    \item \textbf{Fault tolerance:} Nếu một intersection agent gặp sự cố, các giao lộ khác vẫn hoạt động bình thường
+\end{itemize}
+
+\paragraph{Hiệu quả tính toán}
+\begin{itemize}
+    \item \textbf{Parallel processing:} Các intersection agents hoạt động song song, giảm thời gian tính toán tổng thể
+    \item \textbf{Reduced complexity:} Thay vì một bài toán tối ưu hóa khổng lồ cho toàn bộ mạng lưới, bài toán được chia nhỏ thành nhiều bài toán con đơn giản hơn
+\end{itemize}
+
+\paragraph{Tính thực tế trong triển khai}
+\begin{itemize}
+    \item \textbf{Gradual deployment:} Có thể triển khai từng giao lộ một, không cần thay đổi toàn bộ hạ tầng cùng lúc
+    \item \textbf{Maintenance friendly:} Dễ dàng bảo trì, nâng cấp từng thành phần mà không ảnh hưởng đến toàn hệ thống
+    \item \textbf{Integration with existing systems:} Có thể tích hợp với các hệ thống điều khiển giao thông hiện có
+\end{itemize}
 
 \subsection{Môi trường đồng bộ hóa (Sync Environment)}
 Môi trường của Sync Agent được định nghĩa như sau:
@@ -368,8 +422,83 @@ Hàm thưởng này có các đặc điểm:
     \item \textbf{Bounded output:} Hàm tanh đảm bảo reward trong khoảng [-1, 1]
 \end{itemize}
 
+\subsection{Lý do lựa chọn thuật toán Soft Actor-Critic cho Sync Agent}
+Việc lựa chọn thuật toán \ac{sac} cho Sync Agent được dựa trên những lý do kỹ thuật sau:
+
+\subsubsection{Thiết kế cho bài toán điều khiển liên tục}
+Bài toán đồng bộ hóa giao lộ yêu cầu điều chỉnh độ lệch thời gian (offset) giữa các giao lộ, đây là các giá trị liên tục trong khoảng $[0, 1]$ đại diện cho tỷ lệ phần trăm của chu kỳ đèn tín hiệu. \ac{sac} được thiết kế đặc biệt cho không gian hành động liên tục, cho phép điều chỉnh mịn và chính xác các offset này, khác với \ac{dqn} chỉ phù hợp với hành động rời rạc. Khả năng này đặc biệt quan trọng để tạo ra hiệu ứng "green wave" tối ưu.
+
+\subsubsection{Maximum Entropy Framework cho khám phá tối ưu}
+\ac{sac} sử dụng nguyên lý Maximum Entropy, tối đa hóa cả reward và entropy của policy:
+\begin{equation}
+    J(\pi) = \sum_{t=0}^{T} \mathbb{E}_{(s_t,a_t) \sim \rho_\pi} [r(s_t, a_t) + \alpha \mathcal{H}(\pi(\cdot|s_t))]
+\end{equation}
+
+Điều này mang lại những lợi ích quan trọng:
+\begin{itemize}
+    \item \textbf{Khám phá hiệu quả:} Agent được khuyến khích thử nghiệm các chiến lược đồng bộ khác nhau, tránh bị mắc kẹt ở local optimum
+    \item \textbf{Robustness:} Policy đa dạng giúp hệ thống thích ứng tốt với các điều kiện giao thông thay đổi
+    \item \textbf{Tự động điều chỉnh khám phá:} Tham số entropy $\alpha$ được tự động điều chỉnh theo quá trình học
+\end{itemize}
+
+\subsubsection{Dual Critic Networks giảm thiểu Overestimation Bias}
+\ac{sac} sử dụng hai mạng critic song song để ước lượng Q-values:
+\begin{equation}
+    Q_{target} = r + \gamma \min_{i=1,2} Q_{\phi_i}(s', a') - \alpha \log \pi(a'|s')
+\end{equation}
+
+Cơ chế này đặc biệt quan trọng trong bối cảnh đồng bộ hóa giao lộ vì:
+\begin{itemize}
+    \item \textbf{Giảm thiểu overestimation:} Việc lấy minimum của hai Q-values giúp tránh đánh giá quá cao các hành động
+    \item \textbf{Ổn định huấn luyện:} Giảm thiểu biến động trong quá trình học, đặc biệt quan trọng với bài toán phức tạp như đồng bộ đa giao lộ
+\end{itemize}
+
+\subsubsection{Off-policy Learning cho Sample Efficiency}
+\ac{sac} là thuật toán off-policy, cho phép tái sử dụng dữ liệu từ các policy cũ:
+\begin{itemize}
+    \item \textbf{Sample efficiency cao:} Đặc biệt quan trọng khi việc thu thập dữ liệu giao thông tốn kém
+    \item \textbf{Stable learning:} Không bị ảnh hưởng bởi correlation trong dữ liệu sequential
+    \item \textbf{Continuous learning:} Có thể học liên tục từ dữ liệu real-time mà không cần reset
+\end{itemize}
+
+\subsubsection{Soft Updates cho Stability}
+\ac{sac} sử dụng soft updates cho target networks:
+\begin{equation}
+    \phi_{target} \leftarrow \tau \phi + (1-\tau) \phi_{target}
+\end{equation}
+
+Với $\tau = 0.001$ được chọn conservative để đảm bảo:
+\begin{itemize}
+    \item \textbf{Training stability:} Tránh sudden changes trong target values
+    \item \textbf{Smooth convergence:} Đặc biệt quan trọng với bài toán multi-objective như đồng bộ hóa
+\end{itemize}
+
+\subsubsection{So sánh với các thuật toán khác}
+Bảng \ref{tab:algorithm_comparison} so sánh \ac{sac} với các thuật toán khác cho bài toán đồng bộ hóa:
+
+\begin{table}[!htp]
+\centering
+\caption{So sánh các thuật toán cho bài toán đồng bộ hóa giao lộ}
+\label{tab:algorithm_comparison}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Thuật toán} & \textbf{Action Space} & \textbf{Sample Efficiency} & \textbf{Stability} & \textbf{Exploration} \\
+\hline
+DQN & Discrete & Trung bình & Tốt & $\epsilon$-greedy \\
+\hline
+DDPG & Continuous & Trung bình & Kém & Noise-based \\
+\hline
+TD3 & Continuous & Tốt & Tốt & Noise-based \\
+\hline
+\textbf{SAC} & \textbf{Continuous} & \textbf{Rất tốt} & \textbf{Rất tốt} & \textbf{Entropy-based} \\
+\hline
+PPO & Both & Tốt & Tốt & Stochastic policy \\
+\hline
+\end{tabular}
+\end{table}
+
 \subsection{Thuật toán Soft Actor-Critic}
-Sync Agent sử dụng thuật toán SAC với các đặc điểm:
+Sync Agent sử dụng thuật toán SAC với các đặc điểm kỹ thuật sau:
 
 \subsubsection{Kiến trúc mạng neural}
 \begin{itemize}
