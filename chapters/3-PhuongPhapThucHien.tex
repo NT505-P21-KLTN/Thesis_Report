@@ -55,13 +55,13 @@ Mô tả chi tiết các thành phần và luồng dữ liệu trong hệ thốn
 \begin{figure}[!htp]
     \centering
     \includegraphics[width=\textwidth]{img/yolo_models}
-    \caption{So sánh hiệu suất giữa các mô hình \footnotemark[1]}
+    \caption{So sánh hiệu suất giữa các mô hình YOLO \cite{Ultralytics2024}}
     \label{fig:yolo_models}
 \end{figure}
 Cụ thể, nghiên cứu này sử dụng mô hình đã được huấn luyện trước (pre-trained) có tên là \textbf{\texttt{yolov11s.pt}}. Đây là phiên bản thu nhỏ của YOLO11, được lựa chọn dựa trên các ưu điểm nổi bật sau:
 
 \begin{itemize}
-    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47.0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2.5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực\footnote[1]{Ultralytics Documents: \url{https://docs.ultralytics.com/models/yolo11}}.
+    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47.0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2.5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực \cite{Ultralytics2024}.
     \item \textbf{Kiến trúc hiệu quả:} YOLO11 được cải tiến về kiến trúc backbone và neck, giúp tăng cường khả năng trích xuất đặc trưng. Nhờ đó, các mô hình như YOLO11 đạt được độ chính xác cao hơn với số lượng tham số ít hơn, làm cho chúng hiệu quả hơn về mặt tính toán. Phiên bản \texttt{yolov11s.pt} chỉ có 9.4 triệu tham số.
     \item \textbf{Huấn luyện trên tập dữ liệu COCO:} Giống như các phiên bản trước, mô hình được huấn luyện sẵn trên tập dữ liệu COCO, bao gồm các lớp đối tượng giao thông quan trọng như \texttt{car}, \texttt{motorcycle}, \texttt{bus}, và \texttt{truck}. Điều này cho phép áp dụng mô hình trực tiếp vào bài toán mà không cần huấn luyện lại, giúp tiết kiệm thời gian và tài nguyên.
 \end{itemize}
