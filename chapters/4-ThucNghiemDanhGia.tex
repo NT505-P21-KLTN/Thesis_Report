@@ -203,15 +203,12 @@ kết quả dưới dạng biểu đồ. Do hai mô hình Aggressive và High Le
 
 \subsubsection{Tiến trình phần thưởng qua các tập huấn luyện}
 
-\begin{figure}[!htp]
+\begin{figure*}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{
-        figures/individual_plots/intersection_filtered_reward_progress.png
-    }
-    \caption{Tiến trình phần thưởng của các mô hình intersection agent qua các
-    tập huấn luyện (loại bỏ giá trị ngoại lai)}
+    \includegraphics[width=\textwidth]{figures/individual_plots/intersection_filtered_reward_progress.png}
+    \caption{Tiến trình phần thưởng của các mô hình intersection agent qua các tập huấn luyện (loại bỏ giá trị ngoại lai)}
     \label{fig:intersection_filtered_reward_progress}
-\end{figure}
+\end{figure*}
 
 Hình \ref{fig:intersection_filtered_reward_progress} thể hiện quá trình học của
 8 mô hình có hiệu suất khả thi. Mô hình Balanced cho thấy sự hội tụ ổn định nhất
@@ -220,15 +217,12 @@ hơn.
 
 \subsubsection{Thời gian chờ đợi trung bình}
 
-\begin{figure}[!htp]
+\begin{figure*}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{
-        figures/individual_plots/intersection_filtered_waiting_time.png
-    }
-    \caption{So sánh thời gian chờ đợi trung bình của các mô hình intersection
-    agent}
+    \includegraphics[width=\textwidth]{figures/individual_plots/intersection_filtered_waiting_time.png}
+    \caption{So sánh thời gian chờ đợi trung bình của các mô hình intersection agent}
     \label{fig:intersection_filtered_waiting_time}
-\end{figure}
+\end{figure*}
 
 Hình \ref{fig:intersection_filtered_waiting_time} cho thấy mô hình Balanced đạt thời
 gian chờ thấp nhất (37,506s), vượt trội so với các mô hình khác. Điều này chứng minh
@@ -236,15 +230,12 @@ hiệu quả của việc cân bằng các siêu tham số (hyperparameter).
 
 \subsubsection{Độ dài hàng đợi trung bình}
 
-\begin{figure}[!htp]
+\begin{figure*}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{
-        figures/individual_plots/intersection_filtered_queue_length.png
-    }
-    \caption{So sánh độ dài hàng đợi trung bình của các mô hình intersection
-    agent}
+    \includegraphics[width=\textwidth]{figures/individual_plots/intersection_filtered_queue_length.png}
+    \caption{So sánh độ dài hàng đợi trung bình của các mô hình intersection agent}
     \label{fig:intersection_filtered_queue_length}
-\end{figure}
+\end{figure*}
 
 Hình \ref{fig:intersection_filtered_queue_length} thể hiện mô hình Balanced cũng
 đạt độ dài hàng đợi nhỏ nhất (6.95 xe), tương quan trực tiếp với hiệu suất thời
