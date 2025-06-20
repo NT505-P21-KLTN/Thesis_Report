@@ -89,39 +89,46 @@ Hệ thống sử dụng kiến trúc hierarchical với:
 \section{Tiêu chí đánh giá}
 
 \subsection{Các chỉ số hiệu suất chính}
-Nghiên cứu sử dụng các tiêu chí đánh giá sau để đo lường hiệu quả của hệ thống:
+Nghiên cứu sử dụng các tiêu chí đánh giá sau để đo lường hiệu quả của hệ thống được tổng hợp trong Bảng \ref{tab:evaluation_criteria}:
 
-\subsubsection{Thời gian chờ đợi trung bình}
-\begin{itemize}
-    \item \textbf{Định nghĩa:} Thời gian trung bình mà các phương tiện phải chờ tại giao lộ
-    \item \textbf{Đơn vị:} Giây (s)
-    \item \textbf{Ý nghĩa:} Thấp hơn đồng nghĩa với hiệu suất tốt hơn
-    \item \textbf{Công thức:} $\bar{W} = \frac{1}{N} \sum_{i=1}^{N} W_i$ với $W_i$ là thời gian chờ của xe $i$
-\end{itemize}
-
-\subsubsection{Độ dài hàng đợi trung bình (Average Queue Length)}
-\begin{itemize}
-    \item \textbf{Định nghĩa:} Số lượng phương tiện trung bình trong hàng đợi tại mỗi thời điểm
-    \item \textbf{Đơn vị:} Số xe
-    \item \textbf{Ý nghĩa:} Thấp hơn đồng nghĩa với lưu thông tốt hơn
-    \item \textbf{Công thức:} $\bar{Q} = \frac{1}{T} \sum_{t=1}^{T} Q_t$ với $Q_t$ là số xe trong hàng đợi tại thời điểm $t$
-\end{itemize}
-
-\subsubsection{Phần thưởng tích lũy (Cumulative Reward)}
-\begin{itemize}
-    \item \textbf{Định nghĩa:} Tổng phần thưởng nhận được trong quá trình huấn luyện
-    \item \textbf{Đơn vị:} Điểm số
-    \item \textbf{Ý nghĩa:} Cao hơn đồng nghĩa với mô hình học tốt hơn
-    \item \textbf{Mục tiêu:} Tối đa hóa giá trị này thông qua quá trình huấn luyện
-\end{itemize}
+\begin{table*}[!htp]
+\centering
+\caption{Tiêu chí đánh giá hiệu suất hệ thống}
+\label{tab:evaluation_criteria}
+\begin{tabular}{|l|p{4cm}|c|p{3.5cm}|p{3.5cm}|}
+\hline
+\textbf{Chỉ số} & \textbf{Định nghĩa} & \textbf{Đơn vị} & \textbf{Công thức} & \textbf{Ý nghĩa} \\
+\hline
+Thời gian chờ đợi trung bình & Thời gian trung bình mà các phương tiện phải chờ tại giao lộ & Giây (s) & $\bar{W} = \frac{1}{N} \sum_{i=1}^{N} W_i$ & Thấp hơn = hiệu suất tốt hơn \\
+\hline
+Độ dài hàng đợi trung bình & Số lượng phương tiện trung bình trong hàng đợi tại mỗi thời điểm & Số xe & $\bar{Q} = \frac{1}{T} \sum_{t=1}^{T} Q_t$ & Thấp hơn = lưu thông tốt hơn \\
+\hline
+Phần thưởng tích lũy & Tổng phần thưởng nhận được trong quá trình huấn luyện & Điểm số & $R_{total} = \sum_{t=1}^{T} r_t$ & Cao hơn = mô hình học tốt hơn \\
+\hline
+\end{tabular}
+\end{table*}
 
 \subsection{Tiêu chí thành công}
-\begin{itemize}
-    \item \textbf{Cải thiện tối thiểu:} $\geq$10\% so với hệ thống cố định (fixed-time)
-    \item \textbf{Độ ổn định:} Phương sai thời gian chờ $\leq$15\% giá trị trung bình
-    \item \textbf{Hội tụ huấn luyện:} Đạt được trong vòng 150 episodes
-    \item \textbf{Ý nghĩa thống kê:} p-value < 0.05 cho các so sánh hiệu suất
-\end{itemize}
+Các tiêu chí đánh giá thành công của hệ thống được định nghĩa trong Bảng \ref{tab:success_criteria}:
+
+\begin{table*}[!htp]
+\centering
+\caption{Tiêu chí thành công của hệ thống}
+\label{tab:success_criteria}
+\begin{tabular}{|l|p{8cm}|p{4cm}|}
+\hline
+\textbf{Tiêu chí} & \textbf{Mô tả} & \textbf{Ngưỡng đánh giá} \\
+\hline
+Cải thiện tối thiểu & So sánh với hệ thống điều khiển cố định thời gian & $\geq$ 10\% cải thiện \\
+\hline
+Độ ổn định & Phương sai của thời gian chờ đợi & $\leq$ 15\% giá trị trung bình \\
+\hline
+Hội tụ huấn luyện & Thời gian đạt được mô hình ổn định & $\leq$ 150 episodes \\
+\hline
+Ý nghĩa thống kê & Độ tin cậy của kết quả so sánh & p-value < 0.05 \\
+\hline
+\end{tabular}
+\end{table*}
 
 \section{Thiết lập thí nghiệm}
 
