@@ -7,13 +7,13 @@ Chương này tập trung vào việc mô tả hệ thống điều khiển đè
 \begin{figure}[!htp]
     \centering
     \includegraphics[width=\textwidth]{img/yolo_models}
-    \caption{So sánh hiệu suất giữa các mô hình\footnote{Nguồn:\href{https://docs.ultralytics.com/models/yolo11}{Ultralytics YOLO Documentation}}}
+    \caption{So sánh hiệu suất giữa các mô hình \footnotemark[1]}
     \label{fig:yolo_models}
 \end{figure}
 Cụ thể, nghiên cứu này sử dụng mô hình đã được huấn luyện trước (pre-trained) có tên là \textbf{\texttt{yolov11s.pt}}. Đây là phiên bản thu nhỏ của YOLO11, được lựa chọn dựa trên các ưu điểm nổi bật sau:
 
 \begin{itemize}
-    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47.0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2.5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực\footnote[1]{}.
+    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47.0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2.5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực\footnote[1]{Ultralytics Documents: \url{https://docs.ultralytics.com/models/yolo11}}.
     \item \textbf{Kiến trúc hiệu quả:} YOLO11 được cải tiến về kiến trúc backbone và neck, giúp tăng cường khả năng trích xuất đặc trưng. Nhờ đó, các mô hình như YOLO11 đạt được độ chính xác cao hơn với số lượng tham số ít hơn, làm cho chúng hiệu quả hơn về mặt tính toán. Phiên bản \texttt{yolov11s.pt} chỉ có 9.4 triệu tham số.
     \item \textbf{Huấn luyện trên tập dữ liệu COCO:} Giống như các phiên bản trước, mô hình được huấn luyện sẵn trên tập dữ liệu COCO, bao gồm các lớp đối tượng giao thông quan trọng như \texttt{car}, \texttt{motorcycle}, \texttt{bus}, và \texttt{truck}. Điều này cho phép áp dụng mô hình trực tiếp vào bài toán mà không cần huấn luyện lại, giúp tiết kiệm thời gian và tài nguyên.
 \end{itemize}
@@ -257,27 +257,26 @@ bao gồm các thành phần chính:
 
     \item \textbf{Lớp điều khiển:} Điều khiển đèn giao thông thực tế
 \end{itemize}
-
+\newpage
 \subsection{Kiến trúc chi tiết hệ thống}
 
 \begin{figure}[!htp]
     \centering
     \includegraphics[width=0.7\textwidth]{img/detailed_architecture.png}
-    \caption{Kiến trúc chi tiết hệ thống với các thành phần và luồng dữ liệu}
+    \caption{Kiến trúc chi tiết hệ thống với các thành phần}
     \label{fig:detailed_architecture}
 \end{figure}
 
-Hình \ref{fig:detailed_architecture} mô tả chi tiết các thành phần và luồng dữ liệu
-trong hệ thống:
+Mô tả chi tiết các thành phần và luồng dữ liệu trong hệ thống:
 
 \begin{enumerate}
-    \item \textbf{Camera Input:} Thu thập video từ các camera giám sát giao thông
-    \item \textbf{YOLO Detection:} Nhận diện và theo dõi phương tiện
-    \item \textbf{Traffic Analysis:} Phân tích mật độ và luồng giao thông
-    \item \textbf{DQN Agents:} Các agent điều khiển từng giao lộ độc lập
-    \item \textbf{Central Server:} Thu thập và phân phối dữ liệu toàn hệ thống
-    \item \textbf{Sync Agent:} Điều phối đồng bộ giữa các giao lộ
-    \item \textbf{Traffic Light Control:} Điều khiển đèn giao thông thực tế
+    \item \textbf{Lớp thiết bị:} Thu thập video từ các camera giám sát giao thông
+    \item \textbf{Lớp xử lý biên}
+    \begin{itemize}
+        \item \textbf{Nhận diện phương tiện tham gia giao thông:} Dữ liệu video sẽ được dùng để nhận diện các phương tiện tham gia giao thông cũng như xác định khoảng cách và làn đường mà phương tiện đang di chuyển
+        \item \textbf{Các tác nhân DQN :} Các tác nhân ngoài việc điều khiển đèn tín hiệu từng giao lộ thì còn có nhiệm vụ nhận các thông tin từ YOLO và giả lập tình trạng giao thông tại nút giao. Sau đó, gửi các thông tin cần thiết đến centtral server để dự doán và ra quyết định 
+    \end{itemize}
+    \item \textbf{Central Server:} Thu thập từ các tác nhân và chạy các mô hình DQN và Sync Agent để ra quyết định. Đồng thời, cung cấp giao diện để quan sát và điều khiển
 \end{enumerate}
 
 % \subsection{Kiến trúc codebase}
@@ -300,14 +299,11 @@ ra "green wave" - hiệu ứng sóng xanh giúp xe cộ di chuyển liên tục 
 Hệ thống được thiết kế theo mô hình phân tầng với ba thành phần chính:
 
 \begin{enumerate}
-    \item \textbf{Intersection Agents:} Các agent DQN độc lập điều khiển từng
-        giao lộ, tối ưu hóa lưu lượng giao thông cục bộ.
+    \item \textbf{Intersection Agents:} Các agent DQN độc lập điều khiển từng giao lộ, tối ưu hóa lưu lượng giao thông cục bộ.
 
-    \item \textbf{Central Server:} Server trung tâm thu thập và phân phối dữ
-        liệu từ tất cả các giao lộ.
+    \item \textbf{Central Server:} Server trung tâm thu thập và phân phối dữ liệu từ tất cả các giao lộ.
 
-    \item \textbf{Sync Agent:} Agent SAC cấp cao điều phối thời gian giữa các
-        giao lộ để tối ưu hóa toàn cục.
+    \item \textbf{Sync Agent:} Agent SAC cấp cao điều phối thời gian giữa các giao lộ để tối ưu hóa toàn cục.
 \end{enumerate}
 
 \subsection{Môi trường đồng bộ hóa (Sync Environment)}
@@ -451,7 +447,7 @@ Chế độ này sử dụng synthetic data generator để tạo ra dữ liệu
         \State time\_factor $\leftarrow$ $\sin(\frac{\text{current\_time}}{period\_length} \times 2\pi)$
         \State traffic\_volume $\leftarrow$ base\_volume $\times$ (1 + amplitude $\times$ time\_factor) 
         
-        \For{mỗi giao lộ $i$}
+        \For{every_intersection $i$}
             \State waiting\_time[$i$] $\leftarrow$ generate\_waiting\_time(traffic\_volume, intersection\_config[$i$])
             \State queue\_length[$i$] $\leftarrow$ generate\_queue\_length(traffic\_volume, intersection\_config[$i$])
             \State speed[$i$] $\leftarrow$ uniform\_random(25.0, 45.0) \Comment{Phạm vi tốc độ đô thị}
@@ -531,110 +527,4 @@ Sau khi áp dụng các giải pháp, hệ thống đạt được:
     \item \textbf{Convergence:} Stable reward range từ -4.83 đến -5.15
 
     \item \textbf{Deployment readiness:} Đạt tiêu chuẩn production-ready
-\end{itemize}
-
-\section{Thiết kế kịch bản thực nghiệm}
-
-\subsection{Kịch bản 1: Điều khiển tại một giao lộ đơn lẻ}
-\subsubsection{Mục tiêu}
-Đánh giá hiệu quả của các cấu hình DQN khác nhau trong điều khiển giao lộ đơn, xác
-định hyperparameters tối ưu cho từng điều kiện giao thông.
-
-\subsubsection{Thiết lập môi trường giả lập}
-\begin{itemize}
-    \item Giao lộ 4 chiều với 2 làn xe mỗi hướng
-
-    \item Chiều dài đoạn đường: 150m mỗi hướng
-
-    \item Tốc độ tối đa: 50 km/h
-
-    \item Thời gian mô phỏng: 3600 giây
-
-    \item 10 cấu hình khác nhau: Baseline, Conservative, High Traffic, Low Traffic,
-        Balanced, Medium Batch, Moderate Learning, Original, Aggressive, High Learning
-\end{itemize}
-
-\subsubsection{Các phương pháp so sánh}
-\begin{itemize}
-    \item Fixed-time control (cố định thời gian)
-
-    \item Actuated control (điều khiển kích hoạt)
-
-    \item Various DQN configurations
-\end{itemize}
-
-\subsection{Kịch bản 2: Điều khiển phối hợp tại cụm giao lộ}
-\subsubsection{Mục tiêu}
-Đánh giá khả năng đồng bộ hóa và tối ưu hóa toàn cục của Sync Agent trong mạng lưới
-nhiều giao lộ.
-
-\subsubsection{Mô hình điều khiển đa tác nhân (Multi-Agent)}
-Hệ thống sử dụng kiến trúc hierarchical với:
-\begin{itemize}
-    \item \textbf{Local level:} DQN agents điều khiển từng giao lộ
-
-    \item \textbf{Global level:} SAC sync agent điều phối toàn hệ thống
-
-    \item \textbf{Communication:} Central server làm trung gian
-\end{itemize}
-
-\subsubsection{Cơ chế trao đổi thông tin giữa các Agent}
-
-% \begin{algorithm}[!htp]
-%     \caption{Multi-Agent Communication Protocol}
-%     \begin{algorithmic}[1] 
-%         \Statex \textbf{For each timestep:} \STATE
-%         \STATE \textbf{Phase 1: Data Collection}
-%         \for{each intersection\_agent $i$} 
-%             \STATE local\_metrics[i] = collect\_local\_metrics(i)
-%             \STATE send\_to\_central\_server(local\_metrics[i]) 
-%         \ENDFOR
-%         \STATE \textbf{Phase 2: Sync Coordination}
-%         \STATE global\_state = aggregate\_all\_metrics()
-%         \STATE sync\_action = sync\_agent.predict(global\_state) 
-%         \STATE coordination\_signals = compute\_offsets(sync\_action) \STATE 
-%         \STATE \textbf{Phase 3: Action Execution} 
-%         \FOR{each intersection\_agent $i$} 
-%             \STATE local\_action[i] = local\_agent[i].predict(local\_state[i]) 
-%             \STATE apply\_coordination(local\_action[i], coordination\_signals[i]) 
-%             \STATE execute\_action(local\_action[i]) 
-%         \ENDFOR
-%     \end{algorithmic}
-% \end{algorithm}
-
-\begin{algorithm}[!htp]
-    \caption{Giao thức truyền thông đa tác nhân}
-    \begin{algorithmic}[1] 
-        \State \textbf{Với mỗi bước thời gian:}
-        
-        \State \textbf{Giai đoạn 1: Thu thập dữ liệu}
-        \For{mỗi intersection\_agent $i$} 
-            \State local\_metrics[$i$] $\leftarrow$ collect\_local\_metrics($i$)
-            \State send\_to\_central\_server(local\_metrics[$i$]) 
-        \EndFor
-        
-        \State \textbf{Giai đoạn 2: Điều phối đồng bộ}
-        \State global\_state $\leftarrow$ aggregate\_all\_metrics()
-        \State sync\_action $\leftarrow$ sync\_agent.predict(global\_state) 
-        \State coordination\_signals $\leftarrow$ compute\_offsets(sync\_action)
-        
-        \State \textbf{Giai đoạn 3: Thực thi hành động} 
-        \For{mỗi intersection\_agent $i$} 
-            \State local\_action[$i$] $\leftarrow$ local\_agent[$i$].predict(local\_state[$i$]) 
-            \State apply\_coordination(local\_action[$i$], coordination\_signals[$i$]) 
-            \State execute\_action(local\_action[$i$]) 
-        \EndFor
-    \end{algorithmic}
-\end{algorithm}
-
-\subsubsection{Thiết lập môi trường giả lập}
-\begin{itemize}
-    \item Mạng lưới 3-4 giao lộ kết nối
-
-    \item Khoảng cách giữa các giao lộ: 200-750m
-
-    \item Multiple traffic scenarios: light, normal, heavy, rush hour
-
-    \item Evaluation metrics: overall waiting time, queue length,
-        synchronization quality
 \end{itemize}
