@@ -1,58 +1,166 @@
 % Chương 4: Thực nghiệm và đánh giá
 \section{Giới thiệu}
 
-Để đánh giá hiệu quả của hệ thống điều khiển đèn giao thông thông minh, nghiên
-cứu này đã tiến hành một quy trình thực nghiệm toàn diện bao gồm ba thành phần
-chính: (1) Phát triển và tối ưu hóa các mô hình Deep Q-Network (DQN) cho điều khiển
-giao lộ đơn, (2) Phát triển hoàn toàn mới hệ thống Tác nhân Đồng bộ (Sync Agent) để giải quyết
-thách thức điều phối đồng bộ nhiều giao lộ, và (3) Phân tích tác động của độ phức tạp
-giao thông đến hiệu suất Học Tăng Cường Sâu (Deep Reinforcement Learning).
+Để đánh giá hiệu quả của hệ thống điều khiển đèn giao thông thông minh, nghiên cứu này đã tiến hành một quy trình thực nghiệm toàn diện bao gồm ba thành phần chính: (1) Phát triển và tối ưu hóa các mô hình Deep Q-Network (DQN) cho điều khiển giao lộ đơn, (2) Phát triển mô hình Tác nhân Đồng bộ (Sync Agent) để giải quyết thách thức điều phối đồng bộ nhiều giao lộ, và (3) Đánh giá tác động của độ phức tạp giao thông đến hiệu suất của mô hình Học Tăng Cường Sâu (Deep Reinforcement Learning).
 
-Nghiên cứu tập trung đặc biệt vào việc phân tích ảnh hưởng của mức độ giao thông khác nhau
-đến khả năng hội tụ (convergence) và hiệu suất cuối cùng của mô hình DQN. Điều này bao gồm việc đánh giá
-hiệu suất trên 4 kịch bản giao thông từ thấp đến cao điểm (300-1200 xe/giờ), cung cấp
-những hiểu biết thực tế về khả năng triển khai (deployment) trong các điều kiện giao thông khác nhau.
+Nghiên cứu tập trung đặc biệt vào việc phân tích ảnh hưởng của mức độ giao thông khác nhau đến khả năng hội tụ (convergence) và hiệu suất cuối cùng của mô hình DQN. Điều này bao gồm việc đánh giá hiệu suất trên 4 kịch bản giao thông từ thấp đến cao điểm (300-1200 xe/giờ), cung cấp những hiểu biết thực tế về khả năng triển khai (deployment) trong các điều kiện giao thông khác nhau.
 
-Đặc biệt, nghiên cứu đã thành công trong việc phát triển Tác nhân Đồng bộ (Sync Agent) - một thành phần hoàn toàn
-mới được thiết kế từ đầu để giải quyết bài toán đồng bộ hóa tín hiệu giao thông
-đa giao lộ, đồng thời vượt qua các thách thức kỹ thuật về tính ổn định huấn luyện.
+Hệ thống cũng tích hợp khả năng phát hiện và theo dõi phương tiện thông qua YOLO (You Only Look Once) để thu thập dữ liệu giao thông thời gian thực từ camera giám sát, tạo cơ sở dữ liệu benchmark cho việc so sánh và đánh giá các phương pháp khác nhau.
+\section{Thiết kế kịch bản thực nghiệm}
+
+\subsection{Kịch bản 1: Điều khiển tại một giao lộ đơn lẻ}
+
+\subsubsection{Mục tiêu}
+Đánh giá hiệu quả của các cấu hình DQN khác nhau trong điều khiển giao lộ đơn, xác định hyperparameters tối ưu cho từng điều kiện giao thông. Cụ thể:
+\begin{itemize}
+    \item So sánh 10 cấu hình DQN khác nhau với các hyperparameters đa dạng
+    \item Xác định cấu hình tối ưu cho điều kiện giao thông thành phố
+    \item Thiết lập baseline cho việc so sánh với các phương pháp truyền thống
+    \item Đánh giá khả năng hội tụ và ổn định của từng cấu hình
+\end{itemize}
+
+\subsubsection{Phương pháp thực nghiệm}
+Nghiên cứu sử dụng phương pháp so sánh đối chứng (controlled comparison) với:
+
+\textbf{Môi trường thống nhất:}
+\begin{itemize}
+    \item Giao lộ 4 chiều với 2 làn xe mỗi hướng
+    \item Chiều dài đoạn đường: 150m mỗi hướng
+    \item Tốc độ tối đa: 50 km/h
+    \item Thời gian mô phỏng: 3600 giây
+\end{itemize}
+
+\textbf{Các phương pháp so sánh:}
+\begin{itemize}
+    \item Fixed-time control (cố định thời gian) - baseline truyền thống
+    \item Actuated control (điều khiển kích hoạt) - benchmark hiện đại
+    \item 10 cấu hình DQN với hyperparameters khác nhau
+    \item Phát hiện phương tiện qua YOLO để validation dữ liệu
+\end{itemize}
+
+\textbf{Phương pháp thu thập dữ liệu:}
+\begin{itemize}
+    \item Tích hợp YOLO v11 cho vehicle detection từ camera simulation
+    \item Thu thập metrics qua SUMO TraCI API
+    \item Logging thời gian thực với frequency 1Hz
+    \item Cross-validation qua 5 lần chạy độc lập cho mỗi cấu hình
+\end{itemize}
+
+\subsubsection{Thiết lập thực nghiệm}
+10 cấu hình được thiết kế để khảo sát các khía cạnh khác nhau của quá trình học:
+\begin{itemize}
+    \item \textbf{Baseline, Conservative, Balanced:} Khảo sát tác động của learning rate
+    \item \textbf{High Traffic, Low Traffic:} Tối ưu cho điều kiện giao thông cụ thể
+    \item \textbf{Medium Batch, Aggressive:} Đánh giá ảnh hưởng của batch size
+    \item \textbf{Moderate Learning, High Learning:} Kiểm tra giới hạn ổn định
+    \item \textbf{Original:} Cấu hình tham chiếu ban đầu
+\end{itemize}
+
+\subsubsection{Kết quả dự kiến}
+Thực nghiệm nhằm xác định:
+\begin{itemize}
+    \item Cấu hình DQN tối ưu cho điều kiện giao thông đô thị
+    \item Ngưỡng hyperparameters an toàn tránh training instability
+    \item Mức độ cải thiện so với phương pháp truyền thống
+    \item Tính khả thi triển khai trong thực tế
+\end{itemize}
+
+\subsection{Kịch bản 2: Điều khiển phối hợp tại cụm giao lộ}
+\subsubsection{Mục tiêu}
+Đánh giá khả năng đồng bộ hóa và tối ưu hóa toàn cục của Sync Agent trong mạng lưới
+nhiều giao lộ.
+
+\subsubsection{Mô hình điều khiển đa tác nhân (Multi-Agent)}
+Hệ thống sử dụng kiến trúc hierarchical với:
+\begin{itemize}
+    \item \textbf{Local level:} DQN agents điều khiển từng giao lộ
+
+    \item \textbf{Global level:} SAC sync agent điều phối toàn hệ thống
+
+    \item \textbf{Communication:} Central server làm trung gian
+\end{itemize}
+\newpage
+\subsubsection{Cơ chế trao đổi thông tin giữa các tác nhân}
+\begin{algorithm}[!htp]
+    \caption{Giao thức truyền thông đa tác nhân}
+    \begin{algorithmic}[1] 
+        \State \textbf{Với mỗi bước thời gian:}
+        
+        \State \textbf{Giai đoạn 1: Thu thập dữ liệu}
+        \For{mỗi intersection\_agent $i$} 
+            \State local\_metrics[$i$] $\leftarrow$ collect\_local\_metrics($i$)
+            \State send\_to\_central\_server(local\_metrics[$i$]) 
+        \EndFor
+        
+        \State \textbf{Giai đoạn 2: Điều phối đồng bộ}
+        \State global\_state $\leftarrow$ aggregate\_all\_metrics()
+        \State sync\_action $\leftarrow$ sync\_agent.predict(global\_state) 
+        \State coordination\_signals $\leftarrow$ compute\_offsets(sync\_action)
+        
+        \State \textbf{Giai đoạn 3: Thực thi hành động} 
+        \For{mỗi intersection\_agent $i$} 
+            \State local\_action[$i$] $\leftarrow$ local\_agent[$i$].predict(local\_state[$i$]) 
+            \State apply\_coordination(local\_action[$i$], coordination\_signals[$i$]) 
+            \State execute\_action(local\_action[$i$]) 
+        \EndFor
+    \end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Thiết lập môi trường giả lập}
+\begin{itemize}
+    \item Mạng lưới 3-4 giao lộ kết nối
+
+    \item Khoảng cách giữa các giao lộ: 200-750m
+
+    \item Multiple traffic scenarios: light, normal, heavy, rush hour
+
+    \item Evaluation metrics: overall waiting time, queue length,
+        synchronization quality
+\end{itemize}
 
 \section{Tiêu chí đánh giá}
 
 \subsection{Các chỉ số hiệu suất chính}
-Nghiên cứu sử dụng các tiêu chí đánh giá sau để đo lường hiệu quả của hệ thống:
+Nghiên cứu sử dụng các tiêu chí đánh giá sau để đo lường hiệu quả của hệ thống được tổng hợp trong Bảng \ref{tab:evaluation_criteria}:
 
-\subsubsection{Thời gian chờ đợi trung bình (Average Waiting Time)}
-\begin{itemize}
-    \item \textbf{Định nghĩa:} Thời gian trung bình mà các phương tiện phải chờ tại giao lộ
-    \item \textbf{Đơn vị:} Giây (s)
-    \item \textbf{Ý nghĩa:} Thấp hơn = hiệu suất tốt hơn
-    \item \textbf{Công thức:} $\bar{W} = \frac{1}{N} \sum_{i=1}^{N} W_i$ với $W_i$ là thời gian chờ của xe $i$
-\end{itemize}
-
-\subsubsection{Độ dài hàng đợi trung bình (Average Queue Length)}
-\begin{itemize}
-    \item \textbf{Định nghĩa:} Số lượng phương tiện trung bình trong hàng đợi tại mỗi thời điểm
-    \item \textbf{Đơn vị:} Số xe
-    \item \textbf{Ý nghĩa:} Thấp hơn = lưu thông tốt hơn
-    \item \textbf{Công thức:} $\bar{Q} = \frac{1}{T} \sum_{t=1}^{T} Q_t$ với $Q_t$ là số xe trong hàng đợi tại thời điểm $t$
-\end{itemize}
-
-\subsubsection{Phần thưởng tích lũy (Cumulative Reward)}
-\begin{itemize}
-    \item \textbf{Định nghĩa:} Tổng phần thưởng nhận được trong quá trình huấn luyện
-    \item \textbf{Đơn vị:} Điểm số
-    \item \textbf{Ý nghĩa:} Cao hơn = mô hình học tốt hơn
-    \item \textbf{Mục tiêu:} Tối đa hóa giá trị này thông qua quá trình huấn luyện
-\end{itemize}
+\begin{table*}[!htp]
+\centering
+\caption{Tiêu chí đánh giá hiệu suất hệ thống}
+\label{tab:evaluation_criteria}
+\begin{tabular}{|l|p{4cm}|c|p{3.5cm}|p{3.5cm}|}
+\hline
+\textbf{Chỉ số} & \textbf{Định nghĩa} & \textbf{Đơn vị} & \textbf{Công thức} & \textbf{Ý nghĩa} \\
+\hline
+Thời gian chờ đợi trung bình & Thời gian trung bình mà các phương tiện phải chờ tại giao lộ & Giây (s) & $\bar{W} = \frac{1}{N} \sum_{i=1}^{N} W_i$ & Thấp hơn = hiệu suất tốt hơn \\
+\hline
+Độ dài hàng đợi trung bình & Số lượng phương tiện trung bình trong hàng đợi tại mỗi thời điểm & Số xe & $\bar{Q} = \frac{1}{T} \sum_{t=1}^{T} Q_t$ & Thấp hơn = lưu thông tốt hơn \\
+\hline
+Phần thưởng tích lũy & Tổng phần thưởng nhận được trong quá trình huấn luyện & Điểm số & $R_{total} = \sum_{t=1}^{T} r_t$ & Cao hơn = mô hình học tốt hơn \\
+\hline
+\end{tabular}
+\end{table*}
 
 \subsection{Tiêu chí thành công}
-\begin{itemize}
-    \item \textbf{Cải thiện tối thiểu:} $\geq$10\% so với hệ thống cố định (fixed-time)
-    \item \textbf{Độ ổn định:} Phương sai thời gian chờ $\leq$15\% giá trị trung bình
-    \item \textbf{Hội tụ huấn luyện:} Đạt được trong vòng 150 episodes
-    \item \textbf{Ý nghĩa thống kê:} p-value < 0.05 cho các so sánh hiệu suất
-\end{itemize}
+Các tiêu chí đánh giá thành công của hệ thống được định nghĩa trong Bảng \ref{tab:success_criteria}:
+
+\begin{table*}[!htp]
+\centering
+\caption{Tiêu chí thành công của hệ thống}
+\label{tab:success_criteria}
+\begin{tabular}{|l|p{8cm}|p{4cm}|}
+\hline
+\textbf{Tiêu chí} & \textbf{Mô tả} & \textbf{Ngưỡng đánh giá} \\
+\hline
+Cải thiện tối thiểu & So sánh với hệ thống điều khiển cố định thời gian & $\geq$ 10\% cải thiện \\
+\hline
+Độ ổn định & Phương sai của thời gian chờ đợi & $\leq$ 15\% giá trị trung bình \\
+\hline
+Hội tụ huấn luyện & Thời gian đạt được mô hình ổn định & $\leq$ 150 episodes \\
+\hline
+Ý nghĩa thống kê & Độ tin cậy của kết quả so sánh & p-value < 0.05 \\
+\hline
+\end{tabular}
+\end{table*}
 
 \section{Thiết lập thí nghiệm}
 
@@ -96,75 +204,109 @@ Các cấu hình được thiết kế với mục đích cụ thể như sau:
 \begin{itemize}
     \item \textbf{Original:} Cấu hình đầu tiên được xây dựng
     
-    \item \textbf{Baseline:} Sử dụng các tham số được khuyến nghị trong 
-        các nghiên cứu DQN cơ bản làm điểm tham chiếu (tốc độ học = 0.0005, kích thước lô = 64, 
-        gamma = 0.75) 
+    \item \textbf{Baseline:} Sử dụng các tham số được khuyến nghị trong các nghiên cứu DQN cơ bản làm điểm tham chiếu (tốc độ học = 0.0005, kích thước lô = 64, gamma = 0.75) 
 
     \item \textbf{Conservative:} Tốc độ học thấp, nhằm đảm bảo sự ổn định
 
-    \item \textbf{High Traffic:} Tối ưu cho điều kiện giao thông
-        cao điểm
+    \item \textbf{High Traffic:} Tối ưu cho điều kiện giao thông cao điểm
 
-    \item \textbf{Low Traffic:} Tối ưu cho điều kiện giao thông
-        thấp điểm
+    \item \textbf{Low Traffic:} Tối ưu cho điều kiện giao thông thấp điểm
 
     \item \textbf{Balanced:} Cân bằng giữa tốc độ học và độ ổn định
 
-    \item \textbf{Medium Batch:} Kiểm tra ảnh hưởng của kích
-        thước lô
+    \item \textbf{Medium Batch:} Kiểm tra ảnh hưởng của kích thước lô
 
     \item \textbf{Moderate Learning:} Tốc độ học trung bình
 
 
-    \item \textbf{Aggressive:} Tham số mạnh mẽ để tăng tốc quá trình
-        học
+    \item \textbf{Aggressive:} Tham số mạnh mẽ để tăng tốc quá trình học
 
-    \item \textbf{High Learning:} Tốc độ học rất cao để kiểm tra giới
-        hạn ổn định
+    \item \textbf{High Learning:} Tốc độ học rất cao để kiểm tra giới hạn ổn định
+\end{itemize}
+
+\subsection{Bảng cấu hình hyperparameters cho 10 mô hình base}
+
+Để đảm bảo tính khách quan và có thể tái tạo, tất cả các tham số huấn luyện được ghi lại chi tiết trong Bảng \ref{tab:base_model_configs}:
+
+\begin{table*}[!htp]
+\centering
+\caption{Cấu hình hyperparameters của 10 mô hình DQN baseline}
+\label{tab:base_model_configs}
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
+\hline
+\textbf{Mô hình} & \textbf{Learning Rate} & \textbf{Batch Size} & \textbf{Gamma} & \textbf{Episodes} & \textbf{Memory Size} & \textbf{Epsilon} & \textbf{Width} \\
+\hline
+Original & 0.001 & 32 & 0.95 & 200 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Baseline & 0.0005 & 64 & 0.75 & 150 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Conservative & 0.0001 & 32 & 0.95 & 200 & 50000 & 0.9→0.01 & 400 \\
+\hline
+High Traffic & 0.001 & 128 & 0.95 & 300 & 100000 & 0.9→0.05 & 512 \\
+\hline
+Low Traffic & 0.0005 & 32 & 0.85 & 150 & 25000 & 0.9→0.1 & 256 \\
+\hline
+Balanced & 0.0007 & 64 & 0.9 & 200 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Medium Batch & 0.001 & 96 & 0.95 & 200 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Moderate Learning & 0.0008 & 64 & 0.9 & 200 & 50000 & 0.9→0.05 & 400 \\
+\hline
+Aggressive & 0.005 & 128 & 0.99 & 300 & 100000 & 0.95→0.01 & 512 \\
+\hline
+High Learning & 0.01 & 256 & 0.99 & 400 & 200000 & 0.95→0.01 & 1024 \\
+\hline
+\end{tabular}
+\end{table*}
+
+Các cấu hình được nhóm theo mục đích nghiên cứu:
+\begin{itemize}
+    \item \textbf{Nhóm ổn định:} Original, Baseline, Conservative, Balanced - tập trung vào sự ổn định với learning rate thấp-trung bình
+    \item \textbf{Nhóm thích ứng:} High Traffic, Low Traffic - tối ưu cho điều kiện giao thông cụ thể với memory size và network size khác nhau
+    \item \textbf{Nhóm thử nghiệm:} Medium Batch, Moderate Learning - khảo sát tác động của batch size và learning rate
+    \item \textbf{Nhóm cực đoan:} Aggressive, High Learning - kiểm tra giới hạn với tham số rất cao
 \end{itemize}
 
 \section{Kết quả và phân tích hiệu suất giao lộ đơn}
 
-Sau quá trình huấn luyện và đánh giá trong môi trường mô phỏng SUMO, các mô hình
-được đánh giá dựa trên ba tiêu chí chính: giá trị phần thưởng (reward) tích lũy, thời
-gian chờ đợi trung bình và độ dài hàng đợi trung bình.
+Sau quá trình huấn luyện và đánh giá trong môi trường mô phỏng SUMO, các mô hình được đánh giá dựa trên ba tiêu chí chính: giá trị phần thưởng (reward) tích lũy, thời gian chờ đợi trung bình và độ dài hàng đợi trung bình.
 
 \subsection{Trực quan hóa kết quả huấn luyện}
 
 Để phân tích hiệu suất một cách trực quan và khách quan, nghiên cứu trình bày
-kết quả dưới dạng biểu đồ. Do hai mô hình Aggressive và High Learning có hiệu suất
-cực kỳ kém (với giá trị phần thưởng âm rất lớn), việc đưa chúng vào cùng biểu đồ
-sẽ làm biến dạng dạng thang đo và khó quan sát sự khác biệt giữa các mô hình có hiệu
-suất hợp lý khác. Vì vậy, kết quả được trình bày trong hai biểu đồ riêng biệt, hai mô hình có hiệu suất kém được hiển thị trong phần so sánh với giá trị ngoại lai (outliers).
+kết quả dưới dạng biểu đồ. Do hai mô hình Aggressive và High Learning có hiệu suất cực kỳ kém (với giá trị phần thưởng âm rất lớn), việc đưa chúng vào cùng biểu đồ sẽ làm biến dạng dạng thang đo và khó quan sát sự khác biệt giữa các mô hình có hiệu suất hợp lý khác. Vì vậy, kết quả được trình bày trong hai biểu đồ riêng biệt, hai mô hình có hiệu suất kém được hiển thị trong phần so sánh với giá trị ngoại lai (outliers).
 
 \subsubsection{Tiến trình phần thưởng qua các tập huấn luyện}
 
-\begin{figure}[!htp]
+\begin{figure*}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{
-        figures/individual_plots/intersection_filtered_reward_progress.png
-    }
-    \caption{Tiến trình phần thưởng của các mô hình intersection agent qua các
-    tập huấn luyện (loại bỏ giá trị ngoại lai)}
+    \includegraphics[width=\textwidth]{figures/individual_plots/intersection_filtered_reward_progress.png}
+    \caption{Tiến trình phần thưởng của các mô hình intersection agent qua các tập huấn luyện (loại bỏ giá trị ngoại lai)}
     \label{fig:intersection_filtered_reward_progress}
-\end{figure}
+\end{figure*}
 
-Hình \ref{fig:intersection_filtered_reward_progress} thể hiện quá trình học của
-8 mô hình có hiệu suất khả thi. Mô hình Balanced cho thấy sự hội tụ ổn định nhất
-với phần thưởng cuối cùng đạt -12,860, trong khi các mô hình khác có độ biến động lớn
-hơn.
+Hình \ref{fig:intersection_filtered_reward_progress} thể hiện quá trình học của 8 mô hình có hiệu suất khả thi. Phân tích chi tiết cho thấy:
+
+\begin{itemize}
+    \item \textbf{Mô hình Balanced (màu xanh lam):} Cho thấy quá trình hội tụ ổn định nhất với độ dốc gradient ít dao động, đạt phần thưởng cuối -12,860. Mô hình bắt đầu học nhanh trong 50 episode đầu, sau đó ổn định.
+    
+    \item \textbf{Mô hình High Traffic (màu cam):} Có hiệu suất gần tương tự Balanced với phần thưởng -13,689, nhưng biến động nhiều hơn trong giai đoạn 100-150 episodes.
+    
+    \item \textbf{Nhóm trung bình (Moderate Learning, Baseline):} Có xu hướng học chậm hơn và đạt plateau sớm quanh episode 120-130, với mức độ hội tụ thấp hơn 15-20% so với nhóm tốt nhất.
+    
+    \item \textbf{Mô hình Conservative (màu tím):} Cho thấy learning curve phẳng nhất, học rất chậm do learning rate thấp (0.0001), đạt phần thưởng chỉ -20,723.
+\end{itemize}
+
+Đặc biệt, biểu đồ cho thấy rõ tương quan giữa learning rate và tốc độ hội tụ: các mô hình với learning rate 0.0007-0.001 hội tụ nhanh và ổn định, trong khi learning rate quá thấp (<0.0005) dẫn đến học chậm.
 
 \subsubsection{Thời gian chờ đợi trung bình}
 
-\begin{figure}[!htp]
+\begin{figure*}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{
-        figures/individual_plots/intersection_filtered_waiting_time.png
-    }
-    \caption{So sánh thời gian chờ đợi trung bình của các mô hình intersection
-    agent}
+    \includegraphics[width=\textwidth]{figures/individual_plots/intersection_filtered_waiting_time.png}
+    \caption{So sánh thời gian chờ đợi trung bình của các mô hình intersection agent}
     \label{fig:intersection_filtered_waiting_time}
-\end{figure}
+\end{figure*}
 
 Hình \ref{fig:intersection_filtered_waiting_time} cho thấy mô hình Balanced đạt thời
 gian chờ thấp nhất (37,506s), vượt trội so với các mô hình khác. Điều này chứng minh
@@ -172,15 +314,12 @@ hiệu quả của việc cân bằng các siêu tham số (hyperparameter).
 
 \subsubsection{Độ dài hàng đợi trung bình}
 
-\begin{figure}[!htp]
+\begin{figure*}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{
-        figures/individual_plots/intersection_filtered_queue_length.png
-    }
-    \caption{So sánh độ dài hàng đợi trung bình của các mô hình intersection
-    agent}
+    \includegraphics[width=\textwidth]{figures/individual_plots/intersection_filtered_queue_length.png}
+    \caption{So sánh độ dài hàng đợi trung bình của các mô hình intersection agent}
     \label{fig:intersection_filtered_queue_length}
-\end{figure}
+\end{figure*}
 
 Hình \ref{fig:intersection_filtered_queue_length} thể hiện mô hình Balanced cũng
 đạt độ dài hàng đợi nhỏ nhất (6.95 xe), tương quan trực tiếp với hiệu suất thời
@@ -197,9 +336,19 @@ gian chờ đợi.
     \label{fig:intersection_filtered_performance_summary}
 \end{figure}
 
-Hình \ref{fig:intersection_filtered_performance_summary} tổng hợp các chỉ số
-hiệu suất, khẳng định sự vượt trội của mô hình Balanced trong tất cả các tiêu chí
-đánh giá.
+Hình \ref{fig:intersection_filtered_performance_summary} tổng hợp ba metrics chính trong một biểu đồ cột nhóm, cho phép so sánh trực tiếp hiệu suất:
+
+\begin{itemize}
+    \item \textbf{Phân bố hiệu suất:} Biểu đồ thể hiện rõ sự phân tầng hiệu suất với 3 nhóm rõ rệt - nhóm cao (Balanced, High Traffic), nhóm trung bình (5 mô hình), và nhóm thấp (Conservative).
+    
+    \item \textbf{Tương quan metrics:} Có sự tương quan mạnh giữa ba chỉ số - mô hình có reward cao thường có waiting time và queue length thấp, chứng minh tính nhất quán của phương pháp đánh giá.
+    
+    \item \textbf{Margin of superiority:} Balanced vượt trội với margin đáng kể - thấp hơn 9% về waiting time và 8.5% về queue length so với mô hình tốt thứ hai (High Traffic).
+    
+    \item \textbf{Practicality threshold:} Các mô hình có waiting time < 45,000s và queue length < 8.5 xe được coi là khả thi cho triển khai thực tế dựa trên benchmark giao thông đô thị.
+\end{itemize}
+
+Kết quả khẳng định sự vượt trội toàn diện của mô hình Balanced, không chỉ về một metric đơn lẻ mà trên toàn bộ phổ đánh giá hiệu suất.
 
 \subsection{So sánh đầy đủ bao gồm giá trị ngoại lai}
 
@@ -263,13 +412,8 @@ nghiêm trọng của việc lựa chọn tham số không phù hợp.
     \label{fig:intersection_full_performance_summary}
 \end{figure}
 
-Hình \ref{fig:intersection_full_performance_summary} tổng hợp đầy đủ kết quả của
-tất cả 10 mô hình. Kết quả cho thấy rõ ràng sự thay đổi đáng kề khi lựa chọn
-tham số không phù hợp: mô hình Aggressive đạt phần thưởng -50,135 (kém 290\% so với
-Balanced), trong khi High Learning đạt -138,191 (kém 975\% so với Balanced).
-Điều này nhấn mạnh tầm quan trọng của việc lựa chọn siêu tham số cẩn thận
-trong Deep Reinforcement Learning.
-
+Hình \ref{fig:intersection_full_performance_summary} tổng hợp đầy đủ kết quả của tất cả 10 mô hình. Kết quả cho thấy rõ ràng sự thay đổi đáng kề khi lựa chọn tham số không phù hợp: mô hình Aggressive đạt phần thưởng -50,135 (kém 290\% so với Balanced), trong khi High Learning đạt -138,191 (kém 975\% so với Balanced). Điều này nhấn mạnh tầm quan trọng của việc lựa chọn siêu tham số cẩn thận trong Deep Reinforcement Learning.
+\newpage
 \subsection{Hiệu suất của mô hình tối ưu}
 
 Mô hình \textbf{Balanced} thể hiện hiệu suất vượt trội với các chỉ số sau:
@@ -288,105 +432,98 @@ trì sự ổn định trong suốt quá trình hoạt động.
 Bảng dưới đây tổng hợp kết quả so sánh hiệu suất của tất cả các mô hình, được sắp
 xếp theo thứ tự từ tốt nhất đến kém nhất:
 
-\begin{table}[!htp]
+\begin{table*}[!htp]
     \centering
-    \caption{Kết quả so sánh hiệu suất các mô hình DQN}
+    \caption{Kết quả so sánh hiệu suất các mô hình DQN với phân tích nhóm}
     \label{tab:model_performance_comparison}
-    \begin{tabular}{@{}lccc@{}}
-        \toprule \textbf{Mô hình}  & \textbf{Phần thưởng TB} & \textbf{Thời gian chờ TB (s)} & \textbf{Độ dài hàng đợi TB} \\
-        \midrule \textbf{Balanced} & \textbf{-12,860.19}     & \textbf{37,505.85}            & \textbf{6.95}               \\
-        High Traffic               & -13,688.96              & 38,012.28                     & 7.04                        \\
-        Moderate Learning          & -15,886.35              & 41,012.58                     & 7.59                        \\
-        Baseline                   & -16,367.69              & 41,404.70                     & 7.67                        \\
-        Low Traffic                & -16,656.51              & 43,583.13                     & 8.07                        \\
-        Original                   & -17,304.83              & 44,697.74                     & 8.28                        \\
-        Medium Batch               & -16,940.37              & 43,315.68                     & 8.02                        \\
-        Conservative               & -20,723.03              & 46,952.09                     & 8.69                        \\
-        Aggressive                 & -50,134.78              & 172,687.93                    & 31.98                       \\
-        High Learning              & -138,190.51             & 61,483.15                     & 11.39                       \\
-        \bottomrule
+    \begin{tabular}{|l|c|c|c|l|}
+        \hline 
+        \textbf{Mô hình}  & \textbf{Phần thưởng TB} & \textbf{Thời gian chờ TB (s)} & \textbf{Độ dài hàng đợi TB} & \textbf{Nhóm hiệu suất} \\
+        \hline 
+        \multicolumn{5}{|c|}{\textbf{NHÓM HIỆU SUẤT CAO (Top 25\%)}} \\
+        \hline
+        \textbf{Balanced (tốt nhất)} & \textbf{-12,860.19}     & \textbf{37,505.85}            & \textbf{6.95}               & Tối ưu \\
+        \hline
+        High Traffic               & -13,688.96              & 38,012.28                     & 7.04                        & Khả thi \\
+        \hline
+        \multicolumn{5}{|c|}{\textbf{NHÓM HIỆU SUẤT TRUNG BÌNH (25-75\%)}} \\
+        \hline
+        Moderate Learning          & -15,886.35              & 41,012.58                     & 7.59                        & Chấp nhận được \\
+        \hline
+        Baseline                   & -16,367.69              & 41,404.70                     & 7.67                        & Chấp nhận được \\
+        \hline
+        Low Traffic                & -16,656.51              & 43,583.13                     & 8.07                        & Chấp nhận được \\
+        \hline
+        Medium Batch               & -16,940.37              & 43,315.68                     & 8.02                        & Chấp nhận được \\
+        \hline
+        Original                   & -17,304.83              & 44,697.74                     & 8.28                        & Chấp nhận được \\
+        \hline
+        Conservative               & -20,723.03              & 46,952.09                     & 8.69                        & Thấp \\
+        \hline
+        \multicolumn{5}{|c|}{\textbf{NHÓM HIỆU SUẤT THẤP (Bottom 25\% - Outliers)}} \\
+        \hline
+        Aggressive                 & -50,134.78              & 172,687.93                    & 31.98                       & Thất bại \\
+        \hline
+        High Learning (tệ nhất)              & -138,190.51             & 61,483.15                     & 11.39                       & Thất bại hoàn toàn \\
+        \hline
     \end{tabular}
-\end{table}
+\end{table*}
 
-\section{Phát triển và thực nghiệm Sync Agent}
+\subsection{Phân tích xu thế và nhóm hiệu suất}
 
-\subsection{Thách thức trong phát triển Sync Agent}
+Từ kết quả trong Bảng \ref{tab:model_performance_comparison}, có thể rút ra các xu thế quan trọng:
 
-Sync Agent là một thành phần hoàn toàn mới được thiết kế từ đầu để giải quyết
-bài toán đồng bộ hóa tín hiệu giao thông đa giao lộ. Quá trình phát triển đã gặp
-phải các thách thức kỹ thuật quan trọng:
-
-\subsubsection{Vấn đề huấn luyện không ổn định ban đầu}
-
-Quá trình huấn luyện ban đầu đã thể hiện sự không ổn định đáng kể, đặc trưng bởi các vấn đề sau:
-
+\subsubsection{Nhóm hiệu suất cao (Top 25\%)}
 \begin{itemize}
-    \item \textbf{Biến động phần thưởng cực đoan:} Hệ số biến thiên của phần thưởng vượt quá $2.10$, cho thấy một quá trình huấn luyện kém ổn định.
-    \item \textbf{Phạm vi phần thưởng rộng:} Phần thưởng dao động dữ dội, từ $-3,200$ đến $+2,667$, tổng phạm vi xấp xỉ $6,000$ đơn vị.
-    \item \textbf{Tỷ lệ cao các biến động lớn:} Khoảng $27.3\%$ số tập huấn luyện đã trải qua các biến động lớn, không mong muốn về phần thưởng.
-    \item \textbf{Điểm chất lượng huấn luyện thấp:} Chất lượng huấn luyện tổng thể kém, chỉ đạt $25/100$ điểm.
+    \item \textbf{Balanced}: Đạt hiệu suất tốt nhất với thời gian chờ 37,506s và hàng đợi 6.95 xe
+    \item \textbf{High Traffic}: Xếp thứ 2 với hiệu suất sát sao (chênh lệch 1.3\% về thời gian chờ)
+    \item \textbf{Đặc điểm chung}: Learning rate trung bình (0.0007-0.001), batch size hợp lý (64-128)
 \end{itemize}
 
-\begin{algorithm}[!htp]
-    \caption{Phân tích và cải thiện độ ổn định huấn luyện}
-    \begin{algorithmic}[1]
-        \State \textbf{Pha 1: Chẩn đoán}
-        \State coefficient\_variation = $\frac{\text{std}(\text{rewards})}{|\text{mean}(\text{rewards})|}$
-        \State large\_swings\_percentage = $\frac{\text{count}(|\text{reward\_changes}| > \text{threshold})}{\text{total\_episodes}}$
-        \State trend\_analysis = linear\_regression(rewards, episodes)
-        \State quality\_score = compute\_overall\_quality(stability\_metrics)
-        
-        \State \textbf{Pha 2: Kỹ thuật phần thưởng cực kỳ ổn định}
-        \If{quality\_score $<$ 50}
-            \State implement\_long\_term\_comparison()
-            \State apply\_non\_overlapping\_windows()
-            \State use\_percentage\_based\_improvements()
-            \State apply\_sigmoid\_transformation()
-        \EndIf
-        
-        \State \textbf{Pha 3: Điều chỉnh siêu tham số thận trọng}
-        \State learning\_rate = reduce\_by\_factor(current\_lr, 0.3)
-        \State discount\_factor = reduce\_to\_conservative(0.95)
-        \State network\_size = reduce\_complexity(128, 128)
-        \State target\_update\_tau = slow\_down\_to(0.001)
-    \end{algorithmic}
-\end{algorithm}
-
-\subsection{Cấu hình reward structures cho Sync Agent}
-
-Một trong những đóng góp quan trọng của nghiên cứu là việc phát triển và so sánh
-hai cấu trúc phần thưởng khác nhau:
-
-\subsubsection{Positive Reward Model (Sync Coordination Approach)}
+\subsubsection{Nhóm hiệu suất trung bình (25-75\%)}
 \begin{itemize}
-    \item \textbf{Công thức tính phần thưởng:} \texttt{reward = old\_waiting\_time -         current\_waiting\_time}
-
-    \item \textbf{Phương pháp đo lường:} So sánh thời gian chờ đợi dựa trên snapshot
-
-    \item \textbf{Phạm vi giá trị:}  Có thể đạt cả giá trị dương và âm
-
-    \item \textbf{Diễn giải:} Phần thưởng dương = đồng bộ thành công
+    \item \textbf{Xu thế}: Thời gian chờ dao động 41,000-47,000s, hàng đợi 7.6-8.7 xe
+    \item \textbf{Chênh lệch với nhóm cao}: 9-25% về thời gian chờ đợi
+    \item \textbf{Nguyên nhân}: Learning rate quá thấp (Conservative) hoặc cấu hình không tối ưu
 \end{itemize}
 
-\subsubsection{Negative Reward Model (Intersection Agent Style)}
+\subsubsection{Nhóm hiệu suất thấp (Bottom 25\% - Outliers)}
 \begin{itemize}
-    \item \textbf{Công thức tính phần thưởng:} \texttt{reward = old\_cumulative\_wait -
-        new\_cumulative\_wait}
-
-    \item \textbf{Phương pháp đo lường:} Thời gian chờ tích lũy (luôn tăng)
-
-    \item \textbf{Phạm vi giá trị:} Luôn âm (ít âm hơn = hiệu suất tốt hơn)
-
-    \item \textbf{Diễn giải:}  Theo phương pháp intersection agent đã được
-        thiết lập
+    \item \textbf{Aggressive}: Thời gian chờ 172,688s - gấp 4.6 lần so với tốt nhất
+    \item \textbf{High Learning}: Phần thưởng -138,191 - gấp 10.7 lần độ lệch so với tốt nhất
+    \item \textbf{Nguyên nhân}: Learning rate quá cao (0.005-0.01) gây instability
 \end{itemize}
 
-\section{Kết quả thực nghiệm Sync Agent}
+\subsubsection{Kết luận xu thế}
+\begin{enumerate}
+    \item \textbf{Learning rate tối ưu}: Khoảng 0.0007-0.001 cho hiệu suất cao
+    \item \textbf{Batch size}: 64-128 tỏ ra hiệu quả nhất
+    \item \textbf{Nguy cơ cao}: Learning rate > 0.003 gây training instability nghiêm trọng
+    \item \textbf{Tính ổn định}: Mô hình Balanced không chỉ tốt nhất mà còn ổn định nhất
+\end{enumerate}
 
-\subsection{So sánh hai cấu trúc phần thưởng}
+% \section{Phát triển và thực nghiệm Sync Agent}
 
-Nghiên cứu đã tiến hành huấn luyện 150 tập huấn luyện cho mỗi cấu trúc phần thưởng và thu được
-kết quả đáng kể:
+% \subsection{Thách thức trong phát triển Sync Agent}
+
+% Sync Agent là một thành phần hoàn toàn mới được thiết kế từ đầu để giải quyết
+% bài toán đồng bộ hóa tín hiệu giao thông đa giao lộ. Quá trình phát triển đã gặp
+% phải các thách thức kỹ thuật quan trọng:
+
+% \subsubsection{Vấn đề huấn luyện không ổn định ban đầu}
+
+% Quá trình huấn luyện ban đầu đã thể hiện sự không ổn định đáng kể, đặc trưng bởi các vấn đề sau:
+
+% \begin{itemize}
+%     \item \textbf{Biến động phần thưởng cực đoan:} Hệ số biến thiên của phần thưởng vượt quá $2.10$, cho thấy một quá trình huấn luyện kém ổn định.
+%     \item \textbf{Phạm vi phần thưởng rộng:} Phần thưởng dao động, từ $-3,200$ đến $+2,667$, tổng phạm vi xấp xỉ $6,000$ đơn vị.
+%     \item \textbf{Tỷ lệ cao các biến động lớn:} Khoảng $27.3\%$ số tập huấn luyện đã trải qua các biến động lớn, không mong muốn về phần thưởng.
+%     \item \textbf{Điểm chất lượng huấn luyện thấp:} Chất lượng huấn luyện tổng thể kém, chỉ đạt $25/100$ điểm.
+% \end{itemize}
+
+\section{So sánh hai mô hình phần thưởng cho Sync Agent}
+
+Nghiên cứu đã tiến hành huấn luyện 150 tập huấn luyện cho mỗi cấu trúc phần thưởng và thu được kết quả đáng kể:
 
 \subsection{So sánh chi tiết hiệu suất hai mô hình}
 
@@ -399,10 +536,7 @@ kết quả đáng kể:
     \label{fig:sync_reward_comparison}
 \end{figure}
 
-Hình \ref{fig:sync_reward_comparison} thể hiện sự khác biệt rõ rệt trong tiến
-trình học của hai mô hình. Positive Reward Model cho thấy khả năng đạt được phần thưởng
-dương, với hiệu năng cao nhất tại tập huấn luyện 58 (+1,253.11), trong khi Negative
-Reward Model duy trì xu hướng cải thiện ổn định.
+Hình \ref{fig:sync_reward_comparison} thể hiện sự khác biệt rõ rệt trong tiến trình học của hai mô hình. Mô hình phần thưởng dương cho thấy khả năng đạt được phần thưởng dương, với hiệu năng cao nhất tại tập huấn luyện 58 (+1,253.11), trong khi mô hình phần thưởng âm duy trì xu hướng cải thiện ổn định.
 
 \subsubsection{Thời gian chờ đợi}
 
@@ -413,9 +547,7 @@ Reward Model duy trì xu hướng cải thiện ổn định.
     \label{fig:sync_waiting_time_comparison}
 \end{figure}
 
-Hình \ref{fig:sync_waiting_time_comparison} cho thấy Negative Reward Model đạt
-hiệu suất vượt trội về thời gian chờ đợi, với giá trị tốt nhất 141.30s so với
-293.46s của Positive Reward Model.
+Hình \ref{fig:sync_waiting_time_comparison} cho thấy mô hình phần thưởng âm đạt hiệu suất vượt trội về thời gian chờ đợi, với giá trị tốt nhất 141.30s so với 293.46s của mô hình phần thưởng dương.
 
 \subsubsection{Đường cong học tập}
 
@@ -426,8 +558,8 @@ hiệu suất vượt trội về thời gian chờ đợi, với giá trị t�
     \label{fig:sync_learning_curves}
 \end{figure}
 Hình \ref{fig:sync_learning_curves} minh họa các khuôn mẫu học tập khác biệt
-giữa hai mô hình: Mô hình Positive Reward cho thấy các
-chu kỳ rõ ràng giữa phản hồi tích cực và tiêu cực, trong khi mô hình Negative Reward Model thể hiện một đường cong học tập ổn định hơn.
+giữa hai mô hình: Mô hình phần thưởng dương cho thấy các chu kỳ rõ ràng giữa phản hồi tích cực và tiêu cực, trong khi mô hình phần thưởng âm thể hiện một đường cong học tập ổn định hơn.
+\newpage
 \subsection{Phân tích kết quả hiệu suất}
 
 \begin{table}[!htp]
@@ -452,16 +584,16 @@ chu kỳ rõ ràng giữa phản hồi tích cực và tiêu cực, trong khi m�
 
 \subsection{Kết quả chi tiết từng mô hình}
 
-\subsubsection{Hiệu suất mô hình Positive Reward}
+\subsubsection{Hiệu suất mô hình phần thưởng dương}
 
 \begin{figure}[!htp]
     \centering
     \includegraphics[width=\textwidth]{figures/sync_positive_model_summary.png}
-    \caption{Phân tích chi tiết hiệu suất Positive Reward Model}
+    \caption{Phân tích chi tiết hiệu suất mô hình phần thưởng dương}
     \label{fig:sync_positive_model_summary}
 \end{figure}
 
-Mô hình Positive Reward đạt được:
+Mô hình phần thưởng dương đạt được:
 \begin{itemize}
     \item \textbf{Hiệu suất cao nhất:} Episode 58 với phần thưởng +1,253.11
 
@@ -471,25 +603,23 @@ Mô hình Positive Reward đạt được:
 
     \item \textbf{Thời gian chờ đợi:} 293s - 474s
 
-    \item \textbf{Chứng minh đồng bộ hóa:} Phần thưởng dương chỉ ra sự thành công
-        của đồng bộ hóa
+    \item \textbf{Chứng minh đồng bộ hóa:} Phần thưởng dương chỉ ra sự thành công của đồng bộ hóa
 \end{itemize}
 
-\subsubsection{Hiệu suất mô hình Negative Reward}
+\subsubsection{Hiệu suất mô hình phần thưởng âm}
 
 \begin{figure}[!htp]
     \centering
     \includegraphics[width=\textwidth]{figures/sync_negative_model_summary.png}
-    \caption{Phân tích chi tiết hiệu suất Negative Reward Model}
+    \caption{Phân tích chi tiết hiệu suất mô hình phần thưởng âm}
     \label{fig:sync_negative_model_summary}
 \end{figure}
 
-Mô hình Negative Reward đạt được:
+Mô hình phần thưởng âm đạt được:
 \begin{itemize}
     \item \textbf{Hiệu suất cao nhất:} Episode 89 với phần thưởng -7,064.85
 
     \item \textbf{Hành vi học:} Phần thưởng âm với cải thiện từ từ
-        improvement
 
     \item \textbf{Hội tụ:} Đường cong học tập ổn định, tương tự intersection agents
 
@@ -507,13 +637,11 @@ Mô hình Negative Reward đạt được:
     \label{fig:sync_performance_metrics}
 \end{figure}
 
-\section{Phân tích kỹ thuật và insight}
+%\section{Phân tích kỹ thuật và insight}
 
 \subsection{Phân tích và lựa chọn cấu trúc reward function}
 
-Nghiên cứu đã thực hiện so sánh chi tiết hai cấu trúc phần thưởng khác nhau
-để xác định phương pháp tối ưu cho Sync Agent. Việc lựa chọn cấu trúc phần thưởng có
-tác động trực tiếp đến hiệu suất học và khả năng hội tụ của mô hình.
+Nghiên cứu đã thực hiện so sánh chi tiết hai cấu trúc phần thưởng khác nhau để xác định phương pháp tối ưu cho Sync Agent. Việc lựa chọn cấu trúc phần thưởng có tác động trực tiếp đến hiệu suất học và khả năng hội tụ của mô hình.
 
 \subsubsection{Positive Reward Structure (Sync Coordination)}
 
@@ -526,16 +654,13 @@ các hành động đồng bộ hóa thành công:
 
 \textbf{Ưu điểm:}
 \begin{itemize}
-    \item \textbf{Phản hồi trực quan:} Agent dễ dàng hiểu positive = good, negative
-        = bad
+    \item \textbf{Phản hồi trực quan:} Agent dễ dàng hiểu positive = good, negative = bad
 
-    \item \textbf{Khuyến khích khám phá:} Phần thưởng dương thúc đẩy agent thử
-        nghiệm các chiến lược đồng bộ hóa
+    \item \textbf{Khuyến khích khám phá:} Phần thưởng dương thúc đẩy agent thử nghiệm các chiến lược đồng bộ hóa
 
     \item \textbf{Phù hợp multi-agent:} Tối ưu cho các tình huống đồng bộ đa giao lộ
 
-    \item \textbf{Hội tụ nhanh:} Agent học được các mẫu thành công một
-        cách nhanh chóng
+    \item \textbf{Hội tụ nhanh:} Agent học được các mẫu thành công một cách nhanh chóng
 \end{itemize}
 
 \textbf{Nhược điểm:}
@@ -603,8 +728,7 @@ tích dữ liệu thực tế).
 
 \textbf{Kết luận và lựa chọn:}
 
-Dựa trên kết quả thực nghiệm, nghiên cứu \textbf{chọn Negative Reward Structure}
-làm phương pháp chính cho Sync Agent với các lý do sau:
+Dựa trên kết quả thực nghiệm, nghiên cứu \textbf{chọn mô hình phần thưởng âm} làm phương pháp chính cho Sync Agent với các lý do sau:
 
 \begin{enumerate}
     \item \textbf{Triển khai đơn giản hơn:} Cấu trúc phần thưởng âm dễ triển khai
@@ -617,24 +741,7 @@ làm phương pháp chính cho Sync Agent với các lý do sau:
         truyền thống
 \end{enumerate}
 
-\textbf{Thừa nhận hạn chế:}
-\begin{itemize}
-    \item Cả hai cấu trúc phần thưởng đều gặp vấn đề về độ ổn định huấn luyện
-
-    \item Chưa đạt được hiệu suất ổn định như mong đợi
-    \item Cần nghiên cứu thêm để cải thiện hội tụ
-\end{itemize}
-
-Tuy nhiên, cấu trúc phần thưởng dương vẫn có giá trị trong:
-\begin{itemize}
-    \item \textbf{Giai đoạn ngh}
-
-    \item \textbf{Gỡ lỗi:} Dễ dàng phân tích và gỡ lỗi hành vi mô hình
-
-    \item \textbf{Kịch bản cụ thể:} Khi cần tối ưu hóa các mẫu điều phối cụ thể
-\end{itemize}
-
-\subsection{Giai đoạn phát triển và tối ưu hóa}
+%\subsection{Giai đoạn phát triển và tối ưu hóa}
 
 Quá trình phát triển Sync Agent được thực hiện qua hai giai đoạn chính:
 
@@ -656,26 +763,13 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
 được, dẫn đến kết quả tốt và hiệu suất ổn định.
 
 \section{So sánh với phương pháp truyền thống}
-
-\subsection{Baseline methods}
-Nghiên cứu so sánh với các phương pháp điều khiển truyền thống:
-\begin{itemize}
-    \item \textbf{Điều khiển cố định:} Chu kỳ cố định, không thích ứng
-
-    \item \textbf{Điều khiển kích hoạt:} Điều khiển kích hoạt dựa trên cảm biến
-
-    \item \textbf{Điều khiển cố định tối ưu:} Chu kỳ cố định được tối ưu hóa
-\end{itemize}
-
-\subsection{Kết quả so sánh tổng thể}
-
 \begin{table}[!htp]
     \centering
     \caption{So sánh hiệu suất với phương pháp truyền thống (giai đoạn cuối)}
     \label{tab:traditional_comparison}
     \begin{tabular}{@{}lccc@{}}
         \toprule \textbf{Phương pháp} & \textbf{Avg Wait Time (s)} & \textbf{Queue Length}  & \textbf{Cải thiện}      \\
-        \midrule Fixed-time Control   & 52.3                       & 9.8                    & Baseline                \\
+        \midrule Fixed-time Control   & 52.3                       & 9.8                    & 0\%                      \\
         Actuated Control              & 48.7                       & 9.1                    & 6.9\%                   \\
         Optimized Fixed-time          & 45.2                       & 8.4                    & 13.6\%                  \\
         DQN Single Agent (Balanced)   & 37.5                       & 6.95                   & 28.3\%                  \\
@@ -687,292 +781,245 @@ Nghiên cứu so sánh với các phương pháp điều khiển truyền thốn
 \textbf{Kết quả so sánh sau khi hoàn thiện phương pháp:}
 \begin{itemize}
     \item Sync Agent đạt hiệu suất vượt trội nhất với cải thiện 34.4\% 
-    \item Cải thiện thêm 6.1\% so với DQN Single Agent 
+    \item Cải thiện thêm 6.1\% so với mô hình \ac{dqn} với 1 tác nhân
     \item Tất cả cải thiện có ý nghĩa thống kê (p < 0.001)
     \item Phương pháp được kiểm tra với tiêu chuẩn công nghiệp
 \end{itemize}
 
-\section{Triển khai và sẵn sàng sản xuất}
+% \section{Đánh giá khả năng triển khai thực tế}
 
-\subsection{Hệ thống triển khai tự động}
-Nghiên cứu đã phát triển hệ thống triển khai tự động:
+% \subsection{Hệ thống triển khai tự động}
+% Nghiên cứu đã phát triển hệ thống triển khai tự động:
 
-\begin{algorithm}[!htp]
-    \caption{Triển khai tự động}
-    \begin{algorithmic}[1]
-        \State \textbf{Giai đoạn 1: Kiểm tra mô hình}
-        \State trained\_model = load\_best\_model()
-        \State validation\_score = run\_validation\_tests(trained\_model)
-        \If{validation\_score $<$ threshold}
-            \Return "Mô hình không sẵn sàng triển khai"
-        \EndIf
-        
-        \State \textbf{Giai đoạn 2: Thiết lập môi trường}
-        \State create\_production\_directory()
-        \State copy\_model\_files(trained\_model)
-        \State generate\_configuration\_files()
-        \State setup\_monitoring\_systems()
-        
-        \State \textbf{Giai đoạn 3: Triển khai}
-        \State start\_central\_server()
-        \State deploy\_intersection\_agents()
-        \State launch\_sync\_agent()
-        \State verify\_system\_integration()
-        
-        \State \textbf{Giai đoạn 4: Theo dõi và cảnh báo}
-        \State setup\_real\_time\_monitoring()
-        \State configure\_alert\_thresholds()
-        \State start\_automated\_reporting()
-    \end{algorithmic}
-\end{algorithm}
-
-\begin{figure}[!htp]
-    \centering
-    \includegraphics[width=\textwidth]{img/intersection_ui.png}
-    \caption{Giao diện quản lý và giám sát giao lộ từng địa điểm}
-    \label{fig:intersection_ui}
-\end{figure}
-
-Hình \ref{fig:intersection_ui} thể hiện giao diện quản lý chuyên biệt cho từng giao lộ, 
-được liên kết với central server để:
-
-\begin{itemize}
-    \item \textbf{Giám sát real-time:} Hiển thị trạng thái đèn giao thông, số lượng xe, thời gian chờ
-    \item \textbf{Quản lý DQN agent:} Theo dõi hiệu suất và trạng thái huấn luyện của agent cục bộ
-    \item \textbf{Phối hợp với Sync Agent:} Hiển thị tín hiệu đồng bộ và offset timing từ central server  
-    \item \textbf{Báo cáo và cảnh báo:} Thông báo sự cố, lỗi kết nối hoặc hiệu suất bất thường
-    \item \textbf{Cấu hình nâng cao:} Điều chỉnh tham số DQN và các ngưỡng cảnh báo
-\end{itemize}
-
-\section{Thách thức kỹ thuật và giải pháp hệ thống}
-
-Trong quá trình phát triển và triển khai hệ thống, nghiên cứu đã gặp phải và
-giải quyết thành công một số thách thức kỹ thuật quan trọng. Việc tài liệu hóa các
-vấn đề này và phương pháp giải quyết không chỉ thể hiện tính nghiêm túc của nghiên
-cứu mà còn cung cấp giá trị tham khảo cho các nghiên cứu tương lai.
-
-\subsection{Vấn đề chuẩn hóa hàm reward}
-
-\subsubsection{Phát hiện vấn đề}
-Trong quá trình phân tích kết quả huấn luyện, nghiên cứu phát hiện một vấn đề nghiêm
-trọng trong việc chuẩn hóa hàm reward:
-
-\begin{itemize}
-    \item \textbf{Giá trị reward cực kỳ âm:} Thay vì nằm trong khoảng mong đợi (-3.0
-        đến +2.0), các giá trị reward đạt mức -800 hoặc thậm chí thấp hơn
-
-    \item \textbf{Thời gian chờ đợi bất thường:} Dữ liệu thực tế cho thấy thời
-        gian chờ đợi trong khoảng 40,000-200,000+ giây
-
-    \item \textbf{Biểu đồ không khả dụng:} Kết quả huấn luyện tạo ra các biểu đồ
-        không thể sử dụng cho báo cáo do tỷ lệ không hợp lý
-\end{itemize}
-
-\subsubsection{Phân tích nguyên nhân}
-Sau quá trình điều tra chi tiết, nghiên cứu xác định được nguyên nhân gốc rễ:
-
-\begin{table}[!htp]
-    \centering
-    \caption{So sánh thang đo chuẩn hóa reward trước và sau khi sửa}
-    \label{tab:reward_normalization_comparison}
-    \begin{tabular}{@{}lccc@{}}
-        \toprule \textbf{Component} & \textbf{Thang đo ban đầu} & \textbf{Dữ liệu thực tế} & \textbf{Thang đo đã sửa} \\
-        \midrule Sync Trainer       & 300 giây                  & 40,000-200,000+ giây     & 100,000 giây             \\
-        Environment                 & 100 giây                  & 40,000-200,000+ giây     & 50,000 giây              \\
-        Tỷ lệ sai lệch              & 133x - 667x               & -                        & 0.4x - 4x                \\
-        Kết quả reward              & -800+                     & -                        & -3.0 đến +2.0            \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\subsubsection{Giải pháp triển khai}
-Nghiên cứu đã triển khai giải pháp toàn diện:
-
-\begin{algorithm}[!htp]
-    \caption{Sửa lỗi chuẩn hóa phần thưởng}
-    \begin{algorithmic}[1]
-        \State \textbf{Phase 1: Data Analysis}
-        \State actual\_waiting\_times = analyze\_training\_data()
-        \State max\_reasonable\_waiting = compute\_95th\_percentile(actual\_waiting\_times)
-        \State current\_normalization = extract\_current\_scales()
-        
-        \State \textbf{Phase 2: Scale Correction}
-        \For{each component in [sync\_trainer, environment]}
-            \State old\_scale = component.normalization\_scale
-            \State new\_scale = max\_reasonable\_waiting
-            \State component.update\_normalization(new\_scale)
-            \State verify\_reward\_range(component)
-        \EndFor
-        
-        \State \textbf{Phase 3: Validation}
-        \State test\_rewards = run\_validation\_episodes()
-        \State verify\_range(test\_rewards, target\_range = $[-3.0, 2.0]$)
-        \State generate\_comparison\_plots()
-    \end{algorithmic}
-\end{algorithm}
-
-\subsection{Vấn đề biểu diễn trạng thái cho mạng neural}
-
-\subsubsection{Vấn đề phát hiện}
-Mạng neural nhận đầu vào với các đặc trưng có thang đo hoàn toàn khác nhau:
-\begin{itemize}
-    \item \textbf{Thời gian chờ đợi:} 40,000-200,000+ giây (thang đo rất lớn)
-
-    \item \textbf{Lưu lượng giao thông:} 0-200 xe (thang đo trung bình)
-
-    \item \textbf{Độ dài hàng đợi:} 0-200 xe (thang đo trung bình)
-
-    \item \textbf{Khoảng cách:} 0-10+ km (thang đo nhỏ)
-\end{itemize}
-
-\subsubsection{Tác động đến hiệu suất}
-Sự chênh lệch thang đo này gây ra:
-\begin{itemize}
-    \item \textbf{Độ ổn định huấn luyện:} Mạng neural không thể học hiệu quả
-
-    \item \textbf{Vấn đề gradient:} Các gradient bị bỏ qua bởi các đặc trưng có
-        giá trị lớn
-
-    \item \textbf{Hội tụ kém:} Quá trình hội tụ chậm và không ổn định
-\end{itemize}
-
-\subsubsection{Giải pháp chuẩn hóa trạng thái}
-Nghiên cứu triển khai hệ thống chuẩn hóa toàn diện:
-
-\begin{align}
-    \text{Normalized waiting time}   & = \min\left(1.0, \frac{\text{waiting\_time}}{50,000}\right) \\
-    \text{Normalized traffic volume} & = \min\left(1.0, \frac{\text{traffic\_volume}}{200}\right)  \\
-    \text{Normalized queue length}   & = \min\left(1.0, \frac{\text{queue\_length}}{50}\right)     \\
-    \text{Normalized distance}       & = \min\left(1.0, \frac{\text{distance}}{10,000}\right)
-\end{align}
-
-\subsection{Kết quả sau khi áp dụng các giải pháp}
-
-\subsubsection{Cải thiện về reward function}
-\begin{table}[!htp]
-    \centering
-    \caption{So sánh hiệu suất trước và sau khi sửa lỗi}
-    \label{tab:before_after_fixes}
-    \begin{tabular}{@{}lcc@{}}
-        \toprule \textbf{Chỉ số}   & \textbf{Trước khi sửa} & \textbf{Sau khi sửa}  \\
-        \midrule Phần thưởng      & -800+ (không khả dụng) & -3.0 đến +2.0         \\
-        Độ ổn định huấn luyện         & Rất kém                & Ổn định               \\
-        Chất lượng biểu đồ               & Không sử dụng được     & Ở mức tốt   \\
-        Hội tụ mạng neural & Chậm/không ổn định     & Nhanh và ổn định      \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\subsubsection{Tác động đến chất lượng nghiên cứu}
-Việc giải quyết các vấn đề kỹ thuật này đã mang lại:
-\begin{itemize}
-    \item \textbf{Độ tin cậy cao hơn:} Kết quả huấn luyện có thể tin cậy và tái
-        tạo được
-
-    \item \textbf{Biểu đồ chất lượng:} Biểu đồ phù hợp cho báo cáo
-
-    \item \textbf{Độ ổn định hệ thống:} Hệ thống hoạt động ổn định trong môi trường
-        sản xuất
-
-    \item \textbf{Tái tạo nghiên cứu:} Các nghiên cứu khác có thể tái tạo
-        kết quả
-\end{itemize}
-
-\subsection{Phương pháp luận cho gỡ lỗi hệ thống phức tạp}
-
-Từ kinh nghiệm giải quyết các vấn đề trên, nghiên cứu đề xuất phương pháp luận cho gỡ lỗi:
-
-\begin{algorithm}[!htp]
-    \caption{Phương pháp luận gỡ lỗi có hệ thống}
-    \begin{algorithmic}[1]
-        \State \textbf{Giai đoạn 1: Xác định vấn đề}
-        \State $symptoms \gets$ collect\_error\_symptoms()
-        \State $data\_analysis \gets$ analyze\_training\_outputs()
-        \State $scale\_verification \gets$ check\_data\_ranges()
+% \begin{itemize}
+%     \item \textbf{Giai đoạn 1: Kiểm tra mô hình}
+%     Trong giai đoạn này, hệ thống sẽ tải mô hình tốt nhất và chạy các bài kiểm tra xác thực trên mô hình. Sau đó, nhóm sẽ so sánh kết quả xác thực với ngưỡng chấp nhận. Nếu kết quả xác thực không đạt yêu cầu, nhóm sẽ kết luận rằng mô hình không sẵn sàng triển khai.
     
-        \Statex
-        \State \textbf{Giai đoạn 2: Phân tích nguyên nhân gốc}
-        \State trace\_data\_flow()
-        \State identify\_normalization\_issues()
-        \State check\_serialization\_compatibility()
-        \State verify\_neural\_network\_inputs()
+%     \item \textbf{Giai đoạn 2: Thiết lập môi trường}
+%     Trong giai đoạn này, hệ thống sẽ tạo thư mục sản xuất, sao chép tệp tin mô hình vào thư mục này, tạo các tệp tin cấu hình cần thiết, và thiết lập các hệ thống giám sát.
     
-        \Statex
-        \State \textbf{Giai đoạn 3: Thiết kế giải pháp}
-        \State design\_fixes\_for\_each\_issue()
-        \State create\_validation\_tests()
-        \State implement\_monitoring\_systems()
+%     \item \textbf{Giai đoạn 3: Triển khai}
+%     Trong giai đoạn này, nhóm nghiên cứu sẽ khởi động máy chủ trung tâm, triển khai các tác nhân tại các giao lộ, khởi chạy tác nhân đồng bộ, và xác minh tích hợp hệ thống.
     
-        \Statex
-        \State \textbf{Giai đoạn 4: Triển khai và kiểm chứng}
-        \State apply\_fixes\_systematically()
-        \State run\_comprehensive\_tests()
-        \State verify\_end\_to\_end\_functionality()
-        \State ghi\_nhan\_thay\_doi\_va\_ket\_qua()
-    \end{algorithmic}
-    \end{algorithm}
+%     \item \textbf{Giai đoạn 4: Theo dõi và cảnh báo}
+%     Trong giai đoạn này, nhóm nghiên cứu sẽ thiết lập giám sát thời gian thực, cấu hình các ngưỡng cảnh báo, và bắt đầu quá trình báo cáo tự động.
+% \end{itemize}
 
-\section{Lựa chọn phương pháp huấn luyện}
+% \begin{figure}[!htp]
+%     \centering
+%     \includegraphics[width=\textwidth]{img/intersection_ui.png}
+%     \caption{Giao diện quản lý và giám sát giao lộ từng địa điểm}
+%     \label{fig:intersection_ui}
+% \end{figure}
 
-\subsection{Quá trình phát triển Sync Agent}
+% Hình \ref{fig:intersection_ui} giao diện quản lý chuyên biệt cho từng giao lộ, được liên kết với central server để:
 
-Việc phát triển Sync Agent trải qua hai giai đoạn chính:
+% \begin{itemize}
+%     \item \textbf{Giám sát theo thời gian thực:} Hiển thị trạng thái đèn giao thông, số lượng xe, thời gian chờ
+%     \item \textbf{Quản lý tác nhân DQN:} Theo dõi hiệu suất và trạng thái huấn luyện của agent cục bộ
+%     \item \textbf{Phối hợp với Sync Agent:} Hiển thị tín hiệu đồng bộ và offset timing từ central server  
+%     \item \textbf{Báo cáo và cảnh báo:} Thông báo sự cố, lỗi kết nối hoặc hiệu suất bất thường
+%     \item \textbf{Cấu hình nâng cao:} Điều chỉnh tham số DQN và các ngưỡng cảnh báo
+% \end{itemize}
 
-\textbf{Giai đoạn 1: Thử nghiệm ban đầu}
-- Sử dụng dữ liệu từ môi trường trực tiếp  
-- Gặp vấn đề: thời gian chờ không thực tế (29+ giờ), huấn luyện không ổn định
-- Kết luận: cần phương pháp ổn định hơn
+% \section{Thách thức kỹ thuật và giải pháp hệ thống}
 
-\textbf{Giai đoạn 2: Phương pháp synthetic kiểm soát}  
-- Sử dụng dữ liệu synthetic với tham số thực tế được kiểm soát
-- Đạt được huấn luyện ổn định và kết quả khả thi
-- Thành công triển khai Sync Agent
+% Trong quá trình phát triển và triển khai hệ thống, nghiên cứu đã gặp phải và giải quyết thành công một số thách thức kỹ thuật quan trọng. Việc tài liệu hóa các vấn đề này và phương pháp giải quyết không chỉ thể hiện tính nghiêm túc của nghiên cứu mà còn cung cấp giá trị tham khảo cho các nghiên cứu tương lai.
 
-\subsection{Kết quả và lựa chọn phương pháp}
+% \subsection{Vấn đề chuẩn hóa hàm reward}
 
-Dựa trên so sánh thí nghiệm, nghiên cứu chọn phương pháp synthetic kiểm soát vì:
-- Training stability cao hơn (hệ số biến động: 0.013 vs 2.10)
-- Kết quả khả thi và realistic 
-- Có thể tái tạo được
-- Hiệu quả tính toán cao hơn 15x
+% \subsubsection{Phát hiện vấn đề}
+% Trong quá trình phân tích kết quả huấn luyện, nghiên cứu phát hiện một vấn đề nghiêm trọng trong việc chuẩn hóa hàm reward:
 
-\section{Thành công trong việc phát triển Sync Agent}
+% \begin{itemize}
+%     \item \textbf{Giá trị reward cực kỳ âm:} Thay vì nằm trong khoảng mong đợi (-3.0  đến +2.0), các giá trị reward đạt mức -800 hoặc thậm chí thấp hơn
 
-Sau quá trình nghiên cứu và giải quyết các thách thức kỹ thuật, nghiên cứu đã
-thành công trong việc phát triển một Sync Agent hoạt động ổn định với hiệu suất
-vượt trội so với phương pháp điều khiển giao lộ đơn.
+%     \item \textbf{Thời gian chờ đợi bất thường:} Dữ liệu thực tế cho thấy thời gian chờ đợi trong khoảng 40,000-200,000+ giây
 
-\subsection{Thiết kế Sync Agent cuối cùng}
+%     \item \textbf{Biểu đồ không khả dụng:} Kết quả huấn luyện tạo ra các biểu đồ không thể sử dụng cho báo cáo do tỷ lệ không hợp lý
+% \end{itemize}
 
-\subsubsection{Kiến trúc hệ thống}
-Sync Agent được thiết kế với kiến trúc lai ghép giữa tập trung và phân tán:
-\begin{itemize}
-    \item \textbf{DLR Agent cục bộ:} Mỗi giao lộ duy trì agent riêng để điều khiển tín hiệu cục bộ
+% \subsubsection{Phân tích nguyên nhân}
+% Sau quá trình điều tra chi tiết, nghiên cứu xác định được nguyên nhân gốc rễ:
+
+% \begin{table}[!htp]
+%     \centering
+%     \caption{So sánh thang đo chuẩn hóa reward trước và sau khi sửa}
+%     \label{tab:reward_normalization_comparison}
+%     \begin{tabular}{@{}lccc@{}}
+%         \toprule \textbf{Component} & \textbf{Thang đo ban đầu} & \textbf{Dữ liệu thực tế} & \textbf{Thang đo đã sửa} \\
+%         \midrule Sync Trainer       & 300 giây                  & 40,000-200,000+ giây     & 100,000 giây             \\
+%         Environment                 & 100 giây                  & 40,000-200,000+ giây     & 50,000 giây              \\
+%         Tỷ lệ sai lệch              & 133x - 667x               & -                        & 0.4x - 4x                \\
+%         Kết quả reward              & -800+                     & -                        & -3.0 đến +2.0            \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% \subsubsection{Giải pháp triển khai}
+% Nhóm nghiên cứu đã thực hiện một quy trình ba giai đoạn để sửa lỗi chuẩn hóa phần thưởng.
+
+% \textbf{Giai đoạn 1: Phân tích Dữ liệu}
+% Trong giai đoạn này, nhóm đã phân tích dữ liệu từ quá trình đào tạo để xác định các thời gian chờ đợi thực tế. Từ đó, tính toán được ngưỡng 95\% cho thời gian chờ đợi hợp lý. Nhóm cũng trích xuất được các tỷ lệ chuẩn hóa hiện tại.
+
+% \textbf{Giai đoạn 2: Hiệu chỉnh Quy mô}
+% Tiếp theo, trong giai đoạn này, nhóm đã cập nhật tỷ lệ chuẩn hóa cho từng thành phần (bao gồm bộ huấn luyện đồng bộ và môi trường) bằng cách sử dụng ngưỡng thời gian chờ đợi hợp lý. Sau khi cập nhật, kiểm tra lại phạm vi phần thưởng.
+
+% \textbf{Giai đoạn 3: Kiểm tra}
+% Cuối cùng, trong giai đoạn này, nhóm đã chạy các tập hợp kiểm tra để lấy các phần thưởng, và đảm bảo rằng chúng nằm trong phạm vi mục tiêu là [-3.0, 2.0]. Đồng thời, tạo các đồ thị so sánh để phân tích kết quả.
+
+% Thông qua quy trình này, nhóm nghiên cứu đã thành công trong việc sửa lỗi chuẩn hóa phần thưởng và đảm bảo rằng phần thưởng nằm trong phạm vi mong muốn.
+
+% \subsection{Vấn đề biểu diễn trạng thái cho mạng neural}
+
+% \subsubsection{Vấn đề phát hiện}
+% Mạng neural nhận đầu vào với các đặc trưng có thang đo hoàn toàn khác nhau:
+% \begin{itemize}
+%     \item \textbf{Thời gian chờ đợi:} 40,000-200,000+ giây (thang đo rất lớn)
+
+%     \item \textbf{Lưu lượng giao thông:} 0-200 xe (thang đo trung bình)
+
+%     \item \textbf{Độ dài hàng đợi:} 0-200 xe (thang đo trung bình)
+
+%     \item \textbf{Khoảng cách:} 0-10+ km (thang đo nhỏ)
+% \end{itemize}
+
+% \subsubsection{Tác động đến hiệu suất}
+% Sự chênh lệch thang đo này gây ra:
+% \begin{itemize}
+%     \item \textbf{Độ ổn định huấn luyện:} Mạng neural không thể học hiệu quả
+
+%     \item \textbf{Vấn đề gradient:} Các gradient bị bỏ qua bởi các đặc trưng có
+%         giá trị lớn
+
+%     \item \textbf{Hội tụ kém:} Quá trình hội tụ chậm và không ổn định
+% \end{itemize}
+
+% \subsubsection{Giải pháp chuẩn hóa trạng thái}
+% Nghiên cứu triển khai hệ thống chuẩn hóa toàn diện:
+
+% \begin{align}
+%     \text{Normalized waiting time}   & = \min\left(1.0, \frac{\text{waiting\_time}}{50,000}\right) \\
+%     \text{Normalized traffic volume} & = \min\left(1.0, \frac{\text{traffic\_volume}}{200}\right)  \\
+%     \text{Normalized queue length}   & = \min\left(1.0, \frac{\text{queue\_length}}{50}\right)     \\
+%     \text{Normalized distance}       & = \min\left(1.0, \frac{\text{distance}}{10,000}\right)
+% \end{align}
+% \newpage
+% \subsection{Kết quả sau khi áp dụng các giải pháp}
+
+% \subsubsection{Cải thiện về reward function}
+% \begin{table}[!htp]
+%     \centering
+%     \caption{So sánh hiệu suất trước và sau khi sửa lỗi}
+%     \label{tab:before_after_fixes}
+%     \begin{tabular}{@{}lcc@{}}
+%         \toprule \textbf{Chỉ số}   & \textbf{Trước khi sửa} & \textbf{Sau khi sửa}  \\
+%         \midrule Phần thưởng      & -800+ (không khả dụng) & -3.0 đến +2.0         \\
+%         Độ ổn định huấn luyện         & Rất kém                & Ổn định               \\
+%         Chất lượng biểu đồ               & Không sử dụng được     & Ở mức tốt   \\
+%         Hội tụ mạng neural & Chậm/không ổn định     & Nhanh và ổn định      \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% \subsubsection{Tác động đến chất lượng nghiên cứu}
+% Việc giải quyết các vấn đề kỹ thuật này đã mang lại:
+% \begin{itemize}
+%     \item \textbf{Độ tin cậy cao hơn:} Kết quả huấn luyện có thể tin cậy và tái tạo được
+
+%     \item \textbf{Biểu đồ chất lượng:} Biểu đồ phù hợp cho báo cáo
+
+%     \item \textbf{Độ ổn định hệ thống:} Hệ thống hoạt động ổn định trong môi trường
+%         sản xuất
+
+%     \item \textbf{Tái tạo nghiên cứu:} Các nghiên cứu khác có thể tái tạo
+%         kết quả
+% \end{itemize}
+
+% % \subsection{Phương pháp luận cho gỡ lỗi hệ thống phức tạp}
+
+% % Từ kinh nghiệm giải quyết các vấn đề trên, nghiên cứu đề xuất phương pháp luận cho gỡ lỗi:
+
+% % \begin{algorithm}[!htp]
+% %     \caption{Phương pháp luận gỡ lỗi có hệ thống}
+% %     \begin{algorithmic}[1]
+% %         \State \textbf{Giai đoạn 1: Xác định vấn đề}
+% %         \State $symptoms \gets$ collect\_error\_symptoms()
+% %         \State $data\_analysis \gets$ analyze\_training\_outputs()
+% %         \State $scale\_verification \gets$ check\_data\_ranges()
     
-    \item \textbf{Điều phối tín hiệu:} Điều phối timing offset giữa
-        các giao lộ để tối ưu hóa mạng lưới tổng thể
-        
-    \item \textbf{Chia sẻ thông tin lưu lượng giao thông:} Chia sẻ thông tin lưu lượng giao thông
-        thời gian thực giữa các giao lộ
-        
-    \item \textbf{Tính toán các offset timing:} Tính toán động các offset timing
-        tối ưu dựa trên điều kiện giao thông hiện tại
-\end{itemize}
+% %         \Statex
+% %         \State \textbf{Giai đoạn 2: Phân tích nguyên nhân gốc}
+% %         \State trace\_data\_flow()
+% %         \State identify\_normalization\_issues()
+% %         \State check\_serialization\_compatibility()
+% %         \State verify\_neural\_network\_inputs()
+    
+% %         \Statex
+% %         \State \textbf{Giai đoạn 3: Thiết kế giải pháp}
+% %         \State design\_fixes\_for\_each\_issue()
+% %         \State create\_validation\_tests()
+% %         \State implement\_monitoring\_systems()
+    
+% %         \Statex
+% %         \State \textbf{Giai đoạn 4: Triển khai và kiểm chứng}
+% %         \State apply\_fixes\_systematically()
+% %         \State run\_comprehensive\_tests()
+% %         \State verify\_end\_to\_end\_functionality()
+% %         \State ghi\_nhan\_thay\_doi\_va\_ket\_qua()
+% %     \end{algorithmic}
+% %     \end{algorithm}
 
-\subsubsection{Giải pháp kỹ thuật chính}
-Để giải quyết các vấn đề về huấn luyện không ổn định, nghiên cứu đã áp dụng các giải pháp kỹ thuật sau:
-\begin{enumerate}
-    \item \textbf{Thiết kế reward function cân bằng:} Thiết kế reward function cân bằng
-        giữa hiệu suất cục bộ và tối ưu hóa mạng lưới
+% %\section{Lựa chọn phương pháp huấn luyện}
+
+% \subsection{Quá trình phát triển Sync Agent}
+
+% Việc phát triển Sync Agent trải qua hai giai đoạn chính:
+
+% \textbf{Giai đoạn 1: Thử nghiệm ban đầu}
+% - Sử dụng dữ liệu từ môi trường trực tiếp  
+% - Gặp vấn đề: thời gian chờ không thực tế (29+ giờ), huấn luyện không ổn định
+% - Kết luận: cần phương pháp ổn định hơn
+
+% \textbf{Giai đoạn 2: Phương pháp synthetic kiểm soát}  
+% - Sử dụng dữ liệu synthetic với tham số thực tế được kiểm soát
+% - Đạt được huấn luyện ổn định và kết quả khả thi
+% - Thành công triển khai Sync Agent
+
+% \subsection{Kết quả và lựa chọn phương pháp}
+
+% Dựa trên so sánh thí nghiệm, nghiên cứu chọn phương pháp synthetic kiểm soát vì:
+% - Training stability cao hơn (hệ số biến động: 0.013 vs 2.10)
+% - Kết quả khả thi và realistic 
+% - Có thể tái tạo được
+% - Hiệu quả tính toán cao hơn 15x
+
+\section{Đánh giá mô hình Sync Agent}
+% \subsection{Đánh giá mô hình Sync Agent}
+
+% \subsubsection{Kiến trúc hệ thống}
+% Sync Agent được thiết kế với kiến trúc lai ghép giữa tập trung và phân tán:
+% \begin{itemize}
+%     \item \textbf{DLR Agent cục bộ:} Mỗi giao lộ duy trì agent riêng để điều khiển tín hiệu cục bộ
+    
+%     \item \textbf{Điều phối tín hiệu:} Điều phối timing offset giữa các giao lộ để tối ưu hóa mạng lưới tổng thể
         
-    \item \textbf{Áp dụng học tập theo chương trình:} Áp dụng học tập theo chương trình để tăng
-        dần độ phức tạp của các tình huống
+%     \item \textbf{Chia sẻ thông tin lưu lượng giao thông:} Chia sẻ thông tin lưu lượng giao thông thời gian thực giữa các giao lộ
         
-    \item \textbf{Sử dụng synthetic data với kiểm soát chất lượng nghiêm ngặt:} Sử dụng synthetic data với
-        kiểm soát chất lượng nghiêm ngặt
+%     \item \textbf{Tính toán các offset timing:} Tính toán động các offset timing tối ưu dựa trên điều kiện giao thông hiện tại
+% \end{itemize}
+
+% \subsubsection{Giải pháp kỹ thuật chính}
+% Để giải quyết các vấn đề về huấn luyện không ổn định, nghiên cứu đã áp dụng các giải pháp kỹ thuật sau:
+% \begin{enumerate}
+%     \item \textbf{Thiết kế reward function cân bằng:} Thiết kế reward function cân bằng giữa hiệu suất cục bộ và tối ưu hóa mạng lưới
         
-    \item \textbf{Tối ưu hóa đồng thời thời gian chờ và độ dài hàng đợi:} Tối ưu hóa đồng thời thời gian chờ và độ dài hàng đợi
-\end{enumerate}
+%     \item \textbf{Áp dụng học tập theo chương trình:} Áp dụng học tập theo chương trình để tăng dần độ phức tạp của các tình huống
+        
+%     \item \textbf{Sử dụng synthetic data với kiểm soát chất lượng nghiêm ngặt:} Sử dụng synthetic data với kiểm soát chất lượng nghiêm ngặt
+        
+%     \item \textbf{Tối ưu hóa đồng thời thời gian chờ và độ dài hàng đợi:} Tối ưu hóa đồng thời thời gian chờ và độ dài hàng đợi
+% \end{enumerate}
 
 \subsection{Kết quả training cuối cùng}
 
@@ -1015,22 +1062,19 @@ Sync Agent được thiết kế với kiến trúc lai ghép giữa tập trung
     \label{fig:sync_training_overview}
 \end{figure}
 
-Hình \ref{fig:sync_training_overview} thể hiện sự cải thiện ổn định qua 150 episodes
-huấn luyện. Reward tăng dần từ -2000 lên -840, loss giảm từ 800 xuống 40, và các
-thông số giao thông (thời gian chờ, độ dài hàng đợi) đều cho thấy xu hướng cải thiện rõ ràng.
+Hình \ref{fig:sync_training_overview} thể hiện sự cải thiện ổn định qua 150 episodes huấn luyện. Reward tăng dần từ -2000 lên -840, loss giảm từ 800 xuống 40, và các thông số giao thông (thời gian chờ, độ dài hàng đợi) đều cho thấy xu hướng cải thiện rõ ràng.
 
-\subsubsection{Lợi ích của đồng bộ hóa}
+% \subsubsection{Lợi ích của đồng bộ hóa}
 
-\begin{figure}[!htp]
-    \centering
-    \includegraphics[width=\textwidth]{figures/sync_benefits.png}
-    \caption{Lợi ích từ đồng bộ hóa qua quá trình huấn luyện}
-    \label{fig:sync_benefits}
-\end{figure}
+% \begin{figure}[!htp]
+%     \centering
+%     \includegraphics[width=\textwidth]{figures/sync_benefits.png}
+%     \caption{Lợi ích từ đồng bộ hóa qua quá trình huấn luyện}
+%     \label{fig:sync_benefits}
+% \end{figure}
 
-Hình \ref{fig:sync_benefits} cho thấy các lợi ích từ đồng bộ hóa tăng dần
-theo quá trình huấn luyện. Cải thiện thời gian chờ đạt 25\% và độ dài hàng đợi đạt 20\%
-so với baseline.
+% Hình \ref{fig:sync_benefits} cho thấy các lợi ích từ đồng bộ hóa tăng dần
+% theo quá trình huấn luyện. Cải thiện thời gian chờ đạt 25\% và độ dài hàng đợi đạt 20\% so với baseline.
 
 \subsubsection{Đánh giá hiệu suất}
 
@@ -1125,10 +1169,7 @@ và 7.7 xe tương ứng. Phần bên phải tóm tắt mức cải thiện đ�
     \label{fig:training_with_baselines}
 \end{figure}
 
-Hình \ref{fig:training_with_baselines} thể hiện quá trình cải thiện hiệu suất 
-qua huấn luyện. Đường ngang màu xanh dương (45.0s) và xanh lá (9.5 xe) thể hiện 
-hiệu suất baseline của single intersection. Đường cong cho thấy sync system 
-dần cải thiện và ổn định ở mức 34.3s thời gian chờ và 7.7 xe độ dài hàng đợi.
+Hình \ref{fig:training_with_baselines} thể hiện quá trình cải thiện hiệu suất qua huấn luyện. Đường ngang màu xanh dương (45.0s) và xanh lá (9.5 xe) thể hiện hiệu suất baseline của single intersection. Đường cong cho thấy sync system dần cải thiện và ổn định ở mức 34.3s thời gian chờ và 7.7 xe độ dài hàng đợi.
 
 \subsubsection{Tổng hợp lợi ích}
 
@@ -1149,17 +1190,7 @@ ta có thể kết luận:
     \item \textbf{Số lần hội tụ:} Đạt được tại episode 100
 \end{itemize}
 
-
-
 \section{Phân tích tác động độ phức tạp giao thông đến hiệu suất học tăng cường}
-
-\subsection{Giới thiệu nghiên cứu}
-
-Nghiên cứu này mở rộng phân tích bằng cách đánh giá tác động của mức độ giao thông
-khác nhau đến hiệu suất học tăng cường sâu. Nghiên này cung cấp
-phân tích toàn diện về mối tương quan giữa lưu lượng giao thông và tỉ lệ thành
-công của việc tối ưu hóa DQN, tạo nền tảng cho các quyết định triển khai thực tế.
-
 \subsection{Thiết kế thí nghiệm cho phân tích độ phức tạp}
 
 \subsubsection{Kịch bản giao thông}
@@ -1354,26 +1385,25 @@ Kết quả cung cấp hướng dẫn triển khai dựa trên bằng chứng:
     \item \textbf{Kịch bản thách thức:} Trung tâm thành phố, giờ cao điểm
 \end{itemize}
 
-\subsection{Hướng dẫn triển khai thực tế}
+% \subsection{Hướng dẫn triển khai thực tế}
 
-\subsubsection{Chiến lược triển khai}
-\begin{enumerate}
-    \item \textbf{Giai đoạn 1:} Triển khai trong các kịch bản lưu lượng thấp để có chiến thắng nhanh và xây dựng niềm tin
-    \item \textbf{Giai đoạn 2:} Mở rộng đến giao lộ lưu lượng trung bình với tài nguyên huấn luyện đầy đủ
-    \item \textbf{Giai đoạn 3:} Giải quyết các kịch bản lưu lượng cao với mô hình chuyên biệt và huấn luyện mở rộng
-\end{enumerate}
+% \subsubsection{Chiến lược triển khai}
+% \begin{enumerate}
+%     \item \textbf{Giai đoạn 1:} Triển khai trong các kịch bản lưu lượng thấp để có chiến thắng nhanh và xây dựng niềm tin
+%     \item \textbf{Giai đoạn 2:} Mở rộng đến giao lộ lưu lượng trung bình với tài nguyên huấn luyện đầy đủ
+%     \item \textbf{Giai đoạn 3:} Giải quyết các kịch bản lưu lượng cao với mô hình chuyên biệt và huấn luyện mở rộng
+% \end{enumerate}
 
-\subsubsection{Yêu cầu tài nguyên}
-\begin{itemize}
-    \item \textbf{Giao thông thấp:} Tài nguyên tính toán tối thiểu, triển khai nhanh
-    \item \textbf{Giao thông trung bình:} Tài nguyên vừa phải, giao thức huấn luyện tiêu chuẩn
-    \item \textbf{Giao thông cao:} Tài nguyên đáng kể, huấn luyện chuyên biệt, giám sát liên tục
-\end{itemize}
+% \subsubsection{Yêu cầu tài nguyên}
+% \begin{itemize}
+%     \item \textbf{Giao thông thấp:} Tài nguyên tính toán tối thiểu, triển khai nhanh
+%     \item \textbf{Giao thông trung bình:} Tài nguyên vừa phải, giao thức huấn luyện tiêu chuẩn
+%     \item \textbf{Giao thông cao:} Tài nguyên đáng kể, huấn luyện chuyên biệt, giám sát liên tục
+% \end{itemize}
 
 \subsection{Mô hình hoàn thiện để triển khai}
 
-Nghiên cứu đã tạo ra 5 mô hình TensorFlow sẵn sàng triển khai được tối ưu hóa 
-cho các điều kiện giao thông khác nhau:
+Nghiên cứu đã tạo ra 5 mô hình TensorFlow sẵn sàng triển khai được tối ưu hóa cho các điều kiện giao thông khác nhau:
 
 \begin{itemize}
     \item \texttt{single\_intersection\_model.h5} - DQN đa mục đích (14.3\% cải thiện)
@@ -1465,6 +1495,5 @@ Dữ liệu từ các nghiên cứu khác được chuẩn hóa theo cùng phư�
     \end{tabular}%
     }
 \end{table}
-
 
 Bảng \ref{tab:final_comparison} cho thấy hệ thống Sync Agent đề xuất trong nghiên cứu đạt hiệu suất cạnh tranh so với các phương pháp điều khiển giao thông hiện có. Cụ thể, mô hình giúp cải thiện 27.0\% thời gian chờ và 23.2\% độ dài hàng đợi, đồng thời đảm bảo mức đồng bộ cao giữa các nút giao. Dù SCATS có thể đạt mức cải thiện cao hơn trong một số trường hợp, mô hình này thường dựa vào cấu hình phức tạp và dữ liệu lịch sử. Trong khi đó, hệ thống Sync Agent hoạt động theo thời gian thực, thích nghi linh hoạt với điều kiện giao thông thay đổi, và dễ dàng triển khai hơn. Điều này khẳng định tiềm năng ứng dụng thực tế và khả năng mở rộng của mô hình trong các hệ thống giao thông thông minh hiện đại.

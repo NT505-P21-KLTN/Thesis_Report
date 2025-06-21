@@ -23,7 +23,15 @@ hoạch tín hiệu (Thế hệ 2), và các hệ thống điều khiển thời
 trên chu kỳ cố định (Thế hệ 3).
 
 \subsection{Nguyên lý hoạt động}
-Về cơ bản, \ac{atsc} hoạt động theo một vòng lặp gồm ba bước chính:
+Về cơ bản, \ac{atsc} hoạt động theo một vòng lặp gồm ba bước chính được minh họa trong Hình \ref{fig:atsc_operation}:
+
+\begin{figure*}[!htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/atsc_operation_diagram.png}
+    \caption{Sơ đồ nguyên lý hoạt động của hệ thống ATSC}
+    \label{fig:atsc_operation}
+\end{figure*}
+
 \begin{enumerate}
     \item \textbf{Thu thập dữ liệu (Data Collection):} Các cảm biến được lắp đặt
         tại các vị trí chiến lược trên mạng lưới đường phố để thu thập dữ liệu
@@ -46,7 +54,7 @@ Về cơ bản, \ac{atsc} hoạt động theo một vòng lặp gồm ba bước
         đèn tín hiệu tại các nút giao để thực thi. Vòng lặp này được lặp lại liên
         tục, cho phép hệ thống liên tục "thích ứng" với sự thay đổi của luồng
         giao thông.
-\end{enumerate}
+\end{enumerate>
 
 \subsection{Các hệ thống tiêu biểu đã được triển khai}
 Trên thế giới, có nhiều hệ thống \ac{atsc} đã được thương mại hóa và triển khai
@@ -130,14 +138,13 @@ Một bài toán \ac{rl} điển hình được định nghĩa bởi các thành
 
 \subsubsection{Vòng lặp học tập}
 
-Quá trình học của \ac{rl} diễn ra theo một vòng lặp liên tục:
-
-\begin{figure}[!htp]
+\begin{figure*}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{img/RL_components.png}
-    \caption{Vòng lặp học tập của \ac{rl} \footnote{\url{https://www.ibm.com/think/topics/reinforcement-learning}}}
-    \label{fig:enter-label}
-\end{figure}
+    \includegraphics[width=0.8\textwidth]{img/RL_components.png}
+    \caption{Vòng lặp học tập của Reinforcement Learning \cite{IBM2024}}
+    \label{fig:RL-components}
+\end{figure*}
+Quá trình học của \ac{rl} diễn ra theo một vòng lặp liên tục:
 
 \begin{enumerate}
     \item Tác nhân quan sát trạng thái hiện tại $s_{t}$ của môi trường.
@@ -146,11 +153,9 @@ Quá trình học của \ac{rl} diễn ra theo một vòng lặp liên tục:
 
     \item Tác nhân thực hiện hành động $a_{t}$.
 
-    \item Môi trường chuyển sang trạng thái mới $s_{t+1}$ và trả về một phần thưởng
-        $r_{t+1}$ cho tác nhân.
+    \item Môi trường chuyển sang trạng thái mới $s_{t+1}$ và trả về một phần thưởng        $r_{t+1}$ cho tác nhân.
 
-    \item Tác nhân sử dụng thông tin về phần thưởng và trạng thái mới để cập nhật
-        kiến thức của mình, nhằm đưa ra quyết định tốt hơn trong tương lai.
+    \item Tác nhân sử dụng thông tin về phần thưởng và trạng thái mới để cập nhật kiến thức của mình, nhằm đưa ra quyết định tốt hơn trong tương lai.
 \end{enumerate}
 
 \subsubsection{Đặc điểm khác biệt so với các phương pháp học máy khác}
@@ -295,12 +300,14 @@ hạn và xác suất lớp trực tiếp từ hình ảnh đầy đủ trong m�
 kể so với các phương pháp trước đó.
 
 \subsection{Nguyên lý hoạt động}
+
 \begin{figure}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{img/yolo_1}
+    \includegraphics[width=0.6\textwidth]{img/yolo_1}
     \caption{Nguyên lý hoạt động của YOLO}
     \label{fig:yolo_architecture}
 \end{figure}
+
 YOLO chia hình ảnh đầu vào thành một lưới $S \times S$ cells. Mỗi cell chịu
 trách nhiệm dự đoán các đối tượng có tâm nằm trong nó. Mỗi cell dự đoán:
 \begin{itemize}
