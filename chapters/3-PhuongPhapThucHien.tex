@@ -186,52 +186,58 @@ thời gian còn lại, nó sẽ chọn hành động tốt nhất dựa trên d
 thác).
 
 \subsection{Thiết kế trạng thái (State)}
-Trạng thái là cách biểu diễn thông tin của môi trường để agent có thể hiểu và ra
-quyết định. Trong mô hình này, trạng thái được định nghĩa là một vector một chiều,
-bao gồm hai loại thông tin chính được lấy từ \ac{sumo} tại mỗi bước:
-\begin{itemize}
-    \item \textbf{Mật độ và vị trí xe trên mỗi làn (Vehicle Position):} Vị trí của các
-        phương tiện đang đến giao lộ được mã hóa. Mỗi làn đường đến được chia thành
-        các ô (cell) có kích thước bằng một xe. Trạng thái sẽ ghi nhận sự có mặt
-        (1) hoặc vắng mặt (0) của một phương tiện trong từng ô. Điều này giúp agent
-        không chỉ biết có bao nhiêu xe đang chờ, mà còn biết chúng đang ở vị trí
-        nào trên làn đường.
+Trạng thái là cách biểu diễn thông tin của môi trường để agent có thể hiểu và ra quyết định. Trong mô hình này, trạng thái được định nghĩa là một vector một chiều có 80 phần tử biểu diễn vị trí và mật độ xe tại các là đường tại mỗi bước. Sau đây là các bước ghi nhận thông tin vào trạng thái.
 
-    \item \textbf{Pha đèn hiện tại (Current Phase):} Trạng thái của đèn tín hiệu
-        hiện tại cũng được đưa vào vector trạng thái, được mã hóa dưới dạng one-hot.
-        Ví dụ, với 4 pha đèn khác nhau, một vector 4 chiều sẽ được sử dụng với
-        chỉ một phần tử có giá trị 1 để biểu diễn pha đang hoạt động, các phần
-        tử còn lại có giá trị 0.
-\end{itemize}
-Việc kết hợp hai loại thông tin này cho phép agent có một cái nhìn toàn diện về
-tình hình giao thông tại giao lộ.
+\begin{figure}[!htp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/sumo_state_1.png}
+        \caption{Hai nhóm làn đường}
+        \label{fig:sumo_state_1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/sumo_state_2.png}
+        \caption{Chia làn đường thành 10 phần}
+        \label{fig:sumo_state_2}
+    \end{subfigure}
+    \caption{Tiêu đề chung cho cả hai hình}
+    \label{fig:sumo_state}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{Phân loại làn đường:} Chia con đường kết nối tới nút giao thành 2 nhóm làn đường như trong hình \ref{fig:sumo_state_1}: nhóm màu vàng bao gồm làn đường chỉ được rẻ trái và nhóm màu xanh bao gồm các làn đường được đi thẳng và rẻ phải. Với mỗi con đường có 2 nhóm làn đường thì tổng cộng có tất cả 8 nhóm làn đường. Các nhóm sẽ được đánh số theo chiều kim đồng hồ, nhóm làn màu xanh lá sẽ được đánh số chẵn và nhóm làn đường màu vàng sẽ được đánh số lẻ.
+    \item \textbf{Chia các làn đường theo từng ô:} Mỗi làn đường có chiều dài bằng tầm quan sát được của camera giám sát và được chia thành 10 phần như hình \ref{fig:sumo_state_2}. Trạng thái sẽ ghi nhận ô có giá trị 1 biểu thị có xe, giá trị 0 biểu thị không có xe.
+    \item \textbf{Mã hóa thông tin vào mảng:} Tiến hành mã hóa vị trí xe bằng cách sử dụng một hệ thống số hai chữ số Chữ số đầu tiên đại diện cho số thứ tự nhóm làn đường, chữ số thứ hai biểu thị vị trí cụ thể của xe trên làn đó. Chẳng hạn, nếu một chiếc xe nằm ở nhóm làn đường số 1 và ở ô thứ 3, nó sẽ được lưu trữ vào mảng ở vị trí số 13.
+\end{enumerate}
+Việc mã hóa thông tin theo phương pháp này giúp đơn giản hóa cách biểu diễn trạng thái mà vẫn cho phép agent có một cái nhìn toàn diện về tình hình giao thông tại giao lộ.
 
 \subsection{Thiết kế không gian hành động}
-Không gian hành động được định nghĩa như một tập hợp hữu hạn các hành động rời rạc:
+Không gian hành động được định nghĩa như một tập hợp hữu hạn các hành động rời rạc. Trong đó mỗi hành động $a_i \in \mathcal{A}$ tương ứng với việc kích hoạt một pha đèn tín hiệu cụ thể:
 
 \[
     \mathcal{A} = \{a_0, a_1, a_2, a_3\}
 \]
 
-Trong đó mỗi hành động $a_i \in \mathcal{A}$ tương ứng với việc kích hoạt một pha đèn tín hiệu cụ thể:
+Trong đó:
 
 \begin{align}
-    a_0 &: \text{North-South Green (NSG)} \\
-    a_1 &: \text{North-South Left (NSL)} \\
-    a_2 &: \text{East-West Green (EWG)} \\
-    a_3 &: \text{East-West Left (EWL)}
+    a_0 &: \text{North-South Green (NSG): pha đèn xanh đường phía Bắc và Nam đi thẳng} \\
+    a_1 &: \text{North-South Left (NSL): pha đèn xanh đường phía Bắc và Nam rẽ trái} \\
+    a_2 &: \text{East-West Green (EWG): pha đèn xanh đường phía Đông và Tây đi thẳng} \\
+    a_3 &: \text{East-West Left (EWL): pha đèn xanh đường phía Đông và Tây rẽ trái}
 \end{align}
 
-Tại mỗi bước thời gian $t$, agent quan sát trạng thái $s_t$ và chọn hành động $a_t \in \mathcal{A}$ dựa trên chính sách $\pi(a_t|s_t)$. Việc ánh xạ từ hành động trừu tượng sang điều khiển đèn tín hiệu được thực hiện thông qua giao diện TraCI:
+Tại mỗi bước thời gian $t$, agent quan sát trạng thái $s_t$ và chọn hành động $a_t \in \mathcal{A}$ dựa trên chính sách $\pi(a_t|s_t)$. Việc ánh xạ từ hành động trừu tượng sang điều khiển đèn tín hiệu được thực hiện thông qua TraCI
 
-\[
-    \text{TraCI Command} = \phi(a_t)
-\]
+% \[
+%     \text{TraCI Command} = \phi(a_t)
+% \]
 
-Trong đó $\phi: \mathcal{A} \rightarrow \{\text{PHASE\_NSG}, \text{PHASE\_NSL}, \text{PHASE\_EWG}, \text{PHASE\_EWL}\}$ là hàm ánh xạ từ không gian hành động trừu tượng sang các lệnh điều khiển cụ thể.
+% Trong đó $\phi: \mathcal{A} \rightarrow \{\text{PHASE\_NSG}, \text{PHASE\_NSL}, \text{PHASE\_EWG}, \text{PHASE\_EWL}\}$ là hàm ánh xạ từ không gian hành động trừu tượng sang các lệnh điều khiển cụ thể.
 
 \subsection{Thiết kế hàm thưởng (Reward Function)}
-Hàm thưởng được thiết kế để định hướng cho agent học được hành vi giúp giảm thiểu ùn tắc. Phần thưởng được tính toán dựa trên \textbf{sự thay đổi của tổng thời gian chờ đợi tích lũy} của tất cả các phương tiện trong các làn đường dẫn vào giao lộ. Công thức tính phần thưởng tại bước thời gian $t$ là:
+Hàm thưởng được thiết kế để định hướng cho agent học được hành vi giúp giảm thiểu ùn tắc. Phần thưởng được tính toán dựa trên sự thay đổi của tổng thời gian chờ đợi tích lũy của tất cả các phương tiện trong các làn đường dẫn vào giao lộ. Công thức tính phần thưởng tại bước thời gian $t$ là:
 \[
     R_{t} = W_{t-1}- W_{t}
 \]
@@ -255,50 +261,6 @@ Mục tiêu của agent là tối đa hóa tổng phần thưởng tích lũy, �
 
 \subsection{Kiến trúc mạng neural cho agent}
 
-Agent sử dụng một mạng neural sâu đầy đủ kết nối (Fully Connected Deep Neural Network) để xấp xỉ hàm giá trị Q. Kiến trúc của mạng được xây dựng bằng Keras và bao gồm các
-thành phần sau:
-
-\begin{itemize}
-    \item \textbf{Lớp đầu vào (Input Layer):} Một lớp nhận đầu vào là vector
-        trạng thái đã được định nghĩa ở trên, với kích thước bằng \textit{num
-        states}.
-
-    \item \textbf{Các lớp ẩn (Hidden Layers):} Mạng bao gồm một số lượng các lớp
-        ẩn (được xác định bởi tham số \textit{num layers}), mỗi lớp là một lớp
-        \textit{Dense} với số neural bằng \textit{width}. Hàm kích hoạt \textit{ReLU}
-        được sử dụng cho tất cả các lớp ẩn để đưa vào tính phi tuyến.
-
-    \item \textbf{Lớp đầu ra (Output Layer):} Một lớp \textit{Dense} với số neural
-        bằng \textit{num actions} (số lượng hành động có thể). Lớp này sử dụng hàm
-        kích hoạt \textit{Linear} để tạo ra các giá trị Q cho mỗi hành động.
-\end{itemize}
-
-\subsubsection{Lý do lựa chọn mạng neural đầy đủ kết nối (DNN)}
-Việc lựa chọn kiến trúc mạng neural đầy đủ kết nối thay vì các kiến trúc khác như \ac{cnn}, RNN, hoặc Transformer được dựa trên những lý do sau:
-
-\paragraph{Phù hợp với bản chất dữ liệu đầu vào}
-Dữ liệu trạng thái giao thông trong nghiên cứu này là dữ liệu số dạng bảng (tabular data) bao gồm các chỉ số như thời gian chờ, độ dài hàng đợi, tốc độ xe, và mật độ giao thông. Đây không phải là dữ liệu hình ảnh hoặc dữ liệu không gian 2D/3D mà \ac{cnn} được thiết kế để xử lý hiệu quả. Các đặc trưng trong vector trạng thái là các phép đo độc lập từ các vị trí khác nhau của giao lộ, không có mối quan hệ không gian cục bộ (spatial locality) mà convolution có thể khai thác.
-
-\paragraph{Không có tính tuần tự thời gian phức tạp}
-Mặc dù dữ liệu giao thông có tính chất thời gian, nhưng trong bài toán này, agent chỉ cần xử lý trạng thái hiện tại để đưa ra quyết định. Không cần phải học các mẫu tuần tự phức tạp qua nhiều bước thời gian dài, do đó RNN hoặc LSTM không mang lại lợi ích đáng kể so với việc tăng độ phức tạp tính toán.
-
-\paragraph{Hiệu quả tính toán và triển khai}
-\begin{itemize}
-    \item \textbf{Tốc độ xử lý cao:} Mạng DNN có độ phức tạp tính toán thấp hơn \ac{cnn} và RNN, cho phép xử lý real-time với độ trễ thấp (< 100ms) cần thiết cho điều khiển giao thông.
-    \item \textbf{Yêu cầu bộ nhớ thấp:} Phù hợp cho triển khai trên các thiết bị edge computing tại giao lộ với tài nguyên hạn chế.
-    \item \textbf{Huấn luyện nhanh:} Thời gian huấn luyện ngắn hơn, cho phép cập nhật mô hình thường xuyên khi có dữ liệu mới.
-\end{itemize}
-
-\paragraph{Tính giải thích và bảo trì}
-\begin{itemize}
-    \item \textbf{Kiến trúc đơn giản:} Dễ dàng hiểu và giải thích mối quan hệ giữa đầu vào và đầu ra.
-    \item \textbf{Debug thuận tiện:} Có thể dễ dàng theo dõi và phân tích từng lớp để xác định vấn đề.
-    \item \textbf{Khả năng mở rộng:} Dễ dàng điều chỉnh số lượng neurons và layers theo yêu cầu cụ thể của từng giao lộ.
-\end{itemize}
-
-\paragraph{Hiệu suất đã được chứng minh}
-Các nghiên cứu trước đây về điều khiển giao thông sử dụng DRL đã chứng minh rằng mạng DNN đơn giản đủ hiệu quả cho bài toán này. Việc sử dụng kiến trúc phức tạp hơn không mang lại cải thiện đáng kể về hiệu suất nhưng lại tăng đáng kể chi phí tính toán và độ phức tạp triển khai.
-
 \begin{figure*}[!htp]
     \centering
     \includegraphics[width=0.3\textwidth]{img/model_structure}
@@ -306,31 +268,69 @@ Các nghiên cứu trước đây về điều khiển giao thông sử dụng D
     \label{fig:model_structure}
 \end{figure*}
 
-Mô hình được huấn luyện sử dụng thuật toán tối ưu hóa Adam, với hàm mất mát (loss function) là Sai số bình phương trung bình (Mean Squared Error). Mục tiêu của việc này là tối thiểu hóa sự khác biệt giữa giá trị Q dự đoán và giá trị Q mục tiêu, vốn được tính toán từ phương trình Bellman.
+Agent sử dụng một mạng neural sâu đầy đủ kết nối (Fully Connected Deep Neural Network) để tính hàm giá trị Q. Kiến trúc của mạng được xây dựng bằng Keras và bao gồm các thành phần sau:
 
-\subsection{Lý do lựa chọn thuật toán DQN cho Intersection Agents}
-Việc lựa chọn thuật toán \ac{dqn} cho các intersection agents được dựa trên những lý do sau:
-
-\subsubsection{Phù hợp với bản chất bài toán điều khiển giao lộ}
-Điều khiển đèn tín hiệu giao thông có bản chất là một bài toán hành động rời rạc với số lượng hành động hữu hạn và được định nghĩa rõ ràng (4 pha đèn). \ac{dqn} được thiết kế đặc biệt cho loại bài toán này, khác với các thuật toán điều khiển liên tục như DDPG hay SAC. Mỗi intersection agent chỉ cần tối ưu hóa giao thông tại giao lộ của mình, đây là một bài toán tương đối đơn giản so với việc điều phối toàn cục. Do đó, \ac{dqn} với độ phức tạp tính toán thấp hơn so với các thuật toán actor-critic trở thành lựa chọn phù hợp cho việc triển khai song song nhiều agent.
-
-\subsubsection{Experience Replay phù hợp với đặc tính giao thông}
-Cơ chế Experience Replay của \ac{dqn} đặc biệt hiệu quả trong bối cảnh giao thông vì:
 \begin{itemize}
-    \item \textbf{Tái sử dụng kinh nghiệm:} Các mẫu giao thông có tính lặp lại theo chu kỳ (giờ cao điểm, giờ thấp điểm), việc lưu trữ và tái sử dụng kinh nghiệm giúp agent học nhanh hơn.
-    \item \textbf{Phá vỡ tương quan:} Dữ liệu giao thông liên tiếp có tính tương quan cao, Experience Replay giúp phá vỡ tương quan này, làm cho quá trình học ổn định hơn.
+    \item \textbf{Lớp đầu vào (Input Layer):} Một lớp nhận đầu vào là vector trạng thái đã được định nghĩa ở trên, với kích thước bằng \textit{num states}.
+
+    \item \textbf{Các lớp ẩn (Hidden Layers):} Mạng bao gồm một số lượng các lớp ẩn (được xác định bởi tham số \textit{num layers}), mỗi lớp là một lớp \textit{Dense} với số neural bằng \textit{width}. Hàm kích hoạt \textit{ReLU} được sử dụng cho tất cả các lớp ẩn để đưa vào tính phi tuyến.
+
+    \item \textbf{Lớp đầu ra (Output Layer):} Một lớp \textit{Dense} với số neural bằng số lượng hành động có trong không gian hành động. Lớp này sử dụng hàm kích hoạt \textit{Linear} để tạo ra các giá trị Q cho mỗi hành động.
 \end{itemize}
 
-\subsubsection{Ổn định huấn luyện trong môi trường động}
-Cơ chế Target Network của \ac{dqn} đặc biệt quan trọng trong môi trường giao thông động. Bằng cách sử dụng một mạng mục tiêu riêng biệt được cập nhật định kỳ, \ac{dqn} tránh được hiện tượng "moving target" khi Q-values thay đổi liên tục, từ đó đảm bảo sự hội tụ ổn định trong môi trường có nhiều biến động như giao thông đô thị.
+% \subsection{}
 
-\subsubsection{Khả năng mở rộng và triển khai thực tế}
-\ac{dqn} có những ưu điểm về khả năng triển khai:
-\begin{itemize}
-    \item \textbf{Tài nguyên tính toán thấp:} Phù hợp cho việc triển khai trên các thiết bị edge computing tại giao lộ
-    \item \textbf{Dễ dàng debug và giải thích:} Q-values có thể được giải thích trực tiếp, giúp việc kiểm tra và bảo trì hệ thống
-    \item \textbf{Khả năng mở rộng:} Mỗi giao lộ có thể hoạt động độc lập, dễ dàng thêm/bớt giao lộ mà không ảnh hưởng đến toàn hệ thống
-\end{itemize}
+% \subsubsection{Lý do lựa chọn mạng neural đầy đủ kết nối (DNN)}
+% Việc lựa chọn kiến trúc mạng neural đầy đủ kết nối thay vì các kiến trúc khác như \ac{cnn}, RNN, hoặc Transformer được dựa trên những lý do sau:
+
+% \paragraph{Phù hợp với bản chất dữ liệu đầu vào}
+% Dữ liệu trạng thái giao thông trong nghiên cứu này là dữ liệu số dạng bảng (tabular data) bao gồm các chỉ số như thời gian chờ, độ dài hàng đợi, tốc độ xe, và mật độ giao thông. Đây không phải là dữ liệu hình ảnh hoặc dữ liệu không gian 2D/3D mà \ac{cnn} được thiết kế để xử lý hiệu quả. Các đặc trưng trong vector trạng thái là các phép đo độc lập từ các vị trí khác nhau của giao lộ, không có mối quan hệ không gian cục bộ (spatial locality) mà convolution có thể khai thác.
+
+% \paragraph{Không có tính tuần tự thời gian phức tạp}
+% Mặc dù dữ liệu giao thông có tính chất thời gian, nhưng trong bài toán này, agent chỉ cần xử lý trạng thái hiện tại để đưa ra quyết định. Không cần phải học các mẫu tuần tự phức tạp qua nhiều bước thời gian dài, do đó RNN hoặc LSTM không mang lại lợi ích đáng kể so với việc tăng độ phức tạp tính toán.
+
+% \paragraph{Hiệu quả tính toán và triển khai}
+% \begin{itemize}
+%     \item \textbf{Tốc độ xử lý cao:} Mạng DNN có độ phức tạp tính toán thấp hơn \ac{cnn} và RNN, cho phép xử lý real-time với độ trễ thấp (< 100ms) cần thiết cho điều khiển giao thông.
+%     \item \textbf{Yêu cầu bộ nhớ thấp:} Phù hợp cho triển khai trên các thiết bị edge computing tại giao lộ với tài nguyên hạn chế.
+%     \item \textbf{Huấn luyện nhanh:} Thời gian huấn luyện ngắn hơn, cho phép cập nhật mô hình thường xuyên khi có dữ liệu mới.
+% \end{itemize}
+
+% \paragraph{Tính giải thích và bảo trì}
+% \begin{itemize}
+%     \item \textbf{Kiến trúc đơn giản:} Dễ dàng hiểu và giải thích mối quan hệ giữa đầu vào và đầu ra.
+%     \item \textbf{Debug thuận tiện:} Có thể dễ dàng theo dõi và phân tích từng lớp để xác định vấn đề.
+%     \item \textbf{Khả năng mở rộng:} Dễ dàng điều chỉnh số lượng neurons và layers theo yêu cầu cụ thể của từng giao lộ.
+% \end{itemize}
+
+% \paragraph{Hiệu suất đã được chứng minh}
+% Các nghiên cứu trước đây về điều khiển giao thông sử dụng DRL đã chứng minh rằng mạng DNN đơn giản đủ hiệu quả cho bài toán này. Việc sử dụng kiến trúc phức tạp hơn không mang lại cải thiện đáng kể về hiệu suất nhưng lại tăng đáng kể chi phí tính toán và độ phức tạp triển khai.
+
+% Mô hình được huấn luyện sử dụng thuật toán tối ưu hóa Adam, với hàm mất mát (loss function) là Sai số bình phương trung bình (Mean Squared Error). Mục tiêu của việc này là tối thiểu hóa sự khác biệt giữa giá trị Q dự đoán và giá trị Q mục tiêu, vốn được tính toán từ phương trình Bellman.
+
+% \subsection{Lý do lựa chọn thuật toán DQN cho Intersection Agents}
+% Việc lựa chọn thuật toán \ac{dqn} cho các intersection agents được dựa trên những lý do sau:
+
+% \subsubsection{Phù hợp với bản chất bài toán điều khiển giao lộ}
+% Điều khiển đèn tín hiệu giao thông có bản chất là một bài toán hành động rời rạc với số lượng hành động hữu hạn và được định nghĩa rõ ràng (4 pha đèn). \ac{dqn} được thiết kế đặc biệt cho loại bài toán này, khác với các thuật toán điều khiển liên tục như DDPG hay SAC. Mỗi intersection agent chỉ cần tối ưu hóa giao thông tại giao lộ của mình, đây là một bài toán tương đối đơn giản so với việc điều phối toàn cục. Do đó, \ac{dqn} với độ phức tạp tính toán thấp hơn so với các thuật toán actor-critic trở thành lựa chọn phù hợp cho việc triển khai song song nhiều agent.
+
+% \subsubsection{Experience Replay phù hợp với đặc tính giao thông}
+% Cơ chế Experience Replay của \ac{dqn} đặc biệt hiệu quả trong bối cảnh giao thông vì:
+% \begin{itemize}
+%     \item \textbf{Tái sử dụng kinh nghiệm:} Các mẫu giao thông có tính lặp lại theo chu kỳ (giờ cao điểm, giờ thấp điểm), việc lưu trữ và tái sử dụng kinh nghiệm giúp agent học nhanh hơn.
+%     \item \textbf{Phá vỡ tương quan:} Dữ liệu giao thông liên tiếp có tính tương quan cao, Experience Replay giúp phá vỡ tương quan này, làm cho quá trình học ổn định hơn.
+% \end{itemize}
+
+% \subsubsection{Ổn định huấn luyện trong môi trường động}
+% Cơ chế Target Network của \ac{dqn} đặc biệt quan trọng trong môi trường giao thông động. Bằng cách sử dụng một mạng mục tiêu riêng biệt được cập nhật định kỳ, \ac{dqn} tránh được hiện tượng "moving target" khi Q-values thay đổi liên tục, từ đó đảm bảo sự hội tụ ổn định trong môi trường có nhiều biến động như giao thông đô thị.
+
+% \subsubsection{Khả năng mở rộng và triển khai thực tế}
+% \ac{dqn} có những ưu điểm về khả năng triển khai:
+% \begin{itemize}
+%     \item \textbf{Tài nguyên tính toán thấp:} Phù hợp cho việc triển khai trên các thiết bị edge computing tại giao lộ
+%     \item \textbf{Dễ dàng debug và giải thích:} Q-values có thể được giải thích trực tiếp, giúp việc kiểm tra và bảo trì hệ thống
+%     \item \textbf{Khả năng mở rộng:} Mỗi giao lộ có thể hoạt động độc lập, dễ dàng thêm/bớt giao lộ mà không ảnh hưởng đến toàn hệ thống
+% \end{itemize}
 
 \section{Thiết kế hệ thống đồng bộ hóa giao lộ (Sync Agent)}
 
