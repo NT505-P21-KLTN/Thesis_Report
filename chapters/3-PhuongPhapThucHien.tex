@@ -126,7 +126,7 @@ Trong nghiên cứu này, BotSORT được sử dụng như một lựa chọn t
 \end{itemize}
 
 \section{Thiết lập môi trường mô phỏng giao thông đô thị SUMO}
-
+\subsection{Mô tả môi trường giả lập}
 \begin{figure}[!htp]
     \centering
     \includegraphics[width=\textwidth]{figures/sumo_map}
@@ -142,6 +142,9 @@ Nhóm nghiên cứu mô phỏng một nút giao thông trong SUMO với bốn l�
 
     \item Làn trong cùng: Chỉ được phép rẽ phải.
 \end{itemize}
+\subsection{Cơ chế giả lập phương tiện}
+
+
 
 \section{Xây dựng mô hình DRL}
 \subsection{Định nghĩa môi trường (Environment)}
@@ -278,7 +281,27 @@ Agent sử dụng một mạng neural sâu đầy đủ kết nối (Fully Conne
     \item \textbf{Lớp đầu ra (Output Layer):} Một lớp \textit{Dense} với số neural bằng số lượng hành động có trong không gian hành động. Lớp này sử dụng hàm kích hoạt \textit{Linear} để tạo ra các giá trị Q cho mỗi hành động.
 \end{itemize}
 
-% \subsection{}
+\section{Cơ chế trao đổi thông tin giữa tác nhân và central server}
+
+
+
+\section{Cơ chế trao đổi thông tin giữa các tác nhân}
+
+
+
+% \subsection{Training mô hình DRL}
+
+% \begin{figure}[!htp]
+%     \centering
+%     \includegraphics[width=\textwidth]{img/training_flow.png}
+%     \caption{Sơ đồ quá trình training cho mô hình DRL}
+%     \label{fig:training_flow}
+% \end{figure}
+
+% \begin{enumerate}
+%     \item \textbf{}
+% \end{enumerate}
+
 
 % \subsubsection{Lý do lựa chọn mạng neural đầy đủ kết nối (DNN)}
 % Việc lựa chọn kiến trúc mạng neural đầy đủ kết nối thay vì các kiến trúc khác như \ac{cnn}, RNN, hoặc Transformer được dựa trên những lý do sau:
