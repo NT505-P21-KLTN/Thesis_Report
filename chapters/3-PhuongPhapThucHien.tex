@@ -367,14 +367,14 @@ Kiến trúc phân tầng cho phép:
 \paragraph{Hiệu quả tính toán}
 \begin{itemize}
     \item \textbf{Tính toán song song:} Các intersection agents hoạt động song song, giảm thời gian tính toán tổng thể
-    \item \textbf{Reduced complexity:} Thay vì một bài toán tối ưu hóa khổng lồ cho toàn bộ mạng lưới, bài toán được chia nhỏ thành nhiều bài toán con đơn giản hơn
+    \item \textbf{Giảm độ phức tạp:} Thay vì một bài toán tối ưu hóa khổng lồ cho toàn bộ mạng lưới, bài toán được chia nhỏ thành nhiều bài toán con đơn giản hơn
 \end{itemize}
 
 \paragraph{Tính thực tế trong triển khai}
 \begin{itemize}
-    \item \textbf{Gradual deployment:} Có thể triển khai từng giao lộ một, không cần thay đổi toàn bộ hạ tầng cùng lúc
-    \item \textbf{Maintenance friendly:} Dễ dàng bảo trì, nâng cấp từng thành phần mà không ảnh hưởng đến toàn hệ thống
-    \item \textbf{Integration with existing systems:} Có thể tích hợp với các hệ thống điều khiển giao thông hiện có
+    \item \textbf{Triển khai thí điểm:} Có thể triển khai từng giao lộ một, không cần thay đổi toàn bộ hạ tầng cùng lúc
+    \item \textbf{Bảo trì dễ dàng:} Dễ dàng bảo trì, nâng cấp từng thành phần mà không ảnh hưởng đến toàn hệ thống
+    \item \textbf{Tích hợp với hệ thống hiện có:} Có thể tích hợp với các hệ thống điều khiển giao thông hiện có
 \end{itemize}
 
 \subsection{Môi trường đồng bộ hóa (Sync Environment)}
@@ -383,16 +383,16 @@ Môi trường của Sync Agent được định nghĩa như sau:
 \subsubsection{Không gian trạng thái}
 Trạng thái của môi trường đồng bộ bao gồm:
 \begin{itemize}
-    \item \textbf{Traffic metrics:} Thời gian chờ trung bình, độ dài hàng đợi,
+    \item \textbf{Thống kê giao thông:} Thời gian chờ trung bình, độ dài hàng đợi,
         và lưu lượng giao thông tại mỗi giao lộ
 
-    \item \textbf{Spatial relationships:} Khoảng cách địa lý và thời gian di
+    \item \textbf{Quan hệ không gian:} Khoảng cách địa lý và thời gian di
         chuyển giữa các giao lộ
 
-    \item \textbf{Temporal offsets:} Độ lệch thời gian hiện tại giữa các chu kỳ
+    \item \textbf{Độ lệch thời gian:} Độ lệch thời gian hiện tại giữa các chu kỳ
         đèn tín hiệu
 
-    \item \textbf{Cycle information:} Thời gian chu kỳ và pha hiện tại của mỗi
+    \item \textbf{Thông tin chu kỳ:} Thời gian chu kỳ và pha hiện tại của mỗi
         giao lộ
 \end{itemize}
 
@@ -436,16 +436,16 @@ Hành động của Sync Agent là việc điều chỉnh độ lệch thời gi
 
 Hàm thưởng này có các đặc điểm:
 \begin{itemize}
-    \item \textbf{Long-term comparison:} So sánh hiệu suất qua cửa sổ thời gian
+    \item \textbf{So sánh dài hạn:} So sánh hiệu suất qua cửa sổ thời gian
         dài (15+ episodes)
 
-    \item \textbf{Non-overlapping windows:} Tránh bias bằng cách sử dụng các cửa
+    \item \textbf{Cửa sổ thời gian không chồng lấp:} Tránh bias bằng cách sử dụng các cửa
         sổ thời gian không chồng lấp
 
-    \item \textbf{Percentage-based:} Sử dụng tỷ lệ phần trăm thay vì giá trị
+    \item \textbf{Dựa trên tỷ lệ phần trăm:} Sử dụng tỷ lệ phần trăm thay vì giá trị
         tuyệt đối
 
-    \item \textbf{Bounded output:} Hàm tanh đảm bảo reward trong khoảng [-1, 1]
+    \item \textbf{Giới hạn đầu ra:} Hàm tanh đảm bảo reward trong khoảng [-1, 1]
 \end{itemize}
 
 \subsection{Lý do lựa chọn thuật toán Soft Actor-Critic cho Sync Agent}
@@ -462,12 +462,12 @@ Bài toán đồng bộ hóa giao lộ yêu cầu điều chỉnh độ lệch t
 
 Điều này mang lại những lợi ích quan trọng:
 \begin{itemize}
-    \item \textbf{Khám phá hiệu quả:} Agent được khuyến khích thử nghiệm các chiến lược đồng bộ khác nhau, tránh bị mắc kẹt ở local optimum
-    \item \textbf{Robustness:} Policy đa dạng giúp hệ thống thích ứng tốt với các điều kiện giao thông thay đổi
-    \item \textbf{Tự động điều chỉnh khám phá:} Tham số entropy $\alpha$ được tự động điều chỉnh theo quá trình học
+    \item \textbf{Khám phá hiệu quả:} Agent được khuyến khích thử nghiệm các chiến lược đồng bộ khác nhau, tránh bị mắc kẹt ở điểm cực trị cục bộ
+    \item \textbf{Bền vững:} Policy đa dạng giúp hệ thống thích ứng tốt với các điều kiện giao thông thay đổi
+    \item \textbf{Tự động điều chỉnh entropy:} Tham số entropy $\alpha$ được tự động điều chỉnh theo quá trình học
 \end{itemize}
 
-\subsubsection{Dual Critic Networks giảm thiểu Overestimation Bias}
+\subsubsection{Dual Critic Networks giảm thiểu overestimation bias}
 \ac{sac} sử dụng hai mạng critic song song để ước lượng Q-values:
 \begin{equation}
     Q_{target} = r + \gamma \min_{i=1,2} Q_{\phi_i}(s', a') - \alpha \log \pi(a'|s')
@@ -475,28 +475,28 @@ Bài toán đồng bộ hóa giao lộ yêu cầu điều chỉnh độ lệch t
 
 Cơ chế này đặc biệt quan trọng trong bối cảnh đồng bộ hóa giao lộ vì:
 \begin{itemize}
-    \item \textbf{Giảm thiểu overestimation:} Việc lấy minimum của hai Q-values giúp tránh đánh giá quá cao các hành động
+    \item \textbf{Giảm thiểu overestimation bias:} Việc lấy giá trị cực tiểu của hai Q-values giúp tránh đánh giá quá cao các hành động
     \item \textbf{Ổn định huấn luyện:} Giảm thiểu biến động trong quá trình học, đặc biệt quan trọng với bài toán phức tạp như đồng bộ đa giao lộ
 \end{itemize}
 
-\subsubsection{Off-policy Learning cho Sample Efficiency}
+\subsubsection{Off-policy Learning cho hiệu suất mẫu}
 \ac{sac} là thuật toán off-policy, cho phép tái sử dụng dữ liệu từ các policy cũ:
 \begin{itemize}
-    \item \textbf{Sample efficiency cao:} Đặc biệt quan trọng khi việc thu thập dữ liệu giao thông tốn kém
-    \item \textbf{Stable learning:} Không bị ảnh hưởng bởi correlation trong dữ liệu sequential
-    \item \textbf{Continuous learning:} Có thể học liên tục từ dữ liệu real-time mà không cần reset
+    \item \textbf{Hiệu suất mẫu cao:} Đặc biệt quan trọng khi việc thu thập dữ liệu giao thông tốn kém
+    \item \textbf{Học ổn định:} Không bị ảnh hưởng bởi correlation trong dữ liệu sequential
+    \item \textbf{Học liên tục:} Có thể học liên tục từ dữ liệu real-time mà không cần reset
 \end{itemize}
 
-\subsubsection{Soft Updates cho Stability}
-\ac{sac} sử dụng soft updates cho target networks:
+\subsubsection{Soft Updates cho sự ổn định}
+\ac{sac} sử dụng soft updates cho mạng mục tiêu:
 \begin{equation}
     \phi_{target} \leftarrow \tau \phi + (1-\tau) \phi_{target}
 \end{equation}
 
 Với $\tau = 0.001$ được chọn conservative để đảm bảo:
 \begin{itemize}
-    \item \textbf{Training stability:} Tránh sudden changes trong target values
-    \item \textbf{Smooth convergence:} Đặc biệt quan trọng với bài toán multi-objective như đồng bộ hóa
+    \item \textbf{Ổn định huấn luyện:} Tránh thay đổi đột ngột trong giá trị mục tiêu
+    \item \textbf{Smooth convergence:} Đặc biệt quan trọng với bài toán đa mục tiêu như đồng bộ hóa
 \end{itemize}
 
 \subsubsection{So sánh với các thuật toán khác}
@@ -508,17 +508,17 @@ Bảng \ref{tab:algorithm_comparison} so sánh \ac{sac} với các thuật toán
 \label{tab:algorithm_comparison}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-\textbf{Thuật toán} & \textbf{Action Space} & \textbf{Sample Efficiency} & \textbf{Stability} & \textbf{Exploration} \\
+\textbf{Thuật toán} & \textbf{Không gian hành động} & \textbf{Hiệu suất mẫu} & \textbf{Ổn định} & \textbf{Khám phá} \\
 \hline
-DQN & Discrete & Trung bình & Tốt & $\epsilon$-greedy \\
+DQN & Rời rạc & Trung bình & Tốt & $\epsilon$-greedy \\
 \hline
-DDPG & Continuous & Trung bình & Kém & Noise-based \\
+DDPG & Liên tục & Trung bình & Kém & Noise-based \\
 \hline
-TD3 & Continuous & Tốt & Tốt & Noise-based \\
+TD3 & Liên tục & Tốt & Tốt & Noise-based \\
 \hline
-\textbf{SAC} & \textbf{Continuous} & \textbf{Rất tốt} & \textbf{Rất tốt} & \textbf{Entropy-based} \\
+\textbf{SAC} & \textbf{Liên tục} & \textbf{Rất tốt} & \textbf{Rất tốt} & \textbf{Entropy-based} \\
 \hline
-PPO & Both & Tốt & Tốt & Stochastic policy \\
+PPO & Cả hai & Tốt & Tốt & Stochastic policy \\
 \hline
 \end{tabular}
 \end{table}
@@ -528,7 +528,7 @@ Sync Agent sử dụng thuật toán SAC với các đặc điểm kỹ thuật 
 
 \subsubsection{Kiến trúc mạng neural}
 \begin{itemize}
-    \item \textbf{Actor Network:} Mạng policy với 2 lớp ẩn (128 neurons mỗi lớp),
+    \item \textbf{Mạng Actor (Actor Network):} Mạng policy với 2 lớp ẩn (128 neurons mỗi lớp),
         đầu ra là phân phối Gaussian cho các actions liên tục
 
     \item \textbf{Mạng Critic (Critic Networks):} Sử dụng hai mạng Q-function song song nhằm mục đích giảm thiểu hiện tượng \textbf{thiên lệch ước lượng quá mức (overestimation bias)}.
@@ -540,10 +540,10 @@ Sync Agent sử dụng thuật toán SAC với các đặc điểm kỹ thuật 
 \paragraph{Lý do sử dụng mạng fully connected cho SAC}
 Tương tự như DQN, việc lựa chọn kiến trúc fully connected cho SAC được dựa trên:
 \begin{itemize}
-    \item \textbf{Dữ liệu đầu vào tổng hợp:} State của Sync Agent bao gồm metrics từ nhiều giao lộ (traffic metrics, spatial relationships, temporal offsets), đây là dữ liệu tabular không có cấu trúc không gian.
-    \item \textbf{Continuous action space:} Việc điều chỉnh offset values yêu cầu output liên tục, phù hợp với Dense layers có activation function phù hợp.
-    \item \textbf{Computational efficiency:} Quan trọng cho Sync Agent vì phải xử lý dữ liệu từ nhiều giao lộ đồng thời trong real-time.
-\end{itemize}
+    \item \textbf{Dữ liệu đầu vào tổng hợp:} Trạng thái của Sync Agent bao gồm số liệu thống kê từ nhiều giao lộ (thời gian chờ trung bình, độ dài hàng đợi, quan hệ không gian, độ lệch thời gian, thông tin chu kỳ), đây là dữ liệu tabular không có cấu trúc không gian.
+    \item \textbf{Không gian hành động liên tục:} Việc điều chỉnh các giá trị offset yêu cầu output liên tục, phù hợp với Dense layers có hàm kích hoạt phù hợp.
+        \item \textbf{Hiệu quả tính toán:} Quan trọng cho Sync Agent vì phải xử lý dữ liệu từ nhiều giao lộ đồng thời trong thời gian thực.
+    \end{itemize}
 
 \subsubsection{Hyperparameters tối ưu}
 Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã được xác định trong Bảng \ref{tab:sac_hyperparameters}:
@@ -556,17 +556,17 @@ Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã đư�
 \hline
 \textbf{Tham số} & \textbf{Giá trị} & \textbf{Mô tả} \\
 \hline
-Learning rate & $1 \times 10^{-4}$ & Conservative để đảm bảo ổn định \\
+Tốc độ học & $1 \times 10^{-4}$ & Conservative để đảm bảo ổn định \\
 \hline
-Discount factor $\gamma$ & 0.95 & Hệ số chiết khấu cho phần thưởng tương lai \\
+Hệ số chiết khấu $\gamma$ & 0.95 & Hệ số chiết khấu cho phần thưởng tương lai \\
 \hline
-Batch size & 32 & Kích thước lô cho mỗi lần cập nhật \\
+Kích thước lô & 32 & Kích thước lô cho mỗi lần cập nhật \\
 \hline
-Buffer size & $5 \times 10^{4}$ & Kích thước bộ đệm experience replay \\
+Kích thước bộ đệm & $5 \times 10^{4}$ & Kích thước bộ đệm experience replay \\
 \hline
-Temperature $\alpha$ & Auto-tuned & Tham số kiểm soát entropy tự động \\
+Entropy $\alpha$ & Auto-tuned & Tham số kiểm soát entropy tự động \\
 \hline
-Target update $\tau$ & 0.001 & Tốc độ cập nhật soft cho target networks \\
+Tốc độ cập nhật soft cho mạng mục tiêu $\tau$ & 0.001 & Tốc độ cập nhật soft cho target networks \\
 \hline
 \end{tabular}
 \end{table}
@@ -574,7 +574,7 @@ Target update $\tau$ & 0.001 & Tốc độ cập nhật soft cho target networks
 \subsection{Phương pháp huấn luyện hybrid}
 Hệ thống hỗ trợ hai chế độ huấn luyện:
 
-\subsubsection{Synthetic Training Mode}
+\subsubsection{Chế độ huấn luyện tổng hợp (Synthetic Training Mode)}
 Chế độ này sử dụng synthetic data generator để tạo ra dữ liệu giao thông giả lập:
 
 \begin{algorithm}[!htp]
@@ -595,26 +595,26 @@ Chế độ này sử dụng synthetic data generator để tạo ra dữ liệu
     \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Real-time Training Mode}
+\subsubsection{Chế độ huấn luyện thực tế (Real-time Training Mode)}
 Chế độ này sử dụng dữ liệu thực từ các intersection agents:
 \begin{itemize}
-    \item Thu thập metrics real-time từ SUMO simulation
+    \item Thu thập số liệu thực tế từ SUMO simulation
 
-    \item Sử dụng actual traffic flow data
+    \item Sử dụng dữ liệu thực tế về lưu lượng giao thông
 
     \item Áp dụng learned policy trong môi trường thực
 \end{itemize}
 
 \section{Cải tiến ổn định huấn luyện}
 
-Quá trình phát triển đã gặp phải vấn đề training instability nghiêm trọng với các
+Quá trình phát triển đã gặp phải vấn đề ổn định huấn luyện nghiêm trọng với các
 triệu chứng:
 \begin{itemize}
-    \item Reward volatility cao (coefficient of variation > 2.0)
+    \item Biến động reward cao (hệ số biến động > 2.0)
 
-    \item Extreme reward swings (range > 5000)
+    \item Biến động reward lớn (khoảng > 5000)
 
-    \item Không có learning trend rõ ràng
+    \item Không có xu hướng học rõ ràng
 \end{itemize}
 
 \subsection{Giải pháp toàn diện}
@@ -622,47 +622,47 @@ Nghiên cứu đã phát triển một bộ giải pháp tích hợp:
 
 \subsubsection{Ultra-stable reward engineering}
 \begin{itemize}
-    \item Long-term performance comparison windows
+    \item Cửa sổ so sánh hiệu suất dài hạn
 
-    \item Non-overlapping baseline vs current performance
+    \item So sánh không chồng lấp giữa cơ sở và hiệu suất hiện tại
 
-    \item Relative percentage improvements thay vì absolute changes
+    \item So sánh tỷ lệ phần trăm thay vì thay đổi tuyệt đối
 
-    \item Sigmoid transformation để prevent extreme values
+    \item Biến đổi sigmoid để tránh giá trị cực trị
 \end{itemize}
 
-\subsubsection{Conservative hyperparameter tuning}
+\subsubsection{Tối ưu tham số}
 \begin{itemize}
-    \item Reduced learning rates: $3 \times 10^{-4}\rightarrow 1 \times 10^{-4}$
+    \item Giảm tốc độ học: $3 \times 10^{-4}\rightarrow 1 \times 10^{-4}$
 
-    \item Lower discount factor: $0.99 \rightarrow 0.95$
+    \item Giảm hệ số chiết khấu: $0.99 \rightarrow 0.95$
 
-    \item Slower target updates: $\tau = 0.001$
+    \item Giảm tốc độ cập nhật mục tiêu: $\tau = 0.001$
 
-    \item Smaller networks: $256 \times 256 \rightarrow 128 \times 128$
+    \item Giảm kích thước mạng: $256 \times 256 \rightarrow 128 \times 128$
 \end{itemize}
 
-\subsubsection{Training stabilization techniques}
+\subsubsection{Kỹ thuật ổn định huấn luyện}
 \begin{itemize}
-    \item Gradient clipping để prevent exploding gradients
+    % \item Gradient clipping để tránh gradient bùng nổ
+    \item Gradient clipping để tránh gradient bùng nổ
 
-    \item Experience replay với prioritization
+    \item Experience replay với ưu tiên
 
-    \item Curriculum learning từ simple scenarios
+    \item Học theo chương trình từ các tình huống đơn giản
 
-    \item Early stopping based on stability metrics
+    \item Dừng sớm dựa trên các chỉ số ổn định
 \end{itemize}
 
 \subsection{Kết quả cải tiến}
 Sau khi áp dụng các giải pháp, hệ thống đạt được:
 \begin{itemize}
-    \item \textbf{Reward stability:} Coefficient of variation giảm từ 2.10 xuống
-        0.013 (99.4\% improvement)
+    \item \textbf{Ổn định reward:} Hệ số biến động giảm từ 2.10 xuống
+        0.013 (cải thiện 99.4\%)
 
-    \item \textbf{Training quality:} Điểm chất lượng tăng từ 25\% lên 65\% (160\%
-        improvement)
+    \item \textbf{Chất lượng huấn luyện:} Điểm chất lượng tăng từ 25\% lên 65\% (cải thiện 160\%)
 
-    \item \textbf{Convergence:} Stable reward range từ -4.83 đến -5.15
+    \item \textbf{Hội tụ:} Khoảng ổn định reward từ -4.83 đến -5.15
 
-    \item \textbf{Deployment readiness:} Đạt tiêu chuẩn production-ready
+    \item \textbf{Sẵn sàng triển khai:} Có thể được sử dụng để triển khai trên môi trường thực tế
 \end{itemize}
