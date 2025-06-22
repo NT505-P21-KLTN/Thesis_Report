@@ -246,10 +246,10 @@ Trong đó:
 Với cách thiết kế này:
 \begin{itemize}
     \item Nếu hành động của agent làm cho tổng thời gian chờ giảm (tức là xe cộ
-        lưu thông tốt hơn), $W_{t} < W_{t-1}$, phần thưởng $R_{t}$ sẽ là một số dương.
+        lưu thông tốt hơn), $W_{t} < W_{t-1}$, phần thưởng $R_{t}$ sẽ tăng lên.
 
     \item Nếu hành động gây ra ùn tắc và làm tăng tổng thời gian chờ,
-        $W_{t} > W_{t-1}$, phần thưởng $R_{t}$ sẽ là một số âm.
+        $W_{t} > W_{t-1}$, phần thưởng $R_{t}$ sẽ là giảm xuống.
 \end{itemize}
 Mục tiêu của agent là tối đa hóa tổng phần thưởng tích lũy, điều này tương đương với việc học cách giảm thiểu tổng thời gian chờ đợi của các phương tiện.
 
@@ -272,6 +272,32 @@ thành phần sau:
         bằng \textit{num actions} (số lượng hành động có thể). Lớp này sử dụng hàm
         kích hoạt \textit{Linear} để tạo ra các giá trị Q cho mỗi hành động.
 \end{itemize}
+
+\subsubsection{Lý do lựa chọn mạng neural đầy đủ kết nối (DNN)}
+Việc lựa chọn kiến trúc mạng neural đầy đủ kết nối thay vì các kiến trúc khác như \ac{cnn}, RNN, hoặc Transformer được dựa trên những lý do sau:
+
+\paragraph{Phù hợp với bản chất dữ liệu đầu vào}
+Dữ liệu trạng thái giao thông trong nghiên cứu này là dữ liệu số dạng bảng (tabular data) bao gồm các chỉ số như thời gian chờ, độ dài hàng đợi, tốc độ xe, và mật độ giao thông. Đây không phải là dữ liệu hình ảnh hoặc dữ liệu không gian 2D/3D mà \ac{cnn} được thiết kế để xử lý hiệu quả. Các đặc trưng trong vector trạng thái là các phép đo độc lập từ các vị trí khác nhau của giao lộ, không có mối quan hệ không gian cục bộ (spatial locality) mà convolution có thể khai thác.
+
+\paragraph{Không có tính tuần tự thời gian phức tạp}
+Mặc dù dữ liệu giao thông có tính chất thời gian, nhưng trong bài toán này, agent chỉ cần xử lý trạng thái hiện tại để đưa ra quyết định. Không cần phải học các mẫu tuần tự phức tạp qua nhiều bước thời gian dài, do đó RNN hoặc LSTM không mang lại lợi ích đáng kể so với việc tăng độ phức tạp tính toán.
+
+\paragraph{Hiệu quả tính toán và triển khai}
+\begin{itemize}
+    \item \textbf{Tốc độ xử lý cao:} Mạng DNN có độ phức tạp tính toán thấp hơn \ac{cnn} và RNN, cho phép xử lý real-time với độ trễ thấp (< 100ms) cần thiết cho điều khiển giao thông.
+    \item \textbf{Yêu cầu bộ nhớ thấp:} Phù hợp cho triển khai trên các thiết bị edge computing tại giao lộ với tài nguyên hạn chế.
+    \item \textbf{Huấn luyện nhanh:} Thời gian huấn luyện ngắn hơn, cho phép cập nhật mô hình thường xuyên khi có dữ liệu mới.
+\end{itemize}
+
+\paragraph{Tính giải thích và bảo trì}
+\begin{itemize}
+    \item \textbf{Kiến trúc đơn giản:} Dễ dàng hiểu và giải thích mối quan hệ giữa đầu vào và đầu ra.
+    \item \textbf{Debug thuận tiện:} Có thể dễ dàng theo dõi và phân tích từng lớp để xác định vấn đề.
+    \item \textbf{Khả năng mở rộng:} Dễ dàng điều chỉnh số lượng neurons và layers theo yêu cầu cụ thể của từng giao lộ.
+\end{itemize}
+
+\paragraph{Hiệu suất đã được chứng minh}
+Các nghiên cứu trước đây về điều khiển giao thông sử dụng DRL đã chứng minh rằng mạng DNN đơn giản đủ hiệu quả cho bài toán này. Việc sử dụng kiến trúc phức tạp hơn không mang lại cải thiện đáng kể về hiệu suất nhưng lại tăng đáng kể chi phí tính toán và độ phức tạp triển khai.
 
 \begin{figure*}[!htp]
     \centering
@@ -335,12 +361,12 @@ Kiến trúc phân tầng cho phép:
 \begin{itemize}
     \item \textbf{Thêm/bớt giao lộ dễ dàng:} Chỉ cần thêm intersection agent mới mà không cần thay đổi toàn bộ hệ thống
     \item \textbf{Tính toán phân tán:} Intersection agents có thể chạy trên các thiết bị edge tại từng giao lộ
-    \item \textbf{Fault tolerance:} Nếu một intersection agent gặp sự cố, các giao lộ khác vẫn hoạt động bình thường
+    \item \textbf{Khả năng chịu lỗi:} Nếu một intersection agent gặp sự cố, các giao lộ khác vẫn hoạt động bình thường
 \end{itemize}
 
 \paragraph{Hiệu quả tính toán}
 \begin{itemize}
-    \item \textbf{Parallel processing:} Các intersection agents hoạt động song song, giảm thời gian tính toán tổng thể
+    \item \textbf{Tính toán song song:} Các intersection agents hoạt động song song, giảm thời gian tính toán tổng thể
     \item \textbf{Reduced complexity:} Thay vì một bài toán tối ưu hóa khổng lồ cho toàn bộ mạng lưới, bài toán được chia nhỏ thành nhiều bài toán con đơn giản hơn
 \end{itemize}
 
@@ -511,6 +537,14 @@ Sync Agent sử dụng thuật toán SAC với các đặc điểm kỹ thuật 
         huấn luyện
 \end{itemize}
 
+\paragraph{Lý do sử dụng mạng fully connected cho SAC}
+Tương tự như DQN, việc lựa chọn kiến trúc fully connected cho SAC được dựa trên:
+\begin{itemize}
+    \item \textbf{Dữ liệu đầu vào tổng hợp:} State của Sync Agent bao gồm metrics từ nhiều giao lộ (traffic metrics, spatial relationships, temporal offsets), đây là dữ liệu tabular không có cấu trúc không gian.
+    \item \textbf{Continuous action space:} Việc điều chỉnh offset values yêu cầu output liên tục, phù hợp với Dense layers có activation function phù hợp.
+    \item \textbf{Computational efficiency:} Quan trọng cho Sync Agent vì phải xử lý dữ liệu từ nhiều giao lộ đồng thời trong real-time.
+\end{itemize}
+
 \subsubsection{Hyperparameters tối ưu}
 Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã được xác định trong Bảng \ref{tab:sac_hyperparameters}:
 
@@ -551,7 +585,7 @@ Chế độ này sử dụng synthetic data generator để tạo ra dữ liệu
         \State time\_factor $\leftarrow$ $\sin(\frac{\text{current\_time}}{period\_length} \times 2\pi)$
         \State traffic\_volume $\leftarrow$ base\_volume $\times$ (1 + amplitude $\times$ time\_factor) 
         
-        \For{every_intersection $i$}
+        \For{every\_intersection $i$}
             \State waiting\_time[$i$] $\leftarrow$ generate\_waiting\_time(traffic\_volume, intersection\_config[$i$])
             \State queue\_length[$i$] $\leftarrow$ generate\_queue\_length(traffic\_volume, intersection\_config[$i$])
             \State speed[$i$] $\leftarrow$ uniform\_random(25.0, 45.0) \Comment{Phạm vi tốc độ đô thị}
