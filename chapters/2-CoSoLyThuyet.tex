@@ -138,6 +138,7 @@ Một bài toán \ac{rl} điển hình được định nghĩa bởi các thành
 \end{itemize}
 
 \subsubsection{Vòng lặp học tập}
+Reinforcement Learning hoạt động dựa trên một quy trình tương tác liên tục giữa agent và môi trường. Hình \ref{fig:RL-components} minh họa các thành phần và luồng thông tin trong vòng lặp học tập cơ bản.
 
 \begin{figure*}[!htp]
     \centering
@@ -301,6 +302,7 @@ hạn và xác suất lớp trực tiếp từ hình ảnh đầy đủ trong m�
 kể so với các phương pháp trước đó.
 
 \subsection{Nguyên lý hoạt động}
+YOLO áp dụng cách tiếp cận khác biệt trong bài toán phát hiện đối tượng so với các phương pháp truyền thống, khi xử lý toàn bộ hình ảnh chỉ trong một lần duy nhất thay vì chia nhỏ và xử lý trên từng vùng. Hình \ref{fig:yolo_architecture} minh họa cách thức hoạt động của thuật toán này.
 
 \begin{figure}[!htp]
     \centering
@@ -309,7 +311,7 @@ kể so với các phương pháp trước đó.
     \label{fig:yolo_architecture}
 \end{figure}
 
-YOLO chia hình ảnh đầu vào thành một lưới $S \times S$ cells. Mỗi cell chịu
+Cụ thể, thuật toán chia hình ảnh đầu vào thành một lưới $S \times S$ cells. Mỗi cell chịu
 trách nhiệm dự đoán các đối tượng có tâm nằm trong nó. Mỗi cell dự đoán:
 \begin{itemize}
     \item $B$ bounding boxes và độ tin cậy (confidence scores) cho mỗi box

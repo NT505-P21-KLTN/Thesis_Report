@@ -277,6 +277,7 @@ Sau quá trình huấn luyện và đánh giá trong môi trường mô phỏng 
 kết quả dưới dạng biểu đồ. Do hai mô hình Aggressive và High Learning có hiệu suất cực kỳ kém (với giá trị phần thưởng âm rất lớn), việc đưa chúng vào cùng biểu đồ sẽ làm biến dạng dạng thang đo và khó quan sát sự khác biệt giữa các mô hình có hiệu suất hợp lý khác. Vì vậy, kết quả được trình bày trong hai biểu đồ riêng biệt, hai mô hình có hiệu suất kém được hiển thị trong phần so sánh với giá trị ngoại lai (outliers).
 
 \subsubsection{Tiến trình phần thưởng qua các tập huấn luyện}
+Phân tích quá trình học của các mô hình cho thấy sự khác biệt rõ rệt trong khả năng hội tụ và ổn định. Hình \ref{fig:intersection_filtered_reward_progress} thể hiện tiến trình học của các mô hình có hiệu suất khả thi.
 
 \begin{figure*}[!htp]
     \centering
@@ -285,7 +286,7 @@ kết quả dưới dạng biểu đồ. Do hai mô hình Aggressive và High Le
     \label{fig:intersection_filtered_reward_progress}
 \end{figure*}
 
-Hình \ref{fig:intersection_filtered_reward_progress} thể hiện quá trình học của 8 mô hình có hiệu suất khả thi. Phân tích chi tiết cho thấy:
+Từ biểu đồ này, ta có thể phân tích chi tiết quá trình học của 8 mô hình có hiệu suất khả thi:
 
 \begin{itemize}
     \item \textbf{Mô hình Balanced (màu xanh lam):} Cho thấy quá trình hội tụ ổn định nhất với độ dốc gradient ít dao động, đạt phần thưởng cuối -12,860. Mô hình bắt đầu học nhanh trong 50 episode đầu, sau đó ổn định.
@@ -300,6 +301,7 @@ Hình \ref{fig:intersection_filtered_reward_progress} thể hiện quá trình h
 Đặc biệt, biểu đồ cho thấy rõ tương quan giữa learning rate và tốc độ hội tụ: các mô hình với learning rate 0.0007-0.001 hội tụ nhanh và ổn định, trong khi learning rate quá thấp (<0.0005) dẫn đến học chậm.
 
 \subsubsection{Thời gian chờ đợi trung bình}
+Metric thời gian chờ đợi phản ánh trực tiếp hiệu quả của hệ thống trong việc giảm thiểu ùn tắc giao thông. Hình \ref{fig:intersection_filtered_waiting_time} so sánh hiệu suất của các mô hình theo chỉ số này.
 
 \begin{figure*}[!htp]
     \centering
@@ -308,11 +310,10 @@ Hình \ref{fig:intersection_filtered_reward_progress} thể hiện quá trình h
     \label{fig:intersection_filtered_waiting_time}
 \end{figure*}
 
-Hình \ref{fig:intersection_filtered_waiting_time} cho thấy mô hình Balanced đạt thời
-gian chờ thấp nhất (37,506s), vượt trội so với các mô hình khác. Điều này chứng minh
-hiệu quả của việc cân bằng các siêu tham số (hyperparameter).
+Kết quả phân tích cho thấy mô hình Balanced đạt thời gian chờ thấp nhất (37,506s), vượt trội so với các mô hình khác và chứng minh hiệu quả của việc cân bằng các siêu tham số (hyperparameter).
 
 \subsubsection{Độ dài hàng đợi trung bình}
+Độ dài hàng đợi là một chỉ số quan trọng khác để đánh giá mức độ ùn tắc tại giao lộ. Hình \ref{fig:intersection_filtered_queue_length} thể hiện sự so sánh giữa các mô hình dựa trên metric này.
 
 \begin{figure*}[!htp]
     \centering
@@ -321,11 +322,10 @@ hiệu quả của việc cân bằng các siêu tham số (hyperparameter).
     \label{fig:intersection_filtered_queue_length}
 \end{figure*}
 
-Hình \ref{fig:intersection_filtered_queue_length} thể hiện mô hình Balanced cũng
-đạt độ dài hàng đợi nhỏ nhất (6.95 xe), tương quan trực tiếp với hiệu suất thời
-gian chờ đợi.
+Kết quả đánh giá cho thấy mô hình Balanced cũng đạt độ dài hàng đợi nhỏ nhất (6.95 xe), tương quan trực tiếp với hiệu suất thời gian chờ đợi.
 
 \subsubsection{So sánh tổng thể hiệu suất}
+Để có cái nhìn tổng quan về hiệu suất của tất cả các mô hình, nghiên cứu tổng hợp ba chỉ số chính trong một biểu đồ thống nhất. Hình \ref{fig:intersection_filtered_performance_summary} cung cấp phân tích so sánh đa chiều.
 
 \begin{figure}[!htp]
     \centering
@@ -336,7 +336,7 @@ gian chờ đợi.
     \label{fig:intersection_filtered_performance_summary}
 \end{figure}
 
-Hình \ref{fig:intersection_filtered_performance_summary} tổng hợp ba metrics chính trong một biểu đồ cột nhóm, cho phép so sánh trực tiếp hiệu suất:
+Biểu đồ tổng hợp này cho phép so sánh trực tiếp hiệu suất của các mô hình dựa trên ba metrics chính:
 
 \begin{itemize}
     \item \textbf{Phân bố hiệu suất:} Biểu đồ thể hiện rõ sự phân tầng hiệu suất với 3 nhóm rõ rệt - nhóm cao (Balanced, High Traffic), nhóm trung bình (5 mô hình), và nhóm thấp (Conservative).
@@ -357,6 +357,7 @@ nghiên cứu cũng trình bày kết quả đầy đủ của tất cả 10 mô
 hình có hiệu suất cực kém.
 
 \subsubsection{Tiến trình reward với giá trị ngoại lai}
+Để hiểu rõ tác động của việc lựa chọn siêu tham số không phù hợp, nghiên cứu trình bày kết quả đầy đủ bao gồm cả các mô hình thất bại. Hình \ref{fig:intersection_full_reward_progress} cho thấy sự tương phản rõ rệt giữa các nhóm mô hình.
 
 \begin{figure}[!htp]
     \centering
@@ -367,11 +368,10 @@ hình có hiệu suất cực kém.
     \label{fig:intersection_full_reward_progress}
 \end{figure}
 
-Hình \ref{fig:intersection_full_reward_progress} cho thấy rõ ràng sự khác biệt lớn
-giữa các mô hình. Mô hình High Learning có hiệu suất cực kỳ kém với phần thưởng đạt -138,191,
-trong khi Aggressive cũng thất bại với -50,135.
+Biểu đồ này cho thấy rõ ràng sự khác biệt lớn giữa các mô hình, với High Learning có hiệu suất cực kỳ kém (phần thưởng -138,191) và Aggressive cũng thất bại hoàn toàn (-50,135).
 
 \subsubsection{Thời gian chờ đợi với giá trị ngoại lai}
+Metric thời gian chờ đợi khi bao gồm các mô hình thất bại cho thấy mức độ ảnh hưởng của việc cấu hình tham số không phù hợp. Hình \ref{fig:intersection_full_waiting_time} minh họa rõ ràng sự khác biệt lớn này.
 
 \begin{figure}[!htp]
     \centering
@@ -382,11 +382,10 @@ trong khi Aggressive cũng thất bại với -50,135.
     \label{fig:intersection_full_waiting_time}
 \end{figure}
 
-Hình \ref{fig:intersection_full_waiting_time} thể hiện tác động trực tiếp của
-siêu tham số không phù hợp lên hiệu suất thực tế. Mô hình Aggressive gây ra thời
-gian chờ cực lớn (172,687s), gấp 4.6 lần so với mô hình Balanced.
+Kết quả phân tích thể hiện tác động trực tiếp của siêu tham số không phù hợp lên hiệu suất thực tế, với mô hình Aggressive gây ra thời gian chờ cực lớn (172,687s) - gấp 4.6 lần so với mô hình Balanced.
 
 \subsubsection{Độ dài hàng đợi với giá trị ngoại lai}
+Tương tự như thời gian chờ đợi, độ dài hàng đợi cũng bị ảnh hưởng nghiêm trọng bởi việc lựa chọn tham số không phù hợp. Hình \ref{fig:intersection_full_queue_length} thể hiện sự chênh lệch đáng kể giữa các mô hình.
 
 \begin{figure}[!htp]
     \centering
@@ -397,11 +396,10 @@ gian chờ cực lớn (172,687s), gấp 4.6 lần so với mô hình Balanced.
     \label{fig:intersection_full_queue_length}
 \end{figure}
 
-Hình \ref{fig:intersection_full_queue_length} cho thấy mô hình Aggressive tạo ra
-hàng đợi dài nhất (31.98 xe), gấp 4.6 lần so với Balanced, chứng minh tác động
-nghiêm trọng của việc lựa chọn tham số không phù hợp.
+Dữ liệu cho thấy mô hình Aggressive tạo ra hàng đợi dài nhất (31.98 xe) - gấp 4.6 lần so với Balanced, chứng minh tác động nghiêm trọng của việc lựa chọn tham số không phù hợp.
 
 \subsubsection{Tổng hợp so sánh với giá trị ngoại lai}
+Biểu đồ tổng hợp đầy đủ cho thấy phạm vi biến động hiệu suất rộng lớn giữa các mô hình. Hình \ref{fig:intersection_full_performance_summary} cung cấp cái nhìn toàn diện về tác động của việc điều chỉnh tham số.
 
 \begin{figure}[!htp]
     \centering
@@ -412,7 +410,7 @@ nghiêm trọng của việc lựa chọn tham số không phù hợp.
     \label{fig:intersection_full_performance_summary}
 \end{figure}
 
-Hình \ref{fig:intersection_full_performance_summary} tổng hợp đầy đủ kết quả của tất cả 10 mô hình. Kết quả cho thấy rõ ràng sự thay đổi đáng kề khi lựa chọn tham số không phù hợp: mô hình Aggressive đạt phần thưởng -50,135 (kém 290\% so với Balanced), trong khi High Learning đạt -138,191 (kém 975\% so với Balanced). Điều này nhấn mạnh tầm quan trọng của việc lựa chọn siêu tham số cẩn thận trong Deep Reinforcement Learning.
+Biểu đồ tổng hợp này cho thấy rõ ràng sự thay đổi nghiêm trọng khi lựa chọn tham số không phù hợp: mô hình Aggressive đạt phần thưởng -50,135 (kém 290\% so với Balanced), trong khi High Learning đạt -138,191 (kém 975\% so với Balanced). Điều này nhấn mạnh tầm quan trọng của việc lựa chọn siêu tham số cẩn thận trong Deep Reinforcement Learning.
 \newpage
 \subsection{Hiệu suất của mô hình tối ưu}
 
