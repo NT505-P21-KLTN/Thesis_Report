@@ -131,12 +131,12 @@ Môi trường mô phỏng được thiết lập để tái tạo điều kiệ
 
 \begin{figure}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{figures/sumo_map}
+    \includegraphics[width=0.8\textwidth]{figures/sumo_map}
     \caption{Mô hình giao lộ trong mô phỏng}
     \label{fig:sumo_map}
 \end{figure}
 
-Như minh họa trong hình, nghiên cứu mô phỏng một nút giao thông với bốn làn đường cho mỗi hướng, với thiết lập điều hướng cụ thể để kiểm soát hướng di chuyển của phương tiện. Cụ thể:
+Như minh họa trong hình \ref{fig:sumo_map}, nghiên cứu mô phỏng một nút giao thông với bốn làn đường cho mỗi hướng, với thiết lập điều hướng cụ thể để kiểm soát hướng di chuyển của phương tiện. Cụ thể:
 \begin{itemize}
     \item Làn trái ngoài: Chỉ được phép rẽ trái.
 
@@ -144,7 +144,7 @@ Như minh họa trong hình, nghiên cứu mô phỏng một nút giao thông v�
 
     \item Làn trong cùng: Chỉ được phép rẽ phải.
 \end{itemize}
-\subsection{Cơ chế giả lập phương tiện}
+\subsection{Giả lập phương tiện}
 
 
 
@@ -154,19 +154,19 @@ Trong khuôn khổ của đề tài, môi trường chính là một kịch bả
 hiện các công việc sau:
 \begin{itemize}
     \item Khởi tạo và kết thúc một phiên giả lập \ac{sumo} thông qua thư viện
-        TraCI.
+    TraCI.
 
     \item Tại mỗi bước thời gian, thu thập dữ liệu thô từ \ac{sumo} để xây dựng \textit{trạng
-        thái}.
+    thái}.
 
     \item Gửi các \textit{hành động} (lựa chọn pha đèn) từ agent đến \ac{sumo} để
-        thực thi.
+    thực thi.
 
     \item Tính toán \textit{phần thưởng} dựa trên kết quả của hành động vừa thực
-        hiện.
+    hiện.
 
     \item Quản lý vòng lặp của một tập (episode) huấn luyện, bao gồm việc tạo ra
-        các luồng giao thông ngẫu nhiên cho mỗi tập.
+    các luồng giao thông ngẫu nhiên cho mỗi tập.
 \end{itemize}
 
 \subsection{Định nghĩa tác nhân (Agent)}
@@ -175,15 +175,15 @@ xây dựng bằng thư viện TensorFlow và Keras. Agent này thực hiện ha
 chính:
 \begin{enumerate}
     \item \textbf{Dự đoán (Inference):} Dựa vào \textit{trạng thái} hiện tại của
-        môi trường, agent sử dụng mạng neural của mình để dự đoán giá trị Q (Q-value)
-        cho mỗi \textit{hành động} có thể thực hiện. Hành động có giá trị Q cao
-        nhất sẽ được lựa chọn (chiến lược tham lam).
+    môi trường, agent sử dụng mạng neural của mình để dự đoán giá trị Q (Q-value)
+    cho mỗi \textit{hành động} có thể thực hiện. Hành động có giá trị Q cao
+    nhất sẽ được lựa chọn (chiến lược tham lam).
 
     \item \textbf{Học (Learning):} Agent sử dụng một bộ nhớ đệm gọi là \textit{Experience
-        Replay} để lưu trữ các kinh nghiệm $(s, a, r, s')$. Trong giai đoạn huấn
-        luyện, nó sẽ lấy ra các lô (batch) kinh nghiệm ngẫu nhiên từ bộ nhớ này để
-        cập nhật trọng số của mạng neural, nhằm cải thiện khả năng dự đoán và ra
-        quyết định trong tương lai.
+    Replay} để lưu trữ các kinh nghiệm $(s, a, r, s')$. Trong giai đoạn huấn
+    luyện, nó sẽ lấy ra các lô (batch) kinh nghiệm ngẫu nhiên từ bộ nhớ này để
+    cập nhật trọng số của mạng neural, nhằm cải thiện khả năng dự đoán và ra
+    quyết định trong tương lai.
 \end{enumerate}
 Quá trình lựa chọn hành động tuân theo chính sách $\epsilon$-greedy: với một xác
 suất nhỏ $\epsilon$, agent sẽ chọn một hành động ngẫu nhiên (thăm dò), và trong
@@ -197,7 +197,7 @@ Trạng thái là cách biểu diễn thông tin của môi trường để agen
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{img/sumo_state_1.png}
-        \caption{Hai nhóm làn đường}
+        \caption{PhânHai nhóm làn đường}
         \label{fig:sumo_state_1}
     \end{subfigure}
     \hfill
