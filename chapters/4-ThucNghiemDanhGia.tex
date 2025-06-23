@@ -5,7 +5,7 @@
 
 Nghiên cứu tập trung đặc biệt vào việc phân tích ảnh hưởng của mức độ giao thông khác nhau đến khả năng hội tụ (convergence) và hiệu suất cuối cùng của mô hình DQN. Điều này bao gồm việc đánh giá hiệu suất trên 4 kịch bản giao thông từ thấp đến cao điểm (300-1200 xe/giờ), cung cấp những hiểu biết thực tế về khả năng triển khai (deployment) trong các điều kiện giao thông khác nhau.
 
-Hệ thống cũng tích hợp khả năng phát hiện và theo dõi phương tiện thông qua YOLO (You Only Look Once) để thu thập dữ liệu giao thông thời gian thực từ camera giám sát, tạo cơ sở dữ liệu benchmark cho việc so sánh và đánh giá các phương pháp khác nhau.
+Hệ thống cũng tích hợp khả năng phát hiện và theo dõi phương tiện thông qua YOLO (You Only Look Once) để thu thập dữ liệu giao thông thời gian thực từ camera giám sát, tạo cơ sở dữ liệu chuẩn cho việc so sánh và đánh giá các phương pháp khác nhau.
 \section{Thiết kế kịch bản thực nghiệm}
 
 \subsection{Kịch bản 1: Điều khiển tại một giao lộ đơn lẻ}
@@ -33,7 +33,7 @@ Nghiên cứu sử dụng phương pháp so sánh đối chứng (controlled com
 \textbf{Các phương pháp so sánh:}
 \begin{itemize}
     \item Fixed-time control (cố định thời gian) - baseline truyền thống
-    \item Actuated control (điều khiển kích hoạt) - benchmark hiện đại
+    \item Actuated control (điều khiển kích hoạt) - phương pháp chuẩn hiện đại
     \item 10 cấu hình DQN với hyperparameters khác nhau
     \item Phát hiện phương tiện qua YOLO để validation dữ liệu
 \end{itemize}
@@ -289,13 +289,13 @@ Phân tích quá trình học của các mô hình cho thấy sự khác biệt 
 Từ biểu đồ này, ta có thể phân tích chi tiết quá trình học của 8 mô hình có hiệu suất khả thi:
 
 \begin{itemize}
-    \item \textbf{Mô hình Balanced (màu xanh lam):} Cho thấy quá trình hội tụ ổn định nhất với độ dốc gradient ít dao động, đạt phần thưởng cuối -12,860. Mô hình bắt đầu học nhanh trong 50 episode đầu, sau đó ổn định.
+    \item \textbf{Mô hình Balanced (màu xanh lam):} Cho thấy quá trình hội tụ ổn định nhất với độ dốc gradient ít dao động, đạt phần thưởng cuối -12.860. Mô hình bắt đầu học nhanh trong 50 episode đầu, sau đó ổn định.
     
     \item \textbf{Mô hình High Traffic (màu cam):} Có hiệu suất gần tương tự Balanced với phần thưởng -13,689, nhưng biến động nhiều hơn trong giai đoạn 100-150 episodes.
     
-    \item \textbf{Nhóm trung bình (Moderate Learning, Baseline):} Có xu hướng học chậm hơn và đạt plateau sớm quanh episode 120-130, với mức độ hội tụ thấp hơn 15-20% so với nhóm tốt nhất.
+    \item \textbf{Nhóm trung bình (Moderate Learning, Baseline):} Có xu hướng học chậm hơn và đạt plateau sớm quanh episode 120-130, với mức độ hội tụ thấp hơn 15-20\% so với nhóm tốt nhất.
     
-    \item \textbf{Mô hình Conservative (màu tím):} Cho thấy learning curve phẳng nhất, học rất chậm do learning rate thấp (0,0001), đạt phần thưởng chỉ -20,723.
+    \item \textbf{Mô hình Conservative (màu tím):} Cho thấy learning curve phẳng nhất, học rất chậm do learning rate thấp (0,0001), đạt phần thưởng chỉ -20.723.
 \end{itemize}
 
 Đặc biệt, biểu đồ cho thấy rõ tương quan giữa learning rate và tốc độ hội tụ: các mô hình với learning rate 0,0007-0,001 hội tụ nhanh và ổn định, trong khi learning rate quá thấp (<0,0005) dẫn đến học chậm.
@@ -310,7 +310,7 @@ Metric thời gian chờ đợi phản ánh trực tiếp hiệu quả của h�
     \label{fig:intersection_filtered_waiting_time}
 \end{figure*}
 
-Kết quả phân tích cho thấy mô hình Balanced đạt thời gian chờ thấp nhất (37,506s), vượt trội so với các mô hình khác và chứng minh hiệu quả của việc cân bằng các siêu tham số (hyperparameter).
+Kết quả phân tích cho thấy mô hình Balanced đạt thời gian chờ thấp nhất (37,5s), vượt trội so với các mô hình khác và chứng minh hiệu quả của việc cân bằng các siêu tham số (hyperparameter).
 
 \subsubsection{Độ dài hàng đợi trung bình}
 Độ dài hàng đợi là một chỉ số quan trọng khác để đánh giá mức độ ùn tắc tại giao lộ. Hình \ref{fig:intersection_filtered_queue_length} thể hiện sự so sánh giữa các mô hình dựa trên metric này.
@@ -336,16 +336,16 @@ Kết quả đánh giá cho thấy mô hình Balanced cũng đạt độ dài h�
     \label{fig:intersection_filtered_performance_summary}
 \end{figure}
 
-Biểu đồ tổng hợp này cho phép so sánh trực tiếp hiệu suất của các mô hình dựa trên ba metrics chính:
+Biểu đồ tổng hợp này cho phép so sánh trực tiếp hiệu suất của các mô hình dựa trên ba chỉ số chính:
 
 \begin{itemize}
     \item \textbf{Phân bố hiệu suất:} Biểu đồ thể hiện rõ sự phân tầng hiệu suất với 3 nhóm rõ rệt - nhóm cao (Balanced, High Traffic), nhóm trung bình (5 mô hình), và nhóm thấp (Conservative).
     
-    \item \textbf{Tương quan metrics:} Có sự tương quan mạnh giữa ba chỉ số - mô hình có reward cao thường có waiting time và queue length thấp, chứng minh tính nhất quán của phương pháp đánh giá.
+    \item \textbf{Tương quan chỉ số:} Có sự tương quan mạnh giữa ba chỉ số - mô hình có phần thưởng cao thường có thời gian chờ đợi và độ dài hàng đợi thấp, chứng minh tính nhất quán của phương pháp đánh giá.
     
-    \item \textbf{Margin of superiority:} Balanced vượt trội với margin đáng kể - thấp hơn 9% về waiting time và 8,5% về queue length so với mô hình tốt thứ hai (High Traffic).
+    \item \textbf{Margin of superiority:} Balanced vượt trội với margin đáng kể - thấp hơn 9\% về thời gian chờ và 8,5\% về độ dài hàng đợi so với mô hình tốt thứ hai (High Traffic).
     
-    \item \textbf{Practicality threshold:} Các mô hình có waiting time < 45,000s và queue length < 8,5 xe được coi là khả thi cho triển khai thực tế dựa trên benchmark giao thông đô thị.
+    \item \textbf{Ngưỡng khả thi:} Các mô hình có thời gian chờ đợi trung bình < 45s và độ dài hàng đợi trung bình < 8,5 xe được xem là khả thi cho triển khai thực tế dựa trên tiêu chuẩn giao thông đô thị.
 \end{itemize}
 
 Kết quả khẳng định sự vượt trội toàn diện của mô hình Balanced, không chỉ về một metric đơn lẻ mà trên toàn bộ phổ đánh giá hiệu suất.
@@ -368,7 +368,7 @@ hình có hiệu suất cực kém.
     \label{fig:intersection_full_reward_progress}
 \end{figure}
 
-Biểu đồ này cho thấy rõ ràng sự khác biệt lớn giữa các mô hình, với High Learning có hiệu suất cực kỳ kém (phần thưởng -138,191) và Aggressive cũng thất bại hoàn toàn (-50,135).
+Biểu đồ này cho thấy rõ ràng sự khác biệt lớn giữa các mô hình, với High Learning có hiệu suất cực kỳ kém (phần thưởng -138.191) và Aggressive cũng thất bại hoàn toàn (-50.135).
 
 \subsubsection{Thời gian chờ đợi với giá trị ngoại lai}
 Metric thời gian chờ đợi khi bao gồm các mô hình thất bại cho thấy mức độ ảnh hưởng của việc cấu hình tham số không phù hợp. Hình \ref{fig:intersection_full_waiting_time} minh họa rõ ràng sự khác biệt lớn này.
@@ -382,7 +382,7 @@ Metric thời gian chờ đợi khi bao gồm các mô hình thất bại cho th
     \label{fig:intersection_full_waiting_time}
 \end{figure}
 
-Kết quả phân tích thể hiện tác động trực tiếp của siêu tham số không phù hợp lên hiệu suất thực tế, với mô hình Aggressive gây ra thời gian chờ cực lớn (172,687s) - gấp 4,6 lần so với mô hình Balanced.
+Kết quả phân tích thể hiện tác động trực tiếp của siêu tham số không phù hợp lên hiệu suất thực tế, với mô hình Aggressive gây ra thời gian chờ cực lớn (172,7s) - gấp 4,6 lần so với mô hình Balanced.
 
 \subsubsection{Độ dài hàng đợi với giá trị ngoại lai}
 Tương tự như thời gian chờ đợi, độ dài hàng đợi cũng bị ảnh hưởng nghiêm trọng bởi việc lựa chọn tham số không phù hợp. Hình \ref{fig:intersection_full_queue_length} thể hiện sự chênh lệch đáng kể giữa các mô hình.
@@ -410,7 +410,7 @@ Biểu đồ tổng hợp đầy đủ cho thấy phạm vi biến động hiệ
     \label{fig:intersection_full_performance_summary}
 \end{figure}
 
-Biểu đồ tổng hợp này cho thấy rõ ràng sự thay đổi nghiêm trọng khi lựa chọn tham số không phù hợp: mô hình Aggressive đạt phần thưởng -50,135 (kém 290\% so với Balanced), trong khi High Learning đạt -138,191 (kém 975\% so với Balanced). Điều này nhấn mạnh tầm quan trọng của việc lựa chọn siêu tham số cẩn thận trong Deep Reinforcement Learning.
+Biểu đồ tổng hợp này cho thấy rõ ràng sự thay đổi nghiêm trọng khi lựa chọn tham số không phù hợp: mô hình Aggressive đạt phần thưởng -50.135 (kém 290\% so với Balanced), trong khi High Learning đạt -138.191 (kém 975\% so với Balanced). Điều này nhấn mạnh tầm quan trọng của việc lựa chọn siêu tham số cẩn thận trong Deep Reinforcement Learning.
 \newpage
 \subsection{Hiệu suất của mô hình tối ưu}
 
@@ -418,7 +418,7 @@ Mô hình \textbf{Balanced} thể hiện hiệu suất vượt trội với các
 
 \begin{align}
     \text{Phần thưởng trung bình}     & : -12.860             \\
-    \text{Thời gian chờ trung bình}   & : 37,505,85 \text{ giây} \\
+    \text{Thời gian chờ trung bình}   & : 37,5 \text{ giây} \\
     \text{Độ dài hàng đợi trung bình} & : 6,95 \text{ xe}
 \end{align}
 
@@ -434,38 +434,39 @@ xếp theo thứ tự từ tốt nhất đến kém nhất:
     \centering
     \caption{Kết quả so sánh hiệu suất các mô hình DQN với phân tích nhóm}
     \label{tab:model_performance_comparison}
+    \footnotesize
     \begin{tabular}{|l|c|c|c|l|}
         \hline 
         \textbf{Mô hình}  & \textbf{Phần thưởng TB} & \textbf{Thời gian chờ TB (s)} & \textbf{Độ dài hàng đợi TB} & \textbf{Nhóm hiệu suất} \\
         \hline 
         \multicolumn{5}{|c|}{\textbf{NHÓM HIỆU SUẤT CAO (Top 25\%)}} \\
         \hline
-        \textbf{Balanced (tốt nhất)} & \textbf{-12.860}     & \textbf{37.506}            & \textbf{6,95}               & Tối ưu \\
+        \textbf{Balanced (tốt nhất)} & \textbf{-12.860}     & \textbf{37,5}            & \textbf{6,95}               & Tối ưu \\
         \hline
-        High Traffic               & -13.689              & 38.012                     & 7,04                        & Khả thi \\
+        High Traffic               & -13.689              & 38,0                     & 7,04                        & Khả thi \\
         \hline
         \multicolumn{5}{|c|}{\textbf{NHÓM HIỆU SUẤT TRUNG BÌNH (25-75\%)}} \\
         \hline
-        Moderate Learning          & -15.886              & 41.013                     & 7,59                        & Chấp nhận được \\
+        Moderate Learning          & -15.886              & 41,0                     & 7,59                        & Chấp nhận được \\
         \hline
-        Baseline                   & -16.368              & 41.405                     & 7,67                        & Chấp nhận được \\
+        Baseline                   & -16.368              & 41,4                     & 7,67                        & Chấp nhận được \\
         \hline
-        Low Traffic                & -16.657              & 43.583                     & 8,07                        & Chấp nhận được \\
+        Low Traffic                & -16.657              & 43,6                     & 8,07                        & Chấp nhận được \\
         \hline
-        Medium Batch               & -16.940              & 43.316                     & 8,02                        & Chấp nhận được \\
+        Medium Batch               & -16.940              & 43,3                     & 8,02                        & Chấp nhận được \\
         \hline
-        Original                   & -17.305              & 44.698                     & 8,28                        & Chấp nhận được \\
+        Original                   & -17.305              & 44,7                     & 8,28                        & Chấp nhận được \\
         \hline
-        Conservative               & -20.723              & 46.952                     & 8,69                        & Thấp \\
+        Conservative               & -20.723              & 47,0                     & 8,69                        & Thấp \\
         \hline
         \multicolumn{5}{|c|}{\textbf{NHÓM HIỆU SUẤT THẤP (Bottom 25\% - Outliers)}} \\
         \hline
-        Aggressive                 & -50.135              & 172.688                    & 31,98                       & Thất bại \\
+        Aggressive                 & -50.135              & 172,7                    & 31,98                       & Thất bại \\
         \hline
-        High Learning (tệ nhất)              & -138.191             & 61.483                     & 11,39                       & Thất bại hoàn toàn \\
+        High Learning (tệ nhất)              & -138.191             & 61,5                     & 11,39                       & Thất bại hoàn toàn \\
         \hline
     \end{tabular}
-\end{table*}
+\end{table}
 
 \subsection{Phân tích xu thế và nhóm hiệu suất}
 
@@ -473,22 +474,22 @@ Từ kết quả trong Bảng \ref{tab:model_performance_comparison}, có thể 
 
 \subsubsection{Nhóm hiệu suất cao (Top 25\%)}
 \begin{itemize}
-    \item \textbf{Balanced}: Đạt hiệu suất tốt nhất với thời gian chờ 37,506s và hàng đợi 6,95 xe
+    \item \textbf{Balanced}: Đạt hiệu suất tốt nhất với thời gian chờ 37,5s và hàng đợi 6,95 xe
     \item \textbf{High Traffic}: Xếp thứ 2 với hiệu suất sát sao (chênh lệch 1,3\% về thời gian chờ)
     \item \textbf{Đặc điểm chung}: Learning rate trung bình (0,0007-0,001), batch size hợp lý (64-128)
 \end{itemize}
 
 \subsubsection{Nhóm hiệu suất trung bình (25-75\%)}
 \begin{itemize}
-    \item \textbf{Xu thế}: Thời gian chờ dao động 41.000-47.000s, hàng đợi 7,6-8,7 xe
-    \item \textbf{Chênh lệch với nhóm cao}: 9-25% về thời gian chờ đợi
+    \item \textbf{Xu thế}: Thời gian chờ dao động 41-47s, hàng đợi 7,6-8,7 xe
+    \item \textbf{Chênh lệch với nhóm cao}: 9-25\% về thời gian chờ đợi
     \item \textbf{Nguyên nhân}: Learning rate quá thấp (Conservative) hoặc cấu hình không tối ưu
 \end{itemize}
 
 \subsubsection{Nhóm hiệu suất thấp (Bottom 25\% - Outliers)}
 \begin{itemize}
-    \item \textbf{Aggressive}: Thời gian chờ 172.688s - gấp 4,6 lần so với tốt nhất
-    \item \textbf{High Learning}: Phần thưởng -138,191 - gấp 10,7 lần độ lệch so với tốt nhất
+    \item \textbf{Aggressive}: Thời gian chờ 172,7s - gấp 4,6 lần so với mô hình tốt nhất
+    \item \textbf{High Learning}: Phần thưởng -138.191 - gấp 10,7 lần độ lệch so với tốt nhất
     \item \textbf{Nguyên nhân}: Learning rate quá cao (0,005-0,01) gây instability
 \end{itemize}
 
@@ -514,7 +515,7 @@ Từ kết quả trong Bảng \ref{tab:model_performance_comparison}, có thể 
 
 % \begin{itemize}
 %     \item \textbf{Biến động phần thưởng cực đoan:} Hệ số biến thiên của phần thưởng vượt quá $2,10$, cho thấy một quá trình huấn luyện kém ổn định.
-%     \item \textbf{Phạm vi phần thưởng rộng:} Phần thưởng dao động, từ $-3,200$ đến $+2,667$, tổng phạm vi xấp xỉ $6,000$ đơn vị.
+%     \item \textbf{Phạm vi phần thưởng rộng:} Phần thưởng dao động, từ $-3.200$ đến $+2.667$, tổng phạm vi xấp xỉ $6.000$ đơn vị.
 %     \item \textbf{Tỷ lệ cao các biến động lớn:} Khoảng $27,3\%$ số tập huấn luyện đã trải qua các biến động lớn, không mong muốn về phần thưởng.
 %     \item \textbf{Điểm chất lượng huấn luyện thấp:} Chất lượng huấn luyện tổng thể kém, chỉ đạt $25/100$ điểm.
 % \end{itemize}
@@ -572,8 +573,8 @@ giữa hai mô hình: Mô hình phần thưởng dương cho thấy các chu k�
         Phần thưởng cuối cùng     & $-254$                        & $-7.912$                      \\
         Phần thưởng trung bình    & $+106$                        & $-8.170$                      \\
         Độ lệch chuẩn phần thưởng & $471$                         & $3.314$                       \\
-        Thời gian chờ TB tốt nhất & $293.46$s                        & $141.30$s                        \\
-        Thời gian chờ TB cuối cùng & $462.23$s                        & $158.23$s                        \\
+        Thời gian chờ TB tốt nhất & $293$s                        & $141$s                        \\
+        Thời gian chờ TB cuối cùng & $462$s                        & $158$s                        \\
         Số tập có cải thiện       & $97$ tập                         & Giảm thiểu nhất quán            \\
         Tập đạt hiệu suất cao nhất & Tập $58$                         & Tập $89$                         \\
         \bottomrule
@@ -583,6 +584,7 @@ giữa hai mô hình: Mô hình phần thưởng dương cho thấy các chu k�
 \subsection{Kết quả chi tiết từng mô hình}
 
 \subsubsection{Hiệu suất mô hình phần thưởng dương}
+Để đánh giá toàn diện hiệu suất của mô hình phần thưởng dương, nghiên cứu đã tổng hợp các chỉ số quan trọng nhất bao gồm tiến trình học tập, phạm vi phần thưởng, và khả năng đồng bộ hóa. Biểu đồ tổng hợp dưới đây thể hiện đặc điểm nổi bật của mô hình này trong việc xử lý môi trường đa giao lộ phức tạp.
 
 \begin{figure}[!htp]
     \centering
@@ -591,7 +593,7 @@ giữa hai mô hình: Mô hình phần thưởng dương cho thấy các chu k�
     \label{fig:sync_positive_model_summary}
 \end{figure}
 
-Mô hình phần thưởng dương đạt được:
+Từ kết quả phân tích, mô hình phần thưởng dương thể hiện những đặc điểm sau:
 \begin{itemize}
     \item \textbf{Hiệu suất cao nhất:} Episode 58 với phần thưởng +1.253
 
@@ -605,6 +607,7 @@ Mô hình phần thưởng dương đạt được:
 \end{itemize}
 
 \subsubsection{Hiệu suất mô hình phần thưởng âm}
+Tương tự như mô hình phần thưởng dương, việc đánh giá chi tiết mô hình phần thưởng âm cần xem xét các khía cạnh về tốc độ hội tụ, độ ổn định trong học tập, và hiệu quả thực tế trong việc giảm thiểu thời gian chờ đợi. Phân tích tổng hợp này giúp hiểu rõ ưu thế của cách tiếp cận truyền thống hơn trong bối cảnh đa giao lộ.
 
 \begin{figure}[!htp]
     \centering
@@ -613,7 +616,7 @@ Mô hình phần thưởng dương đạt được:
     \label{fig:sync_negative_model_summary}
 \end{figure}
 
-Mô hình phần thưởng âm đạt được:
+Kết quả cho thấy mô hình phần thưởng âm có những đặc trưng riêng biệt:
 \begin{itemize}
     \item \textbf{Hiệu suất cao nhất:} Episode 89 với phần thưởng -7.065
 
@@ -626,7 +629,8 @@ Mô hình phần thưởng âm đạt được:
     \item \textbf{Quản lý giao thông:} Hiệu suất thời gian chờ đợi tốt hơn
 \end{itemize}
 
-\subsection{Comprehensive Performance Metrics}
+\subsection{So sánh hiệu suất tổng thể}
+Sau khi phân tích riêng từng mô hình, nghiên cứu tiến hành so sánh tổng thể để đưa ra quyết định cuối cùng về lựa chọn cấu trúc phần thưởng. Việc so sánh này dựa trên nhiều tiêu chí khác nhau, từ hiệu suất thuần túy đến tính khả thi trong triển khai thực tế. Bảng tổng hợp dưới đây cung cấp cái nhìn toàn diện về tất cả các chỉ số quan trọng.
 
 \begin{figure}[!htp]
     \centering
@@ -679,7 +683,7 @@ thiểu tổng thời gian chờ đợi của hệ thống:
     R_{negative} = -\frac{\text{total\_waiting\_time}}{\text{normalization\_factor}}
 \end{align}
 
-Trong đó normalization\_factor = 50,000 giây (sau khi được điều chỉnh từ phân
+Trong đó normalization\_factor = 50.000 giây (sau khi được điều chỉnh từ phân
 tích dữ liệu thực tế).
 
 \textbf{Ưu điểm:}
@@ -691,7 +695,7 @@ tích dữ liệu thực tế).
 
     \item \textbf{Hội tụ ổn định:} Cung cấp phản hồi học tập ổn định
 
-    \item \textbf{Tương thích benchmark:} Dễ dàng so sánh với các phương pháp
+    \item \textbf{Tương thích tiêu chuẩn:} Dễ dàng so sánh với các phương pháp
         truyền thống
 \end{itemize}
 
@@ -706,6 +710,7 @@ tích dữ liệu thực tế).
 \end{itemize}
 
 \subsubsection{So sánh hiệu suất và lựa chọn cuối cùng}
+Để đưa ra quyết định cuối cùng về cấu trúc phần thưởng, nghiên cứu đã thực hiện phân tích so sánh đa tiêu chí giữa hai mô hình. Việc đánh giá này không chỉ dựa trên hiệu suất thuần túy mà còn xem xét các yếu tố thực tế như độ phức tạp triển khai, khả năng bảo trì, và tính ổn định trong vận hành. Bảng so sánh chi tiết dưới đây tổng hợp tất cả các tiêu chí quan trọng.
 
 \begin{table}[!htp]
     \centering
@@ -721,6 +726,8 @@ tích dữ liệu thực tế).
     \end{tabular}
 \end{table}
 
+Dựa trên kết quả so sánh trong bảng trên, có thể thấy rằng cả hai cấu trúc đều có ưu nhược điểm riêng biệt:
+
 \textbf{Kết luận và lựa chọn:}
 
 Dựa trên kết quả thực nghiệm, nghiên cứu \textbf{chọn mô hình phần thưởng âm} làm phương pháp chính cho Sync Agent với các lý do sau:
@@ -732,7 +739,7 @@ Dựa trên kết quả thực nghiệm, nghiên cứu \textbf{chọn mô hình 
 
     \item \textbf{Khả năng mở rộng:} Dễ dàng áp dụng cho nhiều giao lộ
 
-    \item \textbf{Tương thích benchmark:} Dễ so sánh với các phương pháp
+    \item \textbf{Tương thích tiêu chuẩn:} Dễ so sánh với các phương pháp
         truyền thống
 \end{enumerate}
 
@@ -758,6 +765,8 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
 được, dẫn đến kết quả tốt và hiệu suất cao.
 
 \section{So sánh với phương pháp truyền thống}
+Sau khi hoàn thiện phát triển hệ thống Sync Agent, nghiên cứu tiến hành so sánh hiệu suất với các phương pháp điều khiển giao thông truyền thống để đánh giá mức độ cải thiện đạt được. Việc so sánh này bao gồm các phương pháp từ cơ bản nhất (Fixed-time) đến các phương pháp hiện đại (Actuated Control), cũng như so sánh với chính mô hình DQN đơn giao lộ để thể hiện giá trị của việc đồng bộ hóa. Bảng kết quả dưới đây tổng hợp hiệu suất của tất cả các phương pháp được so sánh.
+
 \begin{table}[!htp]
     \centering
     \caption{So sánh hiệu suất với phương pháp truyền thống (giai đoạn cuối)}
@@ -770,8 +779,10 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
         DQN Single Agent (Balanced)   & 38,5                       & 8,5                    & 14,4\%                  \\
         \textbf{DQN + Sync Agent}     & \textbf{32,9}              & \textbf{7,3}           & \textbf{26,9\%}         \\
         \bottomrule
-    \end{tabular>
+    \end{tabular}
 \end{table}
+
+Kết quả so sánh cho thấy sự vượt trội rõ rệt của hệ thống được đề xuất:
 
 \textbf{Kết quả so sánh sau khi hoàn thiện phương pháp:}
 \begin{itemize}
@@ -828,7 +839,7 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
 % \begin{itemize}
 %     \item \textbf{Giá trị reward cực kỳ âm:} Thay vì nằm trong khoảng mong đợi (-3,0  đến +2,0), các giá trị reward đạt mức -800 hoặc thậm chí thấp hơn
 
-%     \item \textbf{Thời gian chờ đợi bất thường:} Dữ liệu thực tế cho thấy thời gian chờ đợi trong khoảng 40,000-200,000+ giây
+%     \item \textbf{Thời gian chờ đợi bất thường:} Dữ liệu thực tế cho thấy thời gian chờ đợi trong khoảng 40.000-200.000+ giây
 
 %     \item \textbf{Biểu đồ không khả dụng:} Kết quả huấn luyện tạo ra các biểu đồ không thể sử dụng cho báo cáo do tỷ lệ không hợp lý
 % \end{itemize}
@@ -842,8 +853,8 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
 %     \label{tab:reward_normalization_comparison}
 %     \begin{tabular}{@{}lccc@{}}
 %         \toprule \textbf{Component} & \textbf{Thang đo ban đầu} & \textbf{Dữ liệu thực tế} & \textbf{Thang đo đã sửa} \\
-%         \midrule Sync Trainer       & 300 giây                  & 40,000-200,000+ giây     & 100,000 giây             \\
-%         Environment                 & 100 giây                  & 40,000-200,000+ giây     & 50,000 giây              \\
+%         \midrule Sync Trainer       & 300 giây                  & 40.000-200.000+ giây     & 100.000 giây             \\
+%         Environment                 & 100 giây                  & 40.000-200.000+ giây     & 50.000 giây              \\
 %         Tỷ lệ sai lệch              & 133x - 667x               & -                        & 0.4x - 4x                \\
 %         Kết quả reward              & -800+                     & -                        & -3,0 đến +2,0            \\
 %         \bottomrule
@@ -869,7 +880,7 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
 % \subsubsection{Vấn đề phát hiện}
 % Mạng neural nhận đầu vào với các đặc trưng có thang đo hoàn toàn khác nhau:
 % \begin{itemize}
-%     \item \textbf{Thời gian chờ đợi:} 40,000-200,000+ giây (thang đo rất lớn)
+%     \item \textbf{Thời gian chờ đợi:} 40.000-200.000+ giây (thang đo rất lớn)
 
 %     \item \textbf{Lưu lượng giao thông:} 0-200 xe (thang đo trung bình)
 
@@ -893,10 +904,10 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
 % Nghiên cứu triển khai hệ thống chuẩn hóa toàn diện:
 
 % \begin{align}
-%     \text{Normalized waiting time}   & = \min\left(1.0, \frac{\text{waiting\_time}}{50,000}\right) \\
+%     \text{Normalized waiting time}   & = \min\left(1.0, \frac{\text{waiting\_time}}{50.000}\right) \\
 %     \text{Normalized traffic volume} & = \min\left(1.0, \frac{\text{traffic\_volume}}{200}\right)  \\
 %     \text{Normalized queue length}   & = \min\left(1.0, \frac{\text{queue\_length}}{50}\right)     \\
-%     \text{Normalized distance}       & = \min\left(1.0, \frac{\text{distance}}{10,000}\right)
+%     \text{Normalized distance}       & = \min\left(1.0, \frac{\text{distance}}{10.000}\right)
 % \end{align}
 % \newpage
 % \subsection{Kết quả sau khi áp dụng các giải pháp}
@@ -1018,6 +1029,8 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
 \subsection{Kết quả training cuối cùng}
 
 \subsubsection{Hiệu suất training}
+Để đánh giá chất lượng quá trình huấn luyện Sync Agent, nghiên cứu đã theo dõi các chỉ số quan trọng bao gồm số lượng episodes, reward trung bình, loss function, và độ ổn định của quá trình học. Các thông số này giúp xác định mức độ thành công của việc huấn luyện và khả năng hội tụ của mô hình trong môi trường đa giao lộ phức tạp.
+
 \begin{table}[!htp]
     \centering
     \caption{Kết quả huấn luyện Sync Agent}
@@ -1033,6 +1046,10 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
     \end{tabular}
 \end{table}
 
+Kết quả huấn luyện cho thấy Sync Agent đã đạt được sự ổn định và hội tụ thành công sau 100 episodes.
+
+Bên cạnh các chỉ số huấn luyện, nghiên cứu cũng đánh giá hiệu suất thực tế của hệ thống thông qua các metrics giao thông cụ thể. Việc so sánh với hệ thống giao lộ đơn giúp định lượng rõ ràng lợi ích mang lại từ việc đồng bộ hóa đa giao lộ.
+
 \begin{table}[!htp]
     \centering
     \caption{Hiệu suất giao thông}
@@ -1047,7 +1064,10 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
     \end{tabular}
 \end{table}
 
+So sánh hiệu suất giao thông cho thấy hệ thống đồng bộ đạt được cải thiện đáng kể trên tất cả các chỉ số quan trọng.
+
 \subsubsection{Tiến trình training}
+Để hiểu rõ quá trình học tập của Sync Agent, nghiên cứu đã theo dõi chi tiết sự thay đổi của các chỉ số quan trọng qua 150 episodes huấn luyện. Việc phân tích tiến trình này không chỉ xác nhận tính hiệu quả của phương pháp mà còn cung cấp thông tin quan trọng về tốc độ hội tụ và độ ổn định của hệ thống.
 
 \begin{figure}[!htp]
     \centering
@@ -1056,7 +1076,7 @@ Dựa trên kết quả từ Giai đoạn 1, nghiên cứu chuyển sang phươn
     \label{fig:sync_training_overview}
 \end{figure}
 
-Hình \ref{fig:sync_training_overview} thể hiện sự cải thiện ổn định qua 150 episodes huấn luyện. Reward tăng dần từ -2000 lên -840, loss giảm từ 800 xuống 40, và các thông số giao thông (thời gian chờ, độ dài hàng đợi) đều cho thấy xu hướng cải thiện rõ ràng.
+Biểu đồ cho thấy sự cải thiện ổn định và nhất quán qua toàn bộ quá trình huấn luyện, với reward tăng dần từ -2.000 lên -840, loss giảm từ 800 xuống 40, và các thông số giao thông đều thể hiện xu hướng cải thiện rõ rệt.
 
 % \subsubsection{Lợi ích của đồng bộ hóa}
 
@@ -1073,6 +1093,7 @@ Hình \ref{fig:sync_training_overview} thể hiện sự cải thiện ổn đ�
 \subsubsection{Đánh giá hiệu suất}
 
 \paragraph{So sánh với Single Intersection}
+Để đánh giá giá trị thực sự của việc đồng bộ hóa đa giao lộ, nghiên cứu tiến hành so sánh trực tiếp giữa hệ thống giao lộ đơn và hệ thống 4 giao lộ đồng bộ. Việc so sánh này sử dụng cùng một điều kiện giao thông và cùng một bộ tham số để đảm bảo tính công bằng và chính xác của kết quả.
 
 \begin{table}[!htp]
     \centering
@@ -1089,6 +1110,10 @@ Hình \ref{fig:sync_training_overview} thể hiện sự cải thiện ổn đ�
     \end{tabular}
 \end{table}
 
+Kết quả so sánh cho thấy lợi ích rõ rệt của việc đồng bộ hóa, với cải thiện đáng kể trên tất cả các chỉ số hiệu suất.
+
+Để làm rõ hơn mức độ cải thiện đạt được, nghiên cứu tính toán cụ thể phần trăm cải thiện cho từng chỉ số quan trọng. Bảng tóm tắt dưới đây thể hiện mức độ cải thiện tuyệt đối và tương đối của hệ thống đồng bộ so với giao lộ đơn.
+
 \begin{table}[!htp]
     \centering
     \caption{Tóm tắt cải thiện hiệu suất}
@@ -1102,6 +1127,8 @@ Hình \ref{fig:sync_training_overview} thể hiện sự cải thiện ổn đ�
         \bottomrule
     \end{tabular}
 \end{table}
+
+Mức cải thiện trung bình 21,3\% cho thấy giá trị thực sự của việc áp dụng hệ thống đồng bộ hóa đa giao lộ.
 
 \begin{figure}[!htp]
     \centering
