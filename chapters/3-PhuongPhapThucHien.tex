@@ -61,8 +61,8 @@ Mô tả chi tiết các thành phần và luồng dữ liệu trong hệ thốn
 Cụ thể, nghiên cứu này sử dụng mô hình đã được huấn luyện trước (pre-trained) có tên là \textbf{\texttt{yolov11s.pt}}. Đây là phiên bản thu nhỏ của YOLO11, được lựa chọn dựa trên các ưu điểm nổi bật sau:
 
 \begin{itemize}
-    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47.0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2.5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực\footnote[1]{Ultralytics Documents: \url{https://docs.ultralytics.com/models/yolo11}}.
-    \item \textbf{Kiến trúc hiệu quả:} YOLO11 được cải tiến về kiến trúc backbone và neck, giúp tăng cường khả năng trích xuất đặc trưng. Nhờ đó, các mô hình như YOLO11 đạt được độ chính xác cao hơn với số lượng tham số ít hơn, làm cho chúng hiệu quả hơn về mặt tính toán. Phiên bản \texttt{yolov11s.pt} chỉ có 9.4 triệu tham số.
+    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47,0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2,5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực\footnote[1]{Ultralytics Documents: \url{https://docs.ultralytics.com/models/yolo11}}.
+    \item \textbf{Kiến trúc hiệu quả:} YOLO11 được cải tiến về kiến trúc backbone và neck, giúp tăng cường khả năng trích xuất đặc trưng. Nhờ đó, các mô hình như YOLO11 đạt được độ chính xác cao hơn với số lượng tham số ít hơn, làm cho chúng hiệu quả hơn về mặt tính toán. Phiên bản \texttt{yolov11s.pt} chỉ có 9,4 triệu tham số.
     \item \textbf{Huấn luyện trên tập dữ liệu COCO:} Giống như các phiên bản trước, mô hình được huấn luyện sẵn trên tập dữ liệu COCO, bao gồm các lớp đối tượng giao thông quan trọng như \texttt{car}, \texttt{motorcycle}, \texttt{bus}, và \texttt{truck}. Điều này cho phép áp dụng mô hình trực tiếp vào bài toán mà không cần huấn luyện lại, giúp tiết kiệm thời gian và tài nguyên.
 \end{itemize}
 Với những lý do trên, mô hình \texttt{yolov11s.pt} được xác định là lựa chọn phù hợp nhất, đáp ứng được các yêu cầu về độ chính xác, tốc độ và hiệu quả cho hệ thống được đề xuất trong luận văn.
@@ -443,7 +443,7 @@ Hành động của Sync Agent là việc điều chỉnh độ lệch thời gi
         \State \textbf{Input:} current\_metrics, historical\_baseline, episode\_count 
         \State \textbf{Parameters:} baseline\_window = 15, current\_window = 10 
         \If{episode\_count $<$ baseline\_window} 
-            \Return 0.0 \Comment{Không đánh giá trong giai đoạn khởi tạo}
+            \Return 0,0 \Comment{Không đánh giá trong giai đoạn khởi tạo}
         \EndIf
         
         \State baseline\_start $\leftarrow$ episode\_count - baseline\_window - current\_window
@@ -519,7 +519,7 @@ Cơ chế này đặc biệt quan trọng trong bối cảnh đồng bộ hóa g
     \phi_{target} \leftarrow \tau \phi + (1-\tau) \phi_{target}
 \end{equation}
 
-Với $\tau = 0.001$ được chọn conservative để đảm bảo:
+Với $\tau = 0,001$ được chọn conservative để đảm bảo:
 \begin{itemize}
     \item \textbf{Ổn định huấn luyện:} Tránh thay đổi đột ngột trong giá trị mục tiêu
     \item \textbf{Smooth convergence:} Đặc biệt quan trọng với bài toán đa mục tiêu như đồng bộ hóa
@@ -559,7 +559,7 @@ Sync Agent sử dụng thuật toán SAC với các đặc điểm kỹ thuật 
 
     \item \textbf{Mạng Critic (Critic Networks):} Sử dụng hai mạng Q-function song song nhằm mục đích giảm thiểu hiện tượng \textbf{thiên lệch ước lượng quá mức (overestimation bias)}.
 
-    \item \textbf{Target Networks:} Soft update với $\tau = 0.001$ để ổn định
+    \item \textbf{Target Networks:} Soft update với $\tau = 0,001$ để ổn định
         huấn luyện
 \end{itemize}
 
@@ -584,7 +584,7 @@ Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã đư�
 \hline
 Tốc độ học & $1 \times 10^{-4}$ & Conservative để đảm bảo ổn định \\
 \hline
-Hệ số chiết khấu $\gamma$ & 0.95 & Hệ số chiết khấu cho phần thưởng tương lai \\
+Hệ số chiết khấu $\gamma$ & 0,95 & Hệ số chiết khấu cho phần thưởng tương lai \\
 \hline
 Kích thước lô & 32 & Kích thước lô cho mỗi lần cập nhật \\
 \hline
@@ -592,7 +592,7 @@ Kích thước bộ đệm & $5 \times 10^{4}$ & Kích thước bộ đệm expe
 \hline
 Entropy $\alpha$ & Auto-tuned & Tham số kiểm soát entropy tự động \\
 \hline
-Tốc độ cập nhật soft cho mạng mục tiêu $\tau$ & 0.001 & Tốc độ cập nhật soft cho target networks \\
+Tốc độ cập nhật soft cho mạng mục tiêu $\tau$ & 0,001 & Tốc độ cập nhật soft cho target networks \\
 \hline
 \end{tabular}
 \end{table}
@@ -614,7 +614,7 @@ Chế độ này sử dụng synthetic data generator để tạo ra dữ liệu
         \For{every\_intersection $i$}
             \State waiting\_time[$i$] $\leftarrow$ generate\_waiting\_time(traffic\_volume, intersection\_config[$i$])
             \State queue\_length[$i$] $\leftarrow$ generate\_queue\_length(traffic\_volume, intersection\_config[$i$])
-            \State speed[$i$] $\leftarrow$ uniform\_random(25.0, 45.0) \Comment{Phạm vi tốc độ đô thị}
+            \State speed[$i$] $\leftarrow$ uniform\_random(25,0, 45,0) \Comment{Phạm vi tốc độ đô thị}
         \EndFor 
         
         \State \Return intersection\_data
@@ -636,7 +636,7 @@ Chế độ này sử dụng dữ liệu thực từ các intersection agents:
 Quá trình phát triển đã gặp phải vấn đề ổn định huấn luyện nghiêm trọng với các
 triệu chứng:
 \begin{itemize}
-    \item Biến động reward cao (hệ số biến động > 2.0)
+    \item Biến động reward cao (hệ số biến động > 2,0)
 
     \item Biến động reward lớn (khoảng > 5000)
 
@@ -661,9 +661,9 @@ Nghiên cứu đã phát triển một bộ giải pháp tích hợp:
 \begin{itemize}
     \item Giảm tốc độ học: $3 \times 10^{-4}\rightarrow 1 \times 10^{-4}$
 
-    \item Giảm hệ số chiết khấu: $0.99 \rightarrow 0.95$
+    \item Giảm hệ số chiết khấu: $0,99 \rightarrow 0,95$
 
-    \item Giảm tốc độ cập nhật mục tiêu: $\tau = 0.001$
+    \item Giảm tốc độ cập nhật mục tiêu: $\tau = 0,001$
 
     \item Giảm kích thước mạng: $256 \times 256 \rightarrow 128 \times 128$
 \end{itemize}
@@ -683,12 +683,12 @@ Nghiên cứu đã phát triển một bộ giải pháp tích hợp:
 \subsection{Kết quả cải tiến}
 Sau khi áp dụng các giải pháp, hệ thống đạt được:
 \begin{itemize}
-    \item \textbf{Ổn định reward:} Hệ số biến động giảm từ 2.10 xuống
-        0.013 (cải thiện 99.4\%)
+    \item \textbf{Ổn định reward:} Hệ số biến động giảm từ 2,10 xuống
+        0,013 (cải thiện 99,4\%)
 
     \item \textbf{Chất lượng huấn luyện:} Điểm chất lượng tăng từ 25\% lên 65\% (cải thiện 160\%)
 
-    \item \textbf{Hội tụ:} Khoảng ổn định reward từ -4.83 đến -5.15
+    \item \textbf{Hội tụ:} Khoảng ổn định reward từ -4,83 đến -5,15
 
     \item \textbf{Sẵn sàng triển khai:} Có thể được sử dụng để triển khai trên môi trường thực tế
 \end{itemize}
