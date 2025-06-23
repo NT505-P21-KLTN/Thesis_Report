@@ -144,9 +144,6 @@ Như minh họa trong hình \ref{fig:sumo_map}, nghiên cứu mô phỏng một 
 
     \item Làn trong cùng: Chỉ được phép rẽ phải.
 \end{itemize}
-\subsection{Giả lập phương tiện}
-
-
 
 \section{Xây dựng mô hình DRL}
 \subsection{Định nghĩa môi trường (Environment)}
@@ -197,7 +194,7 @@ Trạng thái là cách biểu diễn thông tin của môi trường để agen
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{img/sumo_state_1.png}
-        \caption{PhânHai nhóm làn đường}
+        \caption{Phân hai nhóm làn đường}
         \label{fig:sumo_state_1}
     \end{subfigure}
     \hfill
@@ -213,7 +210,7 @@ Trạng thái là cách biểu diễn thông tin của môi trường để agen
 \begin{enumerate}
     \item \textbf{Phân loại làn đường:} Chia con đường kết nối tới nút giao thành 2 nhóm làn đường như trong hình \ref{fig:sumo_state_1}: nhóm màu vàng bao gồm làn đường chỉ được rẻ trái và nhóm màu xanh bao gồm các làn đường được đi thẳng và rẻ phải. Với mỗi con đường có 2 nhóm làn đường thì tổng cộng có tất cả 8 nhóm làn đường. Các nhóm sẽ được đánh số theo chiều kim đồng hồ, nhóm làn màu xanh lá sẽ được đánh số chẵn và nhóm làn đường màu vàng sẽ được đánh số lẻ.
     \item \textbf{Chia các làn đường theo từng ô:} Mỗi làn đường có chiều dài bằng tầm quan sát được của camera giám sát và được chia thành 10 phần như hình \ref{fig:sumo_state_2}. Trạng thái sẽ ghi nhận ô có giá trị 1 biểu thị có xe, giá trị 0 biểu thị không có xe.
-    \item \textbf{Mã hóa thông tin vào mảng:} Tiến hành mã hóa vị trí xe bằng cách sử dụng một hệ thống số hai chữ số Chữ số đầu tiên đại diện cho số thứ tự nhóm làn đường, chữ số thứ hai biểu thị vị trí cụ thể của xe trên làn đó. Chẳng hạn, nếu một chiếc xe nằm ở nhóm làn đường số 1 và ở ô thứ 3, nó sẽ được lưu trữ vào mảng ở vị trí số 13.
+    \item \textbf{Mã hóa thông tin vào mảng:} Tiến hành mã hóa vị trí xe bằng cách sử dụng một hệ thống số hai chữ số. Chữ số đầu tiên đại diện cho số thứ tự nhóm làn đường, chữ số thứ hai biểu thị vị trí cụ thể của xe trên làn đó. Chẳng hạn, nếu một xe nằm ở nhóm làn đường số 1 và ở ô thứ 3, nó sẽ được lưu trữ vào mảng ở vị trí số 13.
 \end{enumerate}
 Việc mã hóa thông tin theo phương pháp này giúp đơn giản hóa cách biểu diễn trạng thái mà vẫn cho phép agent có một cái nhìn toàn diện về tình hình giao thông tại giao lộ.
 
@@ -283,6 +280,34 @@ Như thể hiện trong hình, kiến trúc của mạng được xây dựng b�
 
     \item \textbf{Lớp đầu ra (Output Layer):} Một lớp \textit{Dense} với số neural bằng số lượng hành động có trong không gian hành động. Lớp này sử dụng hàm kích hoạt \textit{Linear} để tạo ra các giá trị Q cho mỗi hành động.
 \end{itemize}
+
+\subsection{Quá trình huấn luyện}
+\subsubsection{Chiến lược khám phá}
+Trong quá trình huấn luyện mô hình học tăng cường sâu, việc cân bằng giữa khám phá và khai thác là một thách thức then chốt. Nghiên cứu của chúng tôi đã áp dụng chiến lược epsilon-greedy để đảm bảo agent có thể tích cực khám phá trong giai đoạn đầu huấn luyện và tập trung học hỏi ở giai đoạn sau. Cơ chế hoạt động của epsilon-greedy dựa trên việc sinh ra một giá trị ngẫu nhiên trong khoảng [0,1] và so sánh với ngưỡng  $\epsilon$. Tại mỗi bước quyết định, nếu giá trị ngẫu nhiên nhỏ hơn $\epsilon$, agent sẽ chọn một hành động hoàn toàn ngẫu nhiên (khám phá), ngược lại sẽ chọn hành động tối ưu nhất theo mô hình học được (khai thác).
+
+\subsubsection{Quy trình học trong từng episode}
+Quá trình học trong mỗi episode sẽ bao gồm 3 bước. Thứ nhất là khởi tạo các phương tiện trong giả lập SUMO với số bước giả lập cho trước. Thứ hai, trong mỗi bước giả lập, thực hiện tính tóa reward, lưu trữ trải nghiệm vào Memory, chọn hành động cần thực hiện, và thực thi hành động trong giả lập. Cuối cùng, sau khi đã hoàn thành giả lập thì sẽ bắt đầu huấn luyện từ thông tin trải nghiệm đã lưu trước đó.
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/training_episode.png}
+    \caption{Sơ đồ quá trình huấn luyện mô hình}
+    \label{fig:training_flow}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{Bước 1:} Các phương tiện được sinh ra ngẫu nhiên trong SUMO bằng cách sử dụng phân phối Weibull với trọng số là 2 để mô phỏng quá trình số lượng phương tiện tăng dần theo thời gian tại các giao lộ.
+    \item \textbf{Bước 2:} Thực hiện tính toán reward như đã trình bày ở phần 3.4.5. Sau đó, lưu trữ các thông tin trạng thái trước($s_{t-1}$), hành động thực hiện($a_{t-1}$), reward($r_{t-1}$), và trạng thái hiện hiện tại($s_t$). Các thông tin này được quản lý bởi class Memory có kích thước tối thiểu là 100 mẫu và tối đa là 5000 mẫu.
+    \item \textbf{Bước 3:} Sau khi đã hoàn thành công đoạn giả lập, lúc này trong Memory đã lưu trư các thông tin đã học được trong bước giả lập. Quá trình huấn luyện sẽ bao gồm các bước như sau:
+    \begin{itemize}
+        \item Lấy ngẫu nhiên trong Memory số lượng mẫu nhất định để huấn luyện
+        \item Từ trong mẫu lấy được, dự đoán giá trị Q lần lượt cho trạng thái trước và trạng thái hiện tại
+        \item Cập nhật lại giá trị Q theo công thức \ref{eq:q_value}
+        \item Huấn luyện mô hình theo giá trị Q đã được cập nhật 
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Hàm mất mát và thuật toán tối ưu hóa}
+
 
 \section{Cơ chế trao đổi thông tin giữa tác nhân và central server}
 
