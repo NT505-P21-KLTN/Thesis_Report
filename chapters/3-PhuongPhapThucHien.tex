@@ -61,8 +61,8 @@ Mô tả chi tiết các thành phần và luồng dữ liệu trong hệ thốn
 Cụ thể, nghiên cứu này sử dụng mô hình đã được huấn luyện trước (pre-trained) có tên là \textbf{\texttt{yolov11s.pt}}. Đây là phiên bản thu nhỏ của YOLO11, được lựa chọn dựa trên các ưu điểm nổi bật sau:
 
 \begin{itemize}
-    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47.0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2.5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực\footnote[1]{Ultralytics Documents: \url{https://docs.ultralytics.com/models/yolo11}}.
-    \item \textbf{Kiến trúc hiệu quả:} YOLO11 được cải tiến về kiến trúc backbone và neck, giúp tăng cường khả năng trích xuất đặc trưng. Nhờ đó, các mô hình như YOLO11 đạt được độ chính xác cao hơn với số lượng tham số ít hơn, làm cho chúng hiệu quả hơn về mặt tính toán. Phiên bản \texttt{yolov11s.pt} chỉ có 9.4 triệu tham số.
+    \item \textbf{Hiệu suất cân bằng:} Mô hình \texttt{yolov11s.pt} đạt được chỉ số mAP\textsuperscript{50-95} là 47,0 trên tập dữ liệu COCO, đồng thời có tốc độ xử lý rất nhanh (chỉ 2,5ms trên GPU Tesla T4). Sự cân bằng giữa độ chính xác cao và tốc độ suy luận nhanh là yếu tố then chốt cho các ứng dụng phân tích giao thông thời gian thực\footnote[1]{Ultralytics Documents: \url{https://docs.ultralytics.com/models/yolo11}}.
+    \item \textbf{Kiến trúc hiệu quả:} YOLO11 được cải tiến về kiến trúc backbone và neck, giúp tăng cường khả năng trích xuất đặc trưng. Nhờ đó, các mô hình như YOLO11 đạt được độ chính xác cao hơn với số lượng tham số ít hơn, làm cho chúng hiệu quả hơn về mặt tính toán. Phiên bản \texttt{yolov11s.pt} chỉ có 9,4 triệu tham số.
     \item \textbf{Huấn luyện trên tập dữ liệu COCO:} Giống như các phiên bản trước, mô hình được huấn luyện sẵn trên tập dữ liệu COCO, bao gồm các lớp đối tượng giao thông quan trọng như \texttt{car}, \texttt{motorcycle}, \texttt{bus}, và \texttt{truck}. Điều này cho phép áp dụng mô hình trực tiếp vào bài toán mà không cần huấn luyện lại, giúp tiết kiệm thời gian và tài nguyên.
 \end{itemize}
 Với những lý do trên, mô hình \texttt{yolov11s.pt} được xác định là lựa chọn phù hợp nhất, đáp ứng được các yêu cầu về độ chính xác, tốc độ và hiệu quả cho hệ thống được đề xuất trong luận văn.
@@ -126,15 +126,17 @@ Trong nghiên cứu này, BotSORT được sử dụng như một lựa chọn t
 \end{itemize}
 
 \section{Thiết lập môi trường mô phỏng giao thông đô thị SUMO}
+\subsection{Mô tả môi trường giả lập}
+Môi trường mô phỏng được thiết lập để tái tạo điều kiện giao thông thành phố một cách chân thực và có thể kiểm soát được. Hình \ref{fig:sumo_map} thể hiện cấu trúc của nút giao thông được sử dụng trong nghiên cứu.
 
 \begin{figure}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{figures/sumo_map}
+    \includegraphics[width=0.8\textwidth]{figures/sumo_map}
     \caption{Mô hình giao lộ trong mô phỏng}
     \label{fig:sumo_map}
 \end{figure}
 
-Nhóm nghiên cứu mô phỏng một nút giao thông trong SUMO với bốn làn đường, với thiết lập điều hướng cụ thể để kiểm soát hướng di chuyển của phương tiện. Cụ thể:
+Như minh họa trong hình \ref{fig:sumo_map}, nghiên cứu mô phỏng một nút giao thông với bốn làn đường cho mỗi hướng, với thiết lập điều hướng cụ thể để kiểm soát hướng di chuyển của phương tiện. Cụ thể:
 \begin{itemize}
     \item Làn trái ngoài: Chỉ được phép rẽ trái.
 
@@ -149,19 +151,19 @@ Trong khuôn khổ của đề tài, môi trường chính là một kịch bả
 hiện các công việc sau:
 \begin{itemize}
     \item Khởi tạo và kết thúc một phiên giả lập \ac{sumo} thông qua thư viện
-        TraCI.
+    TraCI.
 
     \item Tại mỗi bước thời gian, thu thập dữ liệu thô từ \ac{sumo} để xây dựng \textit{trạng
-        thái}.
+    thái}.
 
     \item Gửi các \textit{hành động} (lựa chọn pha đèn) từ agent đến \ac{sumo} để
-        thực thi.
+    thực thi.
 
     \item Tính toán \textit{phần thưởng} dựa trên kết quả của hành động vừa thực
-        hiện.
+    hiện.
 
     \item Quản lý vòng lặp của một tập (episode) huấn luyện, bao gồm việc tạo ra
-        các luồng giao thông ngẫu nhiên cho mỗi tập.
+    các luồng giao thông ngẫu nhiên cho mỗi tập.
 \end{itemize}
 
 \subsection{Định nghĩa tác nhân (Agent)}
@@ -170,15 +172,15 @@ xây dựng bằng thư viện TensorFlow và Keras. Agent này thực hiện ha
 chính:
 \begin{enumerate}
     \item \textbf{Dự đoán (Inference):} Dựa vào \textit{trạng thái} hiện tại của
-        môi trường, agent sử dụng mạng neural của mình để dự đoán giá trị Q (Q-value)
-        cho mỗi \textit{hành động} có thể thực hiện. Hành động có giá trị Q cao
-        nhất sẽ được lựa chọn (chiến lược tham lam).
+    môi trường, agent sử dụng mạng neural của mình để dự đoán giá trị Q (Q-value)
+    cho mỗi \textit{hành động} có thể thực hiện. Hành động có giá trị Q cao
+    nhất sẽ được lựa chọn (chiến lược tham lam).
 
     \item \textbf{Học (Learning):} Agent sử dụng một bộ nhớ đệm gọi là \textit{Experience
-        Replay} để lưu trữ các kinh nghiệm $(s, a, r, s')$. Trong giai đoạn huấn
-        luyện, nó sẽ lấy ra các lô (batch) kinh nghiệm ngẫu nhiên từ bộ nhớ này để
-        cập nhật trọng số của mạng neural, nhằm cải thiện khả năng dự đoán và ra
-        quyết định trong tương lai.
+    Replay} để lưu trữ các kinh nghiệm $(s, a, r, s')$. Trong giai đoạn huấn
+    luyện, nó sẽ lấy ra các lô (batch) kinh nghiệm ngẫu nhiên từ bộ nhớ này để
+    cập nhật trọng số của mạng neural, nhằm cải thiện khả năng dự đoán và ra
+    quyết định trong tương lai.
 \end{enumerate}
 Quá trình lựa chọn hành động tuân theo chính sách $\epsilon$-greedy: với một xác
 suất nhỏ $\epsilon$, agent sẽ chọn một hành động ngẫu nhiên (thăm dò), và trong
@@ -186,52 +188,58 @@ thời gian còn lại, nó sẽ chọn hành động tốt nhất dựa trên d
 thác).
 
 \subsection{Thiết kế trạng thái (State)}
-Trạng thái là cách biểu diễn thông tin của môi trường để agent có thể hiểu và ra
-quyết định. Trong mô hình này, trạng thái được định nghĩa là một vector một chiều,
-bao gồm hai loại thông tin chính được lấy từ \ac{sumo} tại mỗi bước:
-\begin{itemize}
-    \item \textbf{Mật độ và vị trí xe trên mỗi làn (Vehicle Position):} Vị trí của các
-        phương tiện đang đến giao lộ được mã hóa. Mỗi làn đường đến được chia thành
-        các ô (cell) có kích thước bằng một xe. Trạng thái sẽ ghi nhận sự có mặt
-        (1) hoặc vắng mặt (0) của một phương tiện trong từng ô. Điều này giúp agent
-        không chỉ biết có bao nhiêu xe đang chờ, mà còn biết chúng đang ở vị trí
-        nào trên làn đường.
+Trạng thái là cách biểu diễn thông tin của môi trường để agent có thể hiểu và ra quyết định. Trong mô hình này, trạng thái được định nghĩa là một vector một chiều có 80 phần tử biểu diễn vị trí và mật độ xe tại các là đường tại mỗi bước. Sau đây là các bước ghi nhận thông tin vào trạng thái.
 
-    \item \textbf{Pha đèn hiện tại (Current Phase):} Trạng thái của đèn tín hiệu
-        hiện tại cũng được đưa vào vector trạng thái, được mã hóa dưới dạng one-hot.
-        Ví dụ, với 4 pha đèn khác nhau, một vector 4 chiều sẽ được sử dụng với
-        chỉ một phần tử có giá trị 1 để biểu diễn pha đang hoạt động, các phần
-        tử còn lại có giá trị 0.
-\end{itemize}
-Việc kết hợp hai loại thông tin này cho phép agent có một cái nhìn toàn diện về
-tình hình giao thông tại giao lộ.
+\begin{figure}[!htp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/sumo_state_1.png}
+        \caption{Phân ra hai nhóm làn đường}
+        \label{fig:sumo_state_1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/sumo_state_2.png}
+        \caption{Chia làn đường thành 10 phần}
+        \label{fig:sumo_state_2}
+    \end{subfigure}
+    \caption{Tiêu đề chung cho cả hai hình}
+    \label{fig:sumo_state}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{Phân loại làn đường:} Chia con đường kết nối tới nút giao thành 2 nhóm làn đường như trong hình \ref{fig:sumo_state_1}: nhóm màu vàng bao gồm làn đường chỉ được rẻ trái và nhóm màu xanh bao gồm các làn đường được đi thẳng và rẻ phải. Với mỗi con đường có 2 nhóm làn đường thì tổng cộng có tất cả 8 nhóm làn đường. Các nhóm sẽ được đánh số theo chiều kim đồng hồ, nhóm làn màu xanh lá sẽ được đánh số chẵn và nhóm làn đường màu vàng sẽ được đánh số lẻ.
+    \item \textbf{Chia các làn đường theo từng ô:} Mỗi làn đường có chiều dài bằng tầm quan sát được của camera giám sát và được chia thành 10 phần như hình \ref{fig:sumo_state_2}. Trạng thái sẽ ghi nhận ô có giá trị 1 biểu thị có xe, giá trị 0 biểu thị không có xe.
+    \item \textbf{Mã hóa thông tin vào mảng:} Tiến hành mã hóa vị trí xe bằng cách sử dụng một hệ thống số hai chữ số. Chữ số đầu tiên đại diện cho số thứ tự nhóm làn đường, chữ số thứ hai biểu thị vị trí cụ thể của xe trên làn đó. Chẳng hạn, nếu một xe nằm ở nhóm làn đường số 1 và ở ô thứ 3, nó sẽ được lưu trữ vào mảng ở vị trí số 13.
+\end{enumerate}
+Việc mã hóa thông tin theo phương pháp này giúp đơn giản hóa cách biểu diễn trạng thái mà vẫn cho phép agent có một cái nhìn toàn diện về tình hình giao thông tại giao lộ.
 
 \subsection{Thiết kế không gian hành động}
-Không gian hành động được định nghĩa như một tập hợp hữu hạn các hành động rời rạc:
+Không gian hành động được định nghĩa như một tập hợp hữu hạn các hành động rời rạc. Trong đó mỗi hành động $a_i \in \mathcal{A}$ tương ứng với việc kích hoạt một pha đèn tín hiệu cụ thể:
 
 \[
     \mathcal{A} = \{a_0, a_1, a_2, a_3\}
 \]
 
-Trong đó mỗi hành động $a_i \in \mathcal{A}$ tương ứng với việc kích hoạt một pha đèn tín hiệu cụ thể:
+Trong đó:
 
 \begin{align}
-    a_0 &: \text{North-South Green (NSG)} \\
-    a_1 &: \text{North-South Left (NSL)} \\
-    a_2 &: \text{East-West Green (EWG)} \\
-    a_3 &: \text{East-West Left (EWL)}
+    a_0 &: \text{North-South Green (NSG): pha đèn xanh đường phía Bắc và Nam đi thẳng} \\
+    a_1 &: \text{North-South Left (NSL): pha đèn xanh đường phía Bắc và Nam rẽ trái} \\
+    a_2 &: \text{East-West Green (EWG): pha đèn xanh đường phía Đông và Tây đi thẳng} \\
+    a_3 &: \text{East-West Left (EWL): pha đèn xanh đường phía Đông và Tây rẽ trái}
 \end{align}
 
-Tại mỗi bước thời gian $t$, agent quan sát trạng thái $s_t$ và chọn hành động $a_t \in \mathcal{A}$ dựa trên chính sách $\pi(a_t|s_t)$. Việc ánh xạ từ hành động trừu tượng sang điều khiển đèn tín hiệu được thực hiện thông qua giao diện TraCI:
+Tại mỗi bước thời gian $t$, agent quan sát trạng thái $s_t$ và chọn hành động $a_t \in \mathcal{A}$ dựa trên chính sách $\pi(a_t|s_t)$. Việc ánh xạ từ hành động trừu tượng sang điều khiển đèn tín hiệu được thực hiện thông qua TraCI
 
-\[
-    \text{TraCI Command} = \phi(a_t)
-\]
+% \[
+%     \text{TraCI Command} = \phi(a_t)
+% \]
 
-Trong đó $\phi: \mathcal{A} \rightarrow \{\text{PHASE\_NSG}, \text{PHASE\_NSL}, \text{PHASE\_EWG}, \text{PHASE\_EWL}\}$ là hàm ánh xạ từ không gian hành động trừu tượng sang các lệnh điều khiển cụ thể.
+% Trong đó $\phi: \mathcal{A} \rightarrow \{\text{PHASE\_NSG}, \text{PHASE\_NSL}, \text{PHASE\_EWG}, \text{PHASE\_EWL}\}$ là hàm ánh xạ từ không gian hành động trừu tượng sang các lệnh điều khiển cụ thể.
 
 \subsection{Thiết kế hàm thưởng (Reward Function)}
-Hàm thưởng được thiết kế để định hướng cho agent học được hành vi giúp giảm thiểu ùn tắc. Phần thưởng được tính toán dựa trên \textbf{sự thay đổi của tổng thời gian chờ đợi tích lũy} của tất cả các phương tiện trong các làn đường dẫn vào giao lộ. Công thức tính phần thưởng tại bước thời gian $t$ là:
+Hàm thưởng được thiết kế để định hướng cho agent học được hành vi giúp giảm thiểu ùn tắc. Phần thưởng được tính toán dựa trên sự thay đổi của tổng thời gian chờ đợi tích lũy của tất cả các phương tiện trong các làn đường dẫn vào giao lộ. Công thức tính phần thưởng tại bước thời gian $t$ là:
 \[
     R_{t} = W_{t-1}- W_{t}
 \]
@@ -254,50 +262,7 @@ Với cách thiết kế này:
 Mục tiêu của agent là tối đa hóa tổng phần thưởng tích lũy, điều này tương đương với việc học cách giảm thiểu tổng thời gian chờ đợi của các phương tiện.
 
 \subsection{Kiến trúc mạng neural cho agent}
-
-Agent sử dụng một mạng neural sâu đầy đủ kết nối (Fully Connected Deep Neural Network) để xấp xỉ hàm giá trị Q. Kiến trúc của mạng được xây dựng bằng Keras và bao gồm các
-thành phần sau:
-
-\begin{itemize}
-    \item \textbf{Lớp đầu vào (Input Layer):} Một lớp nhận đầu vào là vector
-        trạng thái đã được định nghĩa ở trên, với kích thước bằng \textit{num
-        states}.
-
-    \item \textbf{Các lớp ẩn (Hidden Layers):} Mạng bao gồm một số lượng các lớp
-        ẩn (được xác định bởi tham số \textit{num layers}), mỗi lớp là một lớp
-        \textit{Dense} với số neural bằng \textit{width}. Hàm kích hoạt \textit{ReLU}
-        được sử dụng cho tất cả các lớp ẩn để đưa vào tính phi tuyến.
-
-    \item \textbf{Lớp đầu ra (Output Layer):} Một lớp \textit{Dense} với số neural
-        bằng \textit{num actions} (số lượng hành động có thể). Lớp này sử dụng hàm
-        kích hoạt \textit{Linear} để tạo ra các giá trị Q cho mỗi hành động.
-\end{itemize}
-
-\subsubsection{Lý do lựa chọn mạng neural đầy đủ kết nối (DNN)}
-Việc lựa chọn kiến trúc mạng neural đầy đủ kết nối thay vì các kiến trúc khác như \ac{cnn}, RNN, hoặc Transformer được dựa trên những lý do sau:
-
-\paragraph{Phù hợp với bản chất dữ liệu đầu vào}
-Dữ liệu trạng thái giao thông trong nghiên cứu này là dữ liệu số dạng bảng (tabular data) bao gồm các chỉ số như thời gian chờ, độ dài hàng đợi, tốc độ xe, và mật độ giao thông. Đây không phải là dữ liệu hình ảnh hoặc dữ liệu không gian 2D/3D mà \ac{cnn} được thiết kế để xử lý hiệu quả. Các đặc trưng trong vector trạng thái là các phép đo độc lập từ các vị trí khác nhau của giao lộ, không có mối quan hệ không gian cục bộ (spatial locality) mà convolution có thể khai thác.
-
-\paragraph{Không có tính tuần tự thời gian phức tạp}
-Mặc dù dữ liệu giao thông có tính chất thời gian, nhưng trong bài toán này, agent chỉ cần xử lý trạng thái hiện tại để đưa ra quyết định. Không cần phải học các mẫu tuần tự phức tạp qua nhiều bước thời gian dài, do đó RNN hoặc LSTM không mang lại lợi ích đáng kể so với việc tăng độ phức tạp tính toán.
-
-\paragraph{Hiệu quả tính toán và triển khai}
-\begin{itemize}
-    \item \textbf{Tốc độ xử lý cao:} Mạng DNN có độ phức tạp tính toán thấp hơn \ac{cnn} và RNN, cho phép xử lý real-time với độ trễ thấp (< 100ms) cần thiết cho điều khiển giao thông.
-    \item \textbf{Yêu cầu bộ nhớ thấp:} Phù hợp cho triển khai trên các thiết bị edge computing tại giao lộ với tài nguyên hạn chế.
-    \item \textbf{Huấn luyện nhanh:} Thời gian huấn luyện ngắn hơn, cho phép cập nhật mô hình thường xuyên khi có dữ liệu mới.
-\end{itemize}
-
-\paragraph{Tính giải thích và bảo trì}
-\begin{itemize}
-    \item \textbf{Kiến trúc đơn giản:} Dễ dàng hiểu và giải thích mối quan hệ giữa đầu vào và đầu ra.
-    \item \textbf{Debug thuận tiện:} Có thể dễ dàng theo dõi và phân tích từng lớp để xác định vấn đề.
-    \item \textbf{Khả năng mở rộng:} Dễ dàng điều chỉnh số lượng neurons và layers theo yêu cầu cụ thể của từng giao lộ.
-\end{itemize}
-
-\paragraph{Hiệu suất đã được chứng minh}
-Các nghiên cứu trước đây về điều khiển giao thông sử dụng DRL đã chứng minh rằng mạng DNN đơn giản đủ hiệu quả cho bài toán này. Việc sử dụng kiến trúc phức tạp hơn không mang lại cải thiện đáng kể về hiệu suất nhưng lại tăng đáng kể chi phí tính toán và độ phức tạp triển khai.
+Agent sử dụng một mạng neural sâu đầy đủ kết nối (Fully Connected Deep Neural Network) để tính hàm giá trị Q. Hình \ref{fig:model_structure} mô tả chi tiết cấu trúc của mạng được sử dụng.
 
 \begin{figure*}[!htp]
     \centering
@@ -306,30 +271,119 @@ Các nghiên cứu trước đây về điều khiển giao thông sử dụng D
     \label{fig:model_structure}
 \end{figure*}
 
-Mô hình được huấn luyện sử dụng thuật toán tối ưu hóa Adam, với hàm mất mát (loss function) là Sai số bình phương trung bình (Mean Squared Error). Mục tiêu của việc này là tối thiểu hóa sự khác biệt giữa giá trị Q dự đoán và giá trị Q mục tiêu, vốn được tính toán từ phương trình Bellman.
+Như thể hiện trong hình, kiến trúc của mạng được xây dựng bằng Keras và bao gồm các thành phần sau:
 
-\subsection{Lý do lựa chọn thuật toán DQN cho Intersection Agents}
-Việc lựa chọn thuật toán \ac{dqn} cho các intersection agents được dựa trên những lý do sau:
-
-\subsubsection{Phù hợp với bản chất bài toán điều khiển giao lộ}
-Điều khiển đèn tín hiệu giao thông có bản chất là một bài toán hành động rời rạc với số lượng hành động hữu hạn và được định nghĩa rõ ràng (4 pha đèn). \ac{dqn} được thiết kế đặc biệt cho loại bài toán này, khác với các thuật toán điều khiển liên tục như DDPG hay SAC. Mỗi intersection agent chỉ cần tối ưu hóa giao thông tại giao lộ của mình, đây là một bài toán tương đối đơn giản so với việc điều phối toàn cục. Do đó, \ac{dqn} với độ phức tạp tính toán thấp hơn so với các thuật toán actor-critic trở thành lựa chọn phù hợp cho việc triển khai song song nhiều agent.
-
-\subsubsection{Experience Replay phù hợp với đặc tính giao thông}
-Cơ chế Experience Replay của \ac{dqn} đặc biệt hiệu quả trong bối cảnh giao thông vì:
 \begin{itemize}
-    \item \textbf{Tái sử dụng kinh nghiệm:} Các mẫu giao thông có tính lặp lại theo chu kỳ (giờ cao điểm, giờ thấp điểm), việc lưu trữ và tái sử dụng kinh nghiệm giúp agent học nhanh hơn.
-    \item \textbf{Phá vỡ tương quan:} Dữ liệu giao thông liên tiếp có tính tương quan cao, Experience Replay giúp phá vỡ tương quan này, làm cho quá trình học ổn định hơn.
+    \item \textbf{Lớp đầu vào (Input Layer):} Một lớp nhận đầu vào là vector trạng thái đã được định nghĩa ở trên, với kích thước bằng \textit{num states}.
+
+    \item \textbf{Các lớp ẩn (Hidden Layers):} Mạng bao gồm một số lượng các lớp ẩn (được xác định bởi tham số \textit{num layers}), mỗi lớp là một lớp \textit{Dense} với số neural bằng \textit{width}. Hàm kích hoạt \textit{ReLU} được sử dụng cho tất cả các lớp ẩn để đưa vào tính phi tuyến.
+
+    \item \textbf{Lớp đầu ra (Output Layer):} Một lớp \textit{Dense} với số neural bằng số lượng hành động có trong không gian hành động. Lớp này sử dụng hàm kích hoạt \textit{Linear} để tạo ra các giá trị Q cho mỗi hành động.
 \end{itemize}
 
-\subsubsection{Ổn định huấn luyện trong môi trường động}
-Cơ chế Target Network của \ac{dqn} đặc biệt quan trọng trong môi trường giao thông động. Bằng cách sử dụng một mạng mục tiêu riêng biệt được cập nhật định kỳ, \ac{dqn} tránh được hiện tượng "moving target" khi Q-values thay đổi liên tục, từ đó đảm bảo sự hội tụ ổn định trong môi trường có nhiều biến động như giao thông đô thị.
+\subsection{Quá trình huấn luyện}
+\subsubsection{Chiến lược khám phá}
+Trong quá trình huấn luyện mô hình học tăng cường sâu, việc cân bằng giữa khám phá và khai thác là một thách thức then chốt. Nghiên cứu của chúng tôi đã áp dụng chiến lược epsilon-greedy để đảm bảo agent có thể tích cực khám phá trong giai đoạn đầu huấn luyện và tập trung học hỏi ở giai đoạn sau. Cơ chế hoạt động của epsilon-greedy dựa trên việc sinh ra một giá trị ngẫu nhiên trong khoảng [0,1] và so sánh với ngưỡng  $\epsilon$. Tại mỗi bước quyết định, nếu giá trị ngẫu nhiên nhỏ hơn $\epsilon$, agent sẽ chọn một hành động hoàn toàn ngẫu nhiên (khám phá), ngược lại sẽ chọn hành động tối ưu nhất theo mô hình học được (khai thác).
 
-\subsubsection{Khả năng mở rộng và triển khai thực tế}
-\ac{dqn} có những ưu điểm về khả năng triển khai:
+\subsubsection{Quy trình học trong từng episode}
+Quá trình học trong mỗi episode sẽ bao gồm 3 bước. Thứ nhất là khởi tạo các phương tiện trong giả lập SUMO với số bước giả lập cho trước. Thứ hai, trong mỗi bước giả lập, thực hiện tính tóa reward, lưu trữ trải nghiệm vào Memory, chọn hành động cần thực hiện, và thực thi hành động trong giả lập. Cuối cùng, sau khi đã hoàn thành giả lập thì sẽ bắt đầu huấn luyện từ thông tin trải nghiệm đã lưu trước đó.
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/training_episode.png}
+    \caption{Sơ đồ quá trình huấn luyện mô hình}
+    \label{fig:training_flow}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{Bước 1:} Các phương tiện được sinh ra ngẫu nhiên trong SUMO bằng cách sử dụng phân phối Weibull với trọng số là 2 để mô phỏng quá trình số lượng phương tiện tăng dần theo thời gian tại các giao lộ.
+    \item \textbf{Bước 2:} Thực hiện tính toán reward như đã trình bày ở phần 3.4.5. Sau đó, lưu trữ các thông tin trạng thái trước($s_{t-1}$), hành động thực hiện($a_{t-1}$), reward($r_{t-1}$), và trạng thái hiện hiện tại($s_t$). Các thông tin này được quản lý bởi class Memory có kích thước tối thiểu là 100 mẫu và tối đa là 5000 mẫu.
+    \item \textbf{Bước 3:} Sau khi đã hoàn thành công đoạn giả lập, lúc này trong Memory đã lưu trư các thông tin đã học được trong bước giả lập. Quá trình huấn luyện sẽ bao gồm các bước như sau:
+    \begin{itemize}
+        \item Lấy ngẫu nhiên trong Memory số lượng mẫu nhất định để huấn luyện
+        \item Từ trong mẫu lấy được, dự đoán giá trị Q lần lượt cho trạng thái trước và trạng thái hiện tại
+        \item Cập nhật lại giá trị Q theo công thức \ref{eq:q_value}
+        \item Huấn luyện mô hình theo giá trị Q đã được cập nhật 
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Hàm mất mát và thuật toán tối ưu hóa}
+Trong nghiên cứu này, chúng tôi lựa chọn hàm mất mát bình phương trung bình (Mean Squared Error - MSE) làm tiêu chuẩn đánh giá sai số của mô hình học tăng cường. Hàm mất mát MSE được định nghĩa như một phép đo khoảng cách giữa giá trị dự đoán và giá trị thực tế, được tính bằng trung bình của bình phương hiệu số giữa chúng.
+
+Công thức toán học của MSE được biểu diễn như sau:
+
+$MSE = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2$
+
+Trong đó $n$ là số lượng mẫu, $y_i$ là giá trị thực tế, $\hat{y}_i$ là giá trị dự đoán.
+
+Để tối ưu hóa mô hình, chúng tôi sử dụng thuật toán Adam (Adaptive Moment Estimation) - một phương pháp tối ưu hóa gradient tiên tiến. Adam kết hợp ưu điểm của hai thuật toán RMSprop và momentum, cho phép điều chỉnh tốc độ học một cách linh hoạt cho từng tham số. Cấu hình Adam trong nghiên cứu được thiết lập với các tham số tốc độ học (learning rate) là 0.001
+
+
+\section{Cơ chế trao đổi thông tin giữa tác nhân và Central Server}
+
+Central Server đóng vai trò trung tâm điều phối dữ liệu, sử dụng kiến trúc client-server thông qua giao tiếp HTTP RESTful API.
+
+\subsection{Chức năng chính}
+
+Central Server cung cấp các API chính như sau:
+
 \begin{itemize}
-    \item \textbf{Tài nguyên tính toán thấp:} Phù hợp cho việc triển khai trên các thiết bị edge computing tại giao lộ
-    \item \textbf{Dễ dàng debug và giải thích:} Q-values có thể được giải thích trực tiếp, giúp việc kiểm tra và bảo trì hệ thống
-    \item \textbf{Khả năng mở rộng:} Mỗi giao lộ có thể hoạt động độc lập, dễ dàng thêm/bớt giao lộ mà không ảnh hưởng đến toàn hệ thống
+\item \textbf{Agent Registration}: Đăng ký và quản lý các Intersection Agent.
+\item \textbf{Heartbeat Monitoring}: Theo dõi tín hiệu hoạt động (heartbeat) từ các agent theo chu kỳ 30 giây.
+\item \textbf{Data Collection}: Thu thập dữ liệu giao thông từ các agent mỗi 10 giây.
+\item \textbf{Coordination Support}: Hỗ trợ đồng bộ hóa hoạt động giữa Sync Agent và Intersection Agent.
+\end{itemize}
+
+\subsection{Cơ chế phát hiện lỗi}
+
+Việc phát hiện agent bị lỗi được thực hiện dựa trên các tiêu chí sau:
+
+\begin{itemize}
+\item Cơ chế \textit{timeout}: nếu không nhận được heartbeat trong vòng 90 giây.
+\item Tự động thử lại (retry) tối đa 3 lần.
+\item Kích hoạt chế độ điều khiển dự phòng (fallback control) khi agent không phản hồi.
+\end{itemize}
+
+\section{Cơ chế trao đổi thông tin giữa các tác nhân}
+
+Các Intersection Agent có thể giao tiếp với nhau thông qua cơ chế lai (hybrid), kết hợp giữa kết nối trực tiếp và thông qua Central Server.
+
+\subsection{Hai chế độ giao tiếp}
+
+\begin{itemize}
+\item \textbf{Thông qua Central Server}: Độ trễ từ 50–100ms, đảm bảo tính nhất quán giữa các agent.
+\item \textbf{Kết nối trực tiếp (peer-to-peer)}: Độ trễ thấp hơn (10–30ms), được sử dụng trong các tình huống khẩn cấp.
+\end{itemize}
+
+\subsection{Các loại thông điệp chính}
+
+Các tác nhân trao đổi bốn loại thông điệp chính:
+
+\begin{itemize}
+\item \textbf{EMERGENCY}: Thông báo khẩn cấp, có độ ưu tiên cao nhất.
+\item \textbf{COORDINATION}: Thông tin điều phối thời gian đèn tín hiệu.
+\item \textbf{DATASHARE}: Chia sẻ dữ liệu giao thông theo thời gian thực.
+\item \textbf{STATUSUPDATE}: Cập nhật trạng thái hoạt động định kỳ (heartbeat).
+\end{itemize}
+
+\subsection{Cơ chế điều phối đồng bộ}
+
+Để tạo hiệu ứng "sóng xanh" giữa các giao lộ liền kề, hệ thống triển khai thuật toán điều phối theo các bước sau:
+
+\begin{enumerate}
+\item Mỗi agent gửi thông tin về pha đèn hiện tại của nút giao.
+\item Hệ thống tính toán độ lệch thời gian tối ưu dựa trên thời gian di chuyển giữa các giao lộ.
+\item Agent điều chỉnh thời gian pha đèn cho phù hợp với đồng bộ chung.
+\item Xác nhận điều phối thành công giữa các nút giao liên quan.
+\end{enumerate}
+
+\subsection{Khả năng chịu lỗi}
+
+Hệ thống hỗ trợ cơ chế chống lỗi với các đặc điểm sau:
+
+\begin{itemize}
+\item Thời gian chờ phản hồi (timeout): tối đa 5 giây cho thông điệp thường, 2 giây cho thông điệp khẩn.
+\item Cơ chế thử lại (retry): tối đa 3 lần với chiến lược \textit{exponential backoff}.
+\item Cơ chế fallback: chuyển sang sử dụng Central Server khi kết nối trực tiếp thất bại.
 \end{itemize}
 
 \section{Thiết kế hệ thống đồng bộ hóa giao lộ (Sync Agent)}
@@ -367,14 +421,14 @@ Kiến trúc phân tầng cho phép:
 \paragraph{Hiệu quả tính toán}
 \begin{itemize}
     \item \textbf{Tính toán song song:} Các intersection agents hoạt động song song, giảm thời gian tính toán tổng thể
-    \item \textbf{Reduced complexity:} Thay vì một bài toán tối ưu hóa khổng lồ cho toàn bộ mạng lưới, bài toán được chia nhỏ thành nhiều bài toán con đơn giản hơn
+    \item \textbf{Giảm độ phức tạp:} Thay vì một bài toán tối ưu hóa khổng lồ cho toàn bộ mạng lưới, bài toán được chia nhỏ thành nhiều bài toán con đơn giản hơn
 \end{itemize}
 
 \paragraph{Tính thực tế trong triển khai}
 \begin{itemize}
-    \item \textbf{Gradual deployment:} Có thể triển khai từng giao lộ một, không cần thay đổi toàn bộ hạ tầng cùng lúc
-    \item \textbf{Maintenance friendly:} Dễ dàng bảo trì, nâng cấp từng thành phần mà không ảnh hưởng đến toàn hệ thống
-    \item \textbf{Integration with existing systems:} Có thể tích hợp với các hệ thống điều khiển giao thông hiện có
+    \item \textbf{Triển khai thí điểm:} Có thể triển khai từng giao lộ một, không cần thay đổi toàn bộ hạ tầng cùng lúc
+    \item \textbf{Bảo trì dễ dàng:} Dễ dàng bảo trì, nâng cấp từng thành phần mà không ảnh hưởng đến toàn hệ thống
+    \item \textbf{Tích hợp với hệ thống hiện có:} Có thể tích hợp với các hệ thống điều khiển giao thông hiện có
 \end{itemize}
 
 \subsection{Môi trường đồng bộ hóa (Sync Environment)}
@@ -383,16 +437,16 @@ Môi trường của Sync Agent được định nghĩa như sau:
 \subsubsection{Không gian trạng thái}
 Trạng thái của môi trường đồng bộ bao gồm:
 \begin{itemize}
-    \item \textbf{Traffic metrics:} Thời gian chờ trung bình, độ dài hàng đợi,
+    \item \textbf{Thống kê giao thông:} Thời gian chờ trung bình, độ dài hàng đợi,
         và lưu lượng giao thông tại mỗi giao lộ
 
-    \item \textbf{Spatial relationships:} Khoảng cách địa lý và thời gian di
+    \item \textbf{Quan hệ không gian:} Khoảng cách địa lý và thời gian di
         chuyển giữa các giao lộ
 
-    \item \textbf{Temporal offsets:} Độ lệch thời gian hiện tại giữa các chu kỳ
+    \item \textbf{Độ lệch thời gian:} Độ lệch thời gian hiện tại giữa các chu kỳ
         đèn tín hiệu
 
-    \item \textbf{Cycle information:} Thời gian chu kỳ và pha hiện tại của mỗi
+    \item \textbf{Thông tin chu kỳ:} Thời gian chu kỳ và pha hiện tại của mỗi
         giao lộ
 \end{itemize}
 
@@ -417,7 +471,7 @@ Hành động của Sync Agent là việc điều chỉnh độ lệch thời gi
         \State \textbf{Input:} current\_metrics, historical\_baseline, episode\_count 
         \State \textbf{Parameters:} baseline\_window = 15, current\_window = 10 
         \If{episode\_count $<$ baseline\_window} 
-            \Return 0.0 \Comment{Không đánh giá trong giai đoạn khởi tạo}
+            \Return 0,0 \Comment{Không đánh giá trong giai đoạn khởi tạo}
         \EndIf
         
         \State baseline\_start $\leftarrow$ episode\_count - baseline\_window - current\_window
@@ -436,16 +490,16 @@ Hành động của Sync Agent là việc điều chỉnh độ lệch thời gi
 
 Hàm thưởng này có các đặc điểm:
 \begin{itemize}
-    \item \textbf{Long-term comparison:} So sánh hiệu suất qua cửa sổ thời gian
+    \item \textbf{So sánh dài hạn:} So sánh hiệu suất qua cửa sổ thời gian
         dài (15+ episodes)
 
-    \item \textbf{Non-overlapping windows:} Tránh bias bằng cách sử dụng các cửa
+    \item \textbf{Cửa sổ thời gian không chồng lấp:} Tránh bias bằng cách sử dụng các cửa
         sổ thời gian không chồng lấp
 
-    \item \textbf{Percentage-based:} Sử dụng tỷ lệ phần trăm thay vì giá trị
+    \item \textbf{Dựa trên tỷ lệ phần trăm:} Sử dụng tỷ lệ phần trăm thay vì giá trị
         tuyệt đối
 
-    \item \textbf{Bounded output:} Hàm tanh đảm bảo reward trong khoảng [-1, 1]
+    \item \textbf{Giới hạn đầu ra:} Hàm tanh đảm bảo reward trong khoảng [-1, 1]
 \end{itemize}
 
 \subsection{Lý do lựa chọn thuật toán Soft Actor-Critic cho Sync Agent}
@@ -462,12 +516,12 @@ Bài toán đồng bộ hóa giao lộ yêu cầu điều chỉnh độ lệch t
 
 Điều này mang lại những lợi ích quan trọng:
 \begin{itemize}
-    \item \textbf{Khám phá hiệu quả:} Agent được khuyến khích thử nghiệm các chiến lược đồng bộ khác nhau, tránh bị mắc kẹt ở local optimum
-    \item \textbf{Robustness:} Policy đa dạng giúp hệ thống thích ứng tốt với các điều kiện giao thông thay đổi
-    \item \textbf{Tự động điều chỉnh khám phá:} Tham số entropy $\alpha$ được tự động điều chỉnh theo quá trình học
+    \item \textbf{Khám phá hiệu quả:} Agent được khuyến khích thử nghiệm các chiến lược đồng bộ khác nhau, tránh bị mắc kẹt ở điểm cực trị cục bộ
+    \item \textbf{Bền vững:} Policy đa dạng giúp hệ thống thích ứng tốt với các điều kiện giao thông thay đổi
+    \item \textbf{Tự động điều chỉnh entropy:} Tham số entropy $\alpha$ được tự động điều chỉnh theo quá trình học
 \end{itemize}
 
-\subsubsection{Dual Critic Networks giảm thiểu Overestimation Bias}
+\subsubsection{Dual Critic Networks giảm thiểu overestimation bias}
 \ac{sac} sử dụng hai mạng critic song song để ước lượng Q-values:
 \begin{equation}
     Q_{target} = r + \gamma \min_{i=1,2} Q_{\phi_i}(s', a') - \alpha \log \pi(a'|s')
@@ -475,28 +529,28 @@ Bài toán đồng bộ hóa giao lộ yêu cầu điều chỉnh độ lệch t
 
 Cơ chế này đặc biệt quan trọng trong bối cảnh đồng bộ hóa giao lộ vì:
 \begin{itemize}
-    \item \textbf{Giảm thiểu overestimation:} Việc lấy minimum của hai Q-values giúp tránh đánh giá quá cao các hành động
+    \item \textbf{Giảm thiểu overestimation bias:} Việc lấy giá trị cực tiểu của hai Q-values giúp tránh đánh giá quá cao các hành động
     \item \textbf{Ổn định huấn luyện:} Giảm thiểu biến động trong quá trình học, đặc biệt quan trọng với bài toán phức tạp như đồng bộ đa giao lộ
 \end{itemize}
 
-\subsubsection{Off-policy Learning cho Sample Efficiency}
+\subsubsection{Off-policy Learning cho hiệu suất mẫu}
 \ac{sac} là thuật toán off-policy, cho phép tái sử dụng dữ liệu từ các policy cũ:
 \begin{itemize}
-    \item \textbf{Sample efficiency cao:} Đặc biệt quan trọng khi việc thu thập dữ liệu giao thông tốn kém
-    \item \textbf{Stable learning:} Không bị ảnh hưởng bởi correlation trong dữ liệu sequential
-    \item \textbf{Continuous learning:} Có thể học liên tục từ dữ liệu real-time mà không cần reset
+    \item \textbf{Hiệu suất mẫu cao:} Đặc biệt quan trọng khi việc thu thập dữ liệu giao thông tốn kém
+    \item \textbf{Học ổn định:} Không bị ảnh hưởng bởi correlation trong dữ liệu sequential
+    \item \textbf{Học liên tục:} Có thể học liên tục từ dữ liệu real-time mà không cần reset
 \end{itemize}
 
-\subsubsection{Soft Updates cho Stability}
-\ac{sac} sử dụng soft updates cho target networks:
+\subsubsection{Soft Updates cho sự ổn định}
+\ac{sac} sử dụng soft updates cho mạng mục tiêu:
 \begin{equation}
     \phi_{target} \leftarrow \tau \phi + (1-\tau) \phi_{target}
 \end{equation}
 
-Với $\tau = 0.001$ được chọn conservative để đảm bảo:
+Với $\tau = 0,001$ được chọn conservative để đảm bảo:
 \begin{itemize}
-    \item \textbf{Training stability:} Tránh sudden changes trong target values
-    \item \textbf{Smooth convergence:} Đặc biệt quan trọng với bài toán multi-objective như đồng bộ hóa
+    \item \textbf{Ổn định huấn luyện:} Tránh thay đổi đột ngột trong giá trị mục tiêu
+    \item \textbf{Smooth convergence:} Đặc biệt quan trọng với bài toán đa mục tiêu như đồng bộ hóa
 \end{itemize}
 
 \subsubsection{So sánh với các thuật toán khác}
@@ -508,17 +562,17 @@ Bảng \ref{tab:algorithm_comparison} so sánh \ac{sac} với các thuật toán
 \label{tab:algorithm_comparison}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-\textbf{Thuật toán} & \textbf{Action Space} & \textbf{Sample Efficiency} & \textbf{Stability} & \textbf{Exploration} \\
+\textbf{Thuật toán} & \textbf{Không gian hành động} & \textbf{Hiệu suất mẫu} & \textbf{Ổn định} & \textbf{Khám phá} \\
 \hline
-DQN & Discrete & Trung bình & Tốt & $\epsilon$-greedy \\
+DQN & Rời rạc & Trung bình & Tốt & $\epsilon$-greedy \\
 \hline
-DDPG & Continuous & Trung bình & Kém & Noise-based \\
+DDPG & Liên tục & Trung bình & Kém & Noise-based \\
 \hline
-TD3 & Continuous & Tốt & Tốt & Noise-based \\
+TD3 & Liên tục & Tốt & Tốt & Noise-based \\
 \hline
-\textbf{SAC} & \textbf{Continuous} & \textbf{Rất tốt} & \textbf{Rất tốt} & \textbf{Entropy-based} \\
+\textbf{SAC} & \textbf{Liên tục} & \textbf{Rất tốt} & \textbf{Rất tốt} & \textbf{Entropy-based} \\
 \hline
-PPO & Both & Tốt & Tốt & Stochastic policy \\
+PPO & Cả hai & Tốt & Tốt & Stochastic policy \\
 \hline
 \end{tabular}
 \end{table}
@@ -528,22 +582,22 @@ Sync Agent sử dụng thuật toán SAC với các đặc điểm kỹ thuật 
 
 \subsubsection{Kiến trúc mạng neural}
 \begin{itemize}
-    \item \textbf{Actor Network:} Mạng policy với 2 lớp ẩn (128 neurons mỗi lớp),
+    \item \textbf{Mạng Actor (Actor Network):} Mạng policy với 2 lớp ẩn (128 neurons mỗi lớp),
         đầu ra là phân phối Gaussian cho các actions liên tục
 
     \item \textbf{Mạng Critic (Critic Networks):} Sử dụng hai mạng Q-function song song nhằm mục đích giảm thiểu hiện tượng \textbf{thiên lệch ước lượng quá mức (overestimation bias)}.
 
-    \item \textbf{Target Networks:} Soft update với $\tau = 0.001$ để ổn định
+    \item \textbf{Target Networks:} Soft update với $\tau = 0,001$ để ổn định
         huấn luyện
 \end{itemize}
 
 \paragraph{Lý do sử dụng mạng fully connected cho SAC}
 Tương tự như DQN, việc lựa chọn kiến trúc fully connected cho SAC được dựa trên:
 \begin{itemize}
-    \item \textbf{Dữ liệu đầu vào tổng hợp:} State của Sync Agent bao gồm metrics từ nhiều giao lộ (traffic metrics, spatial relationships, temporal offsets), đây là dữ liệu tabular không có cấu trúc không gian.
-    \item \textbf{Continuous action space:} Việc điều chỉnh offset values yêu cầu output liên tục, phù hợp với Dense layers có activation function phù hợp.
-    \item \textbf{Computational efficiency:} Quan trọng cho Sync Agent vì phải xử lý dữ liệu từ nhiều giao lộ đồng thời trong real-time.
-\end{itemize}
+    \item \textbf{Dữ liệu đầu vào tổng hợp:} Trạng thái của Sync Agent bao gồm số liệu thống kê từ nhiều giao lộ (thời gian chờ trung bình, độ dài hàng đợi, quan hệ không gian, độ lệch thời gian, thông tin chu kỳ), đây là dữ liệu tabular không có cấu trúc không gian.
+    \item \textbf{Không gian hành động liên tục:} Việc điều chỉnh các giá trị offset yêu cầu output liên tục, phù hợp với Dense layers có hàm kích hoạt phù hợp.
+        \item \textbf{Hiệu quả tính toán:} Quan trọng cho Sync Agent vì phải xử lý dữ liệu từ nhiều giao lộ đồng thời trong thời gian thực.
+    \end{itemize}
 
 \subsubsection{Hyperparameters tối ưu}
 Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã được xác định trong Bảng \ref{tab:sac_hyperparameters}:
@@ -556,17 +610,17 @@ Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã đư�
 \hline
 \textbf{Tham số} & \textbf{Giá trị} & \textbf{Mô tả} \\
 \hline
-Learning rate & $1 \times 10^{-4}$ & Conservative để đảm bảo ổn định \\
+Tốc độ học & $1 \times 10^{-4}$ & Conservative để đảm bảo ổn định \\
 \hline
-Discount factor $\gamma$ & 0.95 & Hệ số chiết khấu cho phần thưởng tương lai \\
+Hệ số chiết khấu $\gamma$ & 0,95 & Hệ số chiết khấu cho phần thưởng tương lai \\
 \hline
-Batch size & 32 & Kích thước lô cho mỗi lần cập nhật \\
+Kích thước lô & 32 & Kích thước lô cho mỗi lần cập nhật \\
 \hline
-Buffer size & $5 \times 10^{4}$ & Kích thước bộ đệm experience replay \\
+Kích thước bộ đệm & $5 \times 10^{4}$ & Kích thước bộ đệm experience replay \\
 \hline
-Temperature $\alpha$ & Auto-tuned & Tham số kiểm soát entropy tự động \\
+Entropy $\alpha$ & Auto-tuned & Tham số kiểm soát entropy tự động \\
 \hline
-Target update $\tau$ & 0.001 & Tốc độ cập nhật soft cho target networks \\
+Tốc độ cập nhật soft cho mạng mục tiêu $\tau$ & 0,001 & Tốc độ cập nhật soft cho target networks \\
 \hline
 \end{tabular}
 \end{table}
@@ -574,7 +628,7 @@ Target update $\tau$ & 0.001 & Tốc độ cập nhật soft cho target networks
 \subsection{Phương pháp huấn luyện hybrid}
 Hệ thống hỗ trợ hai chế độ huấn luyện:
 
-\subsubsection{Synthetic Training Mode}
+\subsubsection{Chế độ huấn luyện tổng hợp (Synthetic Training Mode)}
 Chế độ này sử dụng synthetic data generator để tạo ra dữ liệu giao thông giả lập:
 
 \begin{algorithm}[!htp]
@@ -588,33 +642,33 @@ Chế độ này sử dụng synthetic data generator để tạo ra dữ liệu
         \For{every\_intersection $i$}
             \State waiting\_time[$i$] $\leftarrow$ generate\_waiting\_time(traffic\_volume, intersection\_config[$i$])
             \State queue\_length[$i$] $\leftarrow$ generate\_queue\_length(traffic\_volume, intersection\_config[$i$])
-            \State speed[$i$] $\leftarrow$ uniform\_random(25.0, 45.0) \Comment{Phạm vi tốc độ đô thị}
+            \State speed[$i$] $\leftarrow$ uniform\_random(25,0, 45,0) \Comment{Phạm vi tốc độ đô thị}
         \EndFor 
         
         \State \Return intersection\_data
     \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Real-time Training Mode}
+\subsubsection{Chế độ huấn luyện thực tế (Real-time Training Mode)}
 Chế độ này sử dụng dữ liệu thực từ các intersection agents:
 \begin{itemize}
-    \item Thu thập metrics real-time từ SUMO simulation
+    \item Thu thập số liệu thực tế từ SUMO simulation
 
-    \item Sử dụng actual traffic flow data
+    \item Sử dụng dữ liệu thực tế về lưu lượng giao thông
 
     \item Áp dụng learned policy trong môi trường thực
 \end{itemize}
 
 \section{Cải tiến ổn định huấn luyện}
 
-Quá trình phát triển đã gặp phải vấn đề training instability nghiêm trọng với các
+Quá trình phát triển đã gặp phải vấn đề ổn định huấn luyện nghiêm trọng với các
 triệu chứng:
 \begin{itemize}
-    \item Reward volatility cao (coefficient of variation > 2.0)
+    \item Biến động reward cao (hệ số biến động > 2,0)
 
-    \item Extreme reward swings (range > 5000)
+    \item Biến động reward lớn (khoảng > 5000)
 
-    \item Không có learning trend rõ ràng
+    \item Không có xu hướng học rõ ràng
 \end{itemize}
 
 \subsection{Giải pháp toàn diện}
@@ -622,47 +676,47 @@ Nghiên cứu đã phát triển một bộ giải pháp tích hợp:
 
 \subsubsection{Ultra-stable reward engineering}
 \begin{itemize}
-    \item Long-term performance comparison windows
+    \item Cửa sổ so sánh hiệu suất dài hạn
 
-    \item Non-overlapping baseline vs current performance
+    \item So sánh không chồng lấp giữa cơ sở và hiệu suất hiện tại
 
-    \item Relative percentage improvements thay vì absolute changes
+    \item So sánh tỷ lệ phần trăm thay vì thay đổi tuyệt đối
 
-    \item Sigmoid transformation để prevent extreme values
+    \item Biến đổi sigmoid để tránh giá trị cực trị
 \end{itemize}
 
-\subsubsection{Conservative hyperparameter tuning}
+\subsubsection{Tối ưu tham số}
 \begin{itemize}
-    \item Reduced learning rates: $3 \times 10^{-4}\rightarrow 1 \times 10^{-4}$
+    \item Giảm tốc độ học: $3 \times 10^{-4}\rightarrow 1 \times 10^{-4}$
 
-    \item Lower discount factor: $0.99 \rightarrow 0.95$
+    \item Giảm hệ số chiết khấu: $0,99 \rightarrow 0,95$
 
-    \item Slower target updates: $\tau = 0.001$
+    \item Giảm tốc độ cập nhật mục tiêu: $\tau = 0,001$
 
-    \item Smaller networks: $256 \times 256 \rightarrow 128 \times 128$
+    \item Giảm kích thước mạng: $256 \times 256 \rightarrow 128 \times 128$
 \end{itemize}
 
-\subsubsection{Training stabilization techniques}
+\subsubsection{Kỹ thuật ổn định huấn luyện}
 \begin{itemize}
-    \item Gradient clipping để prevent exploding gradients
+    % \item Gradient clipping để tránh gradient bùng nổ
+    \item Gradient clipping để tránh gradient bùng nổ
 
-    \item Experience replay với prioritization
+    \item Experience replay với ưu tiên
 
-    \item Curriculum learning từ simple scenarios
+    \item Học theo chương trình từ các tình huống đơn giản
 
-    \item Early stopping based on stability metrics
+    \item Dừng sớm dựa trên các chỉ số ổn định
 \end{itemize}
 
 \subsection{Kết quả cải tiến}
 Sau khi áp dụng các giải pháp, hệ thống đạt được:
 \begin{itemize}
-    \item \textbf{Reward stability:} Coefficient of variation giảm từ 2.10 xuống
-        0.013 (99.4\% improvement)
+    \item \textbf{Ổn định reward:} Hệ số biến động giảm từ 2,10 xuống
+        0,013 (cải thiện 99,4\%)
 
-    \item \textbf{Training quality:} Điểm chất lượng tăng từ 25\% lên 65\% (160\%
-        improvement)
+    \item \textbf{Chất lượng huấn luyện:} Điểm chất lượng tăng từ 25\% lên 65\% (cải thiện 160\%)
 
-    \item \textbf{Convergence:} Stable reward range từ -4.83 đến -5.15
+    \item \textbf{Hội tụ:} Khoảng ổn định reward từ -4,83 đến -5,15
 
-    \item \textbf{Deployment readiness:} Đạt tiêu chuẩn production-ready
+    \item \textbf{Sẵn sàng triển khai:} Có thể được sử dụng để triển khai trên môi trường thực tế
 \end{itemize}

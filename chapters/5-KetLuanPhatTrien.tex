@@ -3,58 +3,24 @@ Nghiên cứu này đã phát triển thành công một hệ thống điều kh
 \section{Đóng góp chính của nghiên cứu}
 
 \subsection{Hệ thống DQN Single-Agent hiệu quả}
-Nghiên cứu đã chứng minh thành công khả năng áp dụng DQN cho điều khiển giao lộ đơn:
-\begin{itemize}
-    \item \textbf{Hiệu suất cao:} Cải thiện 14.3\% thời gian chờ và cải thiện 10.5\% độ dài hàng đợi so với hệ thống cố định
-    \item \textbf{Huấn luyện ổn định:} Đạt được độ ổn định cao trong quá trình huấn luyện với mô hình Balanced
-    \item \textbf{Khả năng triển khai:} Tạo ra nền tảng vững chắc cho phát triển hệ thống đa tác nhân
-\end{itemize}
+Nghiên cứu đã chứng minh thành công khả năng áp dụng DQN cho điều khiển giao lộ đơn với những kết quả đáng khích lệ. Hệ thống đạt được hiệu suất cao với mức cải thiện 14,4\% về thời gian chờ và 10,5\% về độ dài hàng đợi so với hệ thống cố định truyền thống. Quá trình huấn luyện cho thấy độ ổn định cao, đặc biệt với mô hình Balanced, tạo ra nền tảng vững chắc cho việc phát triển hệ thống đa tác nhân phức tạp hơn.
 
 \subsection{Hệ thống Sync Agent}
-Phát triển thành công hệ thống điều phối đa giao lộ với kiến trúc phân tầng DQN-SAC:
-\begin{itemize}
-    \item \textbf{Hiệu suất vượt trội:} Cải thiện 27.0\% n thời gian chờ và 23.2\% độ dài hàng đợi, vượt trội 12.6\% so với giao lộ đơn
-    \item \textbf{Kiến trúc kết hợp:} Kết hợp DQN (điều khiển cục bộ) với SAC (điều phối toàn cục) trong kiến trúc phân tầng
-    \item \textbf{Sẵn sàng triển khai:} 5 mô hình TensorFlow chuyên biệt được tối ưu cho các điều kiện giao thông khác nhau
-\end{itemize}
+Một trong những thành tựu quan trọng nhất của nghiên cứu là việc phát triển thành công hệ thống điều phối đa giao lộ với kiến trúc phân tầng kết hợp giữa DQN và SAC. Hệ thống này thể hiện hiệu suất vượt trội với mức cải thiện 26,9\% về thời gian chờ và 23,1\% về độ dài hàng đợi, vượt trội hơn 12,5\% so với phương pháp giao lộ đơn. Kiến trúc độc đáo kết hợp DQN để điều khiển cục bộ tại mỗi giao lộ với SAC để điều phối toàn cục, tạo ra một hệ thống hoàn chỉnh và sẵn sàng triển khai với 5 mô hình TensorFlow chuyên biệt được tối ưu cho các điều kiện giao thông khác nhau.
 
 \subsection{Phân tích độ phức tạp giao thông}
-Nghiên cứu đầu tiên phân tích định lượng mối quan hệ giữa độ phức tạp giao thông và hiệu suất DQN:
-\begin{itemize}
-    \item \textbf{Tương quan mạnh:} Xác định mối tương quan nghịch đảo r = -0.94 giữa lưu lượng giao thông và hiệu suất tối ưu hóa
-    \item \textbf{Framework triển khai:} Cung cấp hướng dẫn thực tế với kỳ vọng hiệu suất từ 12.4\% (cao điểm) đến 34.5\% (giao thông thấp)
-    \item \textbf{Mô hình chuyên biệt:} Phát triển các mô hình chuyên dụng cho từng mức độ phức tạp giao thông
-\end{itemize}
-
-
+Nghiên cứu này cũng phân tích định lượng mối quan hệ giữa độ phức tạp giao thông và hiệu suất của DQN. Kết quả cho thấy mối quan hệ nghịch đảo rõ rệt giữa lưu lượng giao thông và hiệu suất tối ưu hóa, với kỳ vọng hiệu suất dao động từ 12,4\% trong giờ cao điểm đến 34,5\% trong thời gian giao thông thấp. Phân tích này dẫn đến việc phát triển các mô hình chuyên dụng cho từng mức độ phức tạp giao thông cụ thể, cung cấp framework triển khai thực tế.
 
 \section{Hạn chế và hướng phát triển}
 
 \subsection{Hạn chế hiện tại}
-\begin{itemize}
-    \item \textbf{Xác thực thực tế:} Cần kiểm thử với dữ liệu giao thông thực tế chất lượng cao
-    \item \textbf{Quy mô mở rộng:} Đã thử nghiệm với 4 giao lộ, cần mở rộng lên 8-12 giao lộ
-    \item \textbf{Điều kiện đặc biệt:} Chưa kiểm thử với thời tiết khắc nghiệt, tai nạn, sự kiện đặc biệt
-\end{itemize}
+Mặc dù đạt được những kết quả tích cực, nghiên cứu vẫn còn một số hạn chế cần được khắc phục. Việc xác thực thực tế vẫn là thách thức lớn nhất, do hệ thống cần được kiểm thử với dữ liệu giao thông thực tế chất lượng cao thay vì chỉ dựa trên mô phỏng. Về quy mô, nghiên cứu đã thử nghiệm thành công với 4 giao lộ nhưng cần mở rộng lên 8-12 giao lộ để đánh giá khả năng mở rộng thực tế. Ngoài ra, hệ thống chưa được kiểm thử trong các điều kiện đặc biệt như thời tiết khắc nghiệt, tai nạn giao thông, hoặc các sự kiện đặc biệt có thể ảnh hưởng đến lưu lượng giao thông.
 
 \subsection{Hướng phát triển tương lai}
-\begin{itemize}
-    \item \textbf{Triển khai thí điểm:} Áp dụng hệ thống trong môi trường thực tế để xác thực hiệu suất
-    \item \textbf{Mở rộng quy mô:} Phát triển cho mạng lưới giao thông lớn hơn (10+ giao lộ)
-    \item \textbf{Tích hợp tính năng:} Thêm ưu tiên xe cứu thương, thích ứng thời tiết, điều phối người đi bộ
-    \item \textbf{Tối ưu đa mục tiêu:} Cân bằng hiệu suất, an toàn và tác động môi trường
-\end{itemize}
+Bước tiếp theo quan trọng nhất là triển khai hệ thống trong môi trường thực tế để xác thực hiệu suất và độ tin cậy. Việc mở rộng quy mô lên mạng lưới giao thông lớn hơn với 10+ giao lộ sẽ cho phép đánh giá khả năng mở rộng và hiệu quả của kiến trúc phân tầng. Đồng thời, việc tích hợp các tính năng nâng cao như ưu tiên xe cứu thương, khả năng thích ứng với điều kiện thời tiết, và điều phối người đi bộ sẽ tạo ra một hệ thống hoàn chỉnh hơn. Cuối cùng, phát triển hướng tối ưu đa mục tiêu để cân bằng giữa hiệu suất giao thông, an toàn và tác động môi trường sẽ mang lại giá trị thực tế cao hơn.
 
 \section{Kết luận}
 
-Nghiên cứu đã đạt được những kết quả quan trọng:
+Nghiên cứu đã đạt được ba thành tựu quan trọng trong lĩnh vực điều khiển giao thông thông minh. Thứ nhất, việc ứng dụng thành công thuật toán DQN cho điều khiển giao lộ đơn, với mức cải thiện hiệu suất 14,4\%, đã chứng minh tính khả thi của phương pháp học tăng cường sâu trong bài toán này. Thứ hai, hệ thống điều khiển phân tán với các tác tử đồng bộ (Sync Agent) sử dụng kiến trúc phân tầng đã đạt mức cải thiện 26,9\%, vượt trội so với các phương pháp truyền thống như SCOOT (12–20\%), đồng thời duy trì được tính linh hoạt cao. Thứ ba, phân tích định lượng độ phức tạp giao thông đã cung cấp cơ sở khoa học vững chắc cho việc ra quyết định triển khai thực tế, cho phép dự đoán hiệu suất hệ thống theo từng điều kiện cụ thể.
 
-\begin{enumerate}
-    \item \textbf{Ứng dụng thành công DQN:} Áp dụng DQN cho điều khiển giao lộ đơn với hiệu suất cải thiện 14.3\%
-
-    \item \textbf{Phát triển hệ thống Sync Agent:} Hệ thống điều phối đa giao lộ đạt mức cải thiện 27.0\% , vượt trội các phương pháp truyền thống
-
-    \item \textbf{Phân tích độ phức tạp giao thông:} Định lượng mối quan hệ giao thông-hiệu suất (r=-0.94) với hướng dẫn triển khai thực tế
-\end{enumerate}
-
-Hệ thống đã sẵn sàng cho giai đoạn triển khai thí điểm với 5 mô hình chuyên biệt và tài liệu kỹ thuật hoàn chỉnh. Nghiên cứu tạo nền tảng vững chắc cho phát triển hệ thống giao thông thông minh tương lai với hiệu suất vượt trội và khả năng mở rộng thực tế.
+Với năm mô hình chuyên biệt đã được tối ưu hóa cùng tài liệu kỹ thuật hoàn chỉnh, hệ thống hiện tại đã sẵn sàng cho giai đoạn triển khai thí điểm. Nghiên cứu này không chỉ xây dựng nền tảng cho các hệ thống giao thông thông minh trong tương lai, mà còn chứng minh tiềm năng đạt được hiệu suất vượt trội và khả năng mở rộng trong điều kiện giao thông phức tạp tại Việt Nam.
