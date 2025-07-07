@@ -21,7 +21,6 @@ quyết định (dựa trên luật, tối ưu hóa), và cơ chế phối hợp
 thống lựa chọn kế hoạch tín hiệu có sẵn (Thế hệ 1) đến các hệ thống điều chỉnh kế
 hoạch tín hiệu (Thế hệ 2), và các hệ thống điều khiển thời gian thực không dựa
 trên chu kỳ cố định (Thế hệ 3).
-\newpage
 \subsection{Nguyên lý hoạt động}
 Về cơ bản, \ac{atsc} hoạt động theo một vòng lặp gồm ba bước chính được minh họa trong 
 % Hình \ref{fig:atsc_operation}:
@@ -292,57 +291,57 @@ Kể từ khi ra đời, \ac{dqn} đã có nhiều biến thể cải tiến qua
         (action advantage), giúp học hiệu quả hơn.
 \end{itemize}
 
-\subsection{Soft Actor-Critic}
-\subsubsection{Tổng quan về Soft Actor-Critic}
-Soft Actor-Critic (\ac{sac}) là một thuật toán học tăng cường sâu hiện đại, thuộc nhóm Actor-Critic và được thiết kế đặc biệt cho các bài toán có không gian hành động liên tục \cite{Haarnoja2018}. Khác với \ac{dqn} chỉ phù hợp với hành động rời rạc, \ac{sac} có thể xử lý các hành động có giá trị liên tục, điều này rất quan trọng trong nhiều ứng dụng thực tế như điều khiển robot, tự động hóa, và điều phối hệ thống.
+% \subsection{Soft Actor-Critic}
+% \subsubsection{Tổng quan về Soft Actor-Critic}
+% Soft Actor-Critic (\ac{sac}) là một thuật toán học tăng cường sâu hiện đại, thuộc nhóm Actor-Critic và được thiết kế đặc biệt cho các bài toán có không gian hành động liên tục \cite{Haarnoja2018}. Khác với \ac{dqn} chỉ phù hợp với hành động rời rạc, \ac{sac} có thể xử lý các hành động có giá trị liên tục, điều này rất quan trọng trong nhiều ứng dụng thực tế như điều khiển robot, tự động hóa, và điều phối hệ thống.
 
-\subsubsection{Nguyên lý Maximum Entropy}
-Điểm đặc biệt của \ac{sac} là việc áp dụng nguyên lý Maximum Entropy trong quá trình học. Thay vì chỉ tối đa hóa phần thưởng tích lũy như các thuật toán truyền thống, \ac{sac} đồng thời tối đa hóa entropy của policy:
+% \subsubsection{Nguyên lý Maximum Entropy}
+% Điểm đặc biệt của \ac{sac} là việc áp dụng nguyên lý Maximum Entropy trong quá trình học. Thay vì chỉ tối đa hóa phần thưởng tích lũy như các thuật toán truyền thống, \ac{sac} đồng thời tối đa hóa entropy của policy:
 
-\begin{equation}
-    J(\pi) = \sum_{t=0}^{T} \mathbb{E}_{(s_t,a_t) \sim \rho_\pi} [r(s_t, a_t) + \alpha \mathcal{H}(\pi(\cdot|s_t))]
-\end{equation}
+% \begin{equation}
+%     J(\pi) = \sum_{t=0}^{T} \mathbb{E}_{(s_t,a_t) \sim \rho_\pi} [r(s_t, a_t) + \alpha \mathcal{H}(\pi(\cdot|s_t))]
+% \end{equation}
 
-Trong đó $\mathcal{H}(\pi(\cdot|s_t))$ là entropy của policy tại trạng thái $s_t$, và $\alpha$ là hệ số cân bằng giữa reward và entropy. Việc tối đa hóa entropy giúp:
-\begin{itemize}
-    \item \textbf{Khuyến khích khám phá:} Policy được khuyến khích duy trì tính ngẫu nhiên, giúp tác nhân khám phá môi trường hiệu quả hơn
-    \item \textbf{Tránh hội tụ sớm:} Ngăn chặn policy hội tụ quá sớm về một giải pháp cục bộ
-    \item \textbf{Tăng tính ổn định:} Cải thiện độ ổn định trong quá trình huấn luyện
-\end{itemize}
+% Trong đó $\mathcal{H}(\pi(\cdot|s_t))$ là entropy của policy tại trạng thái $s_t$, và $\alpha$ là hệ số cân bằng giữa reward và entropy. Việc tối đa hóa entropy giúp:
+% \begin{itemize}
+%     \item \textbf{Khuyến khích khám phá:} Policy được khuyến khích duy trì tính ngẫu nhiên, giúp tác nhân khám phá môi trường hiệu quả hơn
+%     \item \textbf{Tránh hội tụ sớm:} Ngăn chặn policy hội tụ quá sớm về một giải pháp cục bộ
+%     \item \textbf{Tăng tính ổn định:} Cải thiện độ ổn định trong quá trình huấn luyện
+% \end{itemize}
 
-\subsubsection{Kiến trúc Actor-Critic}
-\ac{sac} sử dụng kiến trúc Actor-Critic với các thành phần chính:
-\begin{itemize}
-    \item \textbf{Actor (Policy Network):} Học một policy stochastic $\pi_\phi(a|s)$ để chọn hành động. Actor được huấn luyện để tối đa hóa cả reward và entropy
-    \item \textbf{Critic (Q-Networks):} Sử dụng hai mạng Q song song $Q_{\theta_1}(s,a)$ và $Q_{\theta_2}(s,a)$ để ước lượng giá trị Q. Việc sử dụng hai mạng giúp giảm thiểu sai lệch ước lượng quá mức (overestimation bias)
-    \item \textbf{Target Networks:} Sử dụng target networks cho cả Actor và Critic để ổn định quá trình huấn luyện
-\end{itemize}
+% \subsubsection{Kiến trúc Actor-Critic}
+% \ac{sac} sử dụng kiến trúc Actor-Critic với các thành phần chính:
+% \begin{itemize}
+%     \item \textbf{Actor (Policy Network):} Học một policy stochastic $\pi_\phi(a|s)$ để chọn hành động. Actor được huấn luyện để tối đa hóa cả reward và entropy
+%     \item \textbf{Critic (Q-Networks):} Sử dụng hai mạng Q song song $Q_{\theta_1}(s,a)$ và $Q_{\theta_2}(s,a)$ để ước lượng giá trị Q. Việc sử dụng hai mạng giúp giảm thiểu sai lệch ước lượng quá mức (overestimation bias)
+%     \item \textbf{Target Networks:} Sử dụng target networks cho cả Actor và Critic để ổn định quá trình huấn luyện
+% \end{itemize}
 
-\subsubsection{Thuật toán huấn luyện}
-Quá trình huấn luyện \ac{sac} bao gồm các bước chính:
-\begin{enumerate}
-    \item \textbf{Cập nhật Critic:} Hai mạng Q được huấn luyện để tối thiểu hóa Bellman error:
-    \begin{equation}
-        L_Q = \mathbb{E}_{(s,a,r,s') \sim \mathcal{D}} \left[ (Q_\theta(s,a) - y)^2 \right]
-    \end{equation}
-    với $y = r + \gamma \mathbb{E}_{a' \sim \pi} [Q_{\bar{\theta}}(s',a') - \alpha \log \pi(a'|s')]$
+% \subsubsection{Thuật toán huấn luyện}
+% Quá trình huấn luyện \ac{sac} bao gồm các bước chính:
+% \begin{enumerate}
+%     \item \textbf{Cập nhật Critic:} Hai mạng Q được huấn luyện để tối thiểu hóa Bellman error:
+%     \begin{equation}
+%         L_Q = \mathbb{E}_{(s,a,r,s') \sim \mathcal{D}} \left[ (Q_\theta(s,a) - y)^2 \right]
+%     \end{equation}
+%     với $y = r + \gamma \mathbb{E}_{a' \sim \pi} [Q_{\bar{\theta}}(s',a') - \alpha \log \pi(a'|s')]$
     
-    \item \textbf{Cập nhật Actor:} Policy được cập nhật để tối đa hóa expected Q-value và entropy:
-    \begin{equation}
-        L_\pi = \mathbb{E}_{s \sim \mathcal{D}, a \sim \pi} [\alpha \log \pi(a|s) - Q_\theta(s,a)]
-    \end{equation}
+%     \item \textbf{Cập nhật Actor:} Policy được cập nhật để tối đa hóa expected Q-value và entropy:
+%     \begin{equation}
+%         L_\pi = \mathbb{E}_{s \sim \mathcal{D}, a \sim \pi} [\alpha \log \pi(a|s) - Q_\theta(s,a)]
+%     \end{equation}
     
-    \item \textbf{Điều chỉnh temperature parameter:} Hệ số $\alpha$ có thể được tự động điều chỉnh để cân bằng giữa exploration và exploitation
-\end{enumerate}
+%     \item \textbf{Điều chỉnh temperature parameter:} Hệ số $\alpha$ có thể được tự động điều chỉnh để cân bằng giữa exploration và exploitation
+% \end{enumerate}
 
-\subsubsection{Ưu điểm của SAC}
-\ac{sac} có nhiều ưu điểm vượt trội:
-\begin{itemize}
-    \item \textbf{Hiệu quả dữ liệu:} Học hiệu quả với ít dữ liệu hơn so với các thuật toán dựa trên policy
-    \item \textbf{Ổn định:} Ít nhạy cảm với siêu tham số (hyperparameter) và ổn định trong quá trình huấn luyện
-    \item \textbf{Khả năng khám phá tốt:} Maximum entropy giúp duy trì khả năng khám phá trong suốt quá trình học
-    \item \textbf{Phù hợp với hành động liên tục:} Được thiết kế đặc biệt cho không gian hành động liên tục
-\end{itemize}
+% \subsubsection{Ưu điểm của SAC}
+% \ac{sac} có nhiều ưu điểm vượt trội:
+% \begin{itemize}
+%     \item \textbf{Hiệu quả dữ liệu:} Học hiệu quả với ít dữ liệu hơn so với các thuật toán dựa trên policy
+%     \item \textbf{Ổn định:} Ít nhạy cảm với siêu tham số (hyperparameter) và ổn định trong quá trình huấn luyện
+%     \item \textbf{Khả năng khám phá tốt:} Maximum entropy giúp duy trì khả năng khám phá trong suốt quá trình học
+%     \item \textbf{Phù hợp với hành động liên tục:} Được thiết kế đặc biệt cho không gian hành động liên tục
+% \end{itemize}
 
 \subsection{Soft Actor-Critic}
 \subsubsection{Tổng quan về Soft Actor-Critic}
@@ -533,7 +532,7 @@ và ứng dụng bên ngoài tại mỗi bước thời gian của giả lập:
 \begin{enumerate}
     \item \textbf{Truy xuất dữ liệu (Data Retrieval):} Ứng dụng bên ngoài gửi
         yêu cầu và nhận về dữ liệu chi tiết từ môi trường giả lập. Các dữ liệu này
-        có thể bao gồm thông tin về các đối tượng trong giả lập (ví dụ: vị trí,
+        có th0ể bao gồm thông tin về các đối tượng trong giả lập (ví dụ: vị trí,
         tốc độ của từng phương tiện) hoặc trạng thái của cơ sở hạ tầng (ví dụ: trạng
         thái đèn tín hiệu, số xe trên một làn đường).
 

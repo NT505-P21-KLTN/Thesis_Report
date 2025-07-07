@@ -1,8 +1,6 @@
 Chương này tập trung vào việc mô tả hệ thống điều khiển đèn giao thông thông minh sử dụng thuật toán học tăng cường sâu (\ac{drl}). Hệ thống sẽ được huấn luyện và đánh giá trong môi trường giả lập \ac{sumo}, với dữ liệu đầu vào có thể được thu thập từ thực tế thông qua các camera tích hợp thuật toán nhận diện vật thể \ac{yl}.
 
 \section{Kiến trúc tổng thể hệ thống}
-Để có cái nhìn toàn diện về hệ thống điều khiển đèn giao thông thông minh, trước tiên, chúng ta cần tìm hiểu kiến trúc tổng thể của nó. Hệ thống này được thiết kế theo mô hình phân tầng, cho phép khả năng mở rộng linh hoạt từ việc điều khiển một giao lộ đơn lẻ đến việc điều phối đồng bộ nhiều giao lộ cùng lúc.
-
 \subsection{Kiến trúc tổng quan}
 
 \begin{figure*}[!htp]
@@ -16,15 +14,11 @@ Hình \ref{fig:overview_architecture} thể hiện kiến trúc tổng quan củ
 bao gồm các thành phần chính:
 
 \begin{itemize}
-    \item \textbf{Lớp thu thập dữ liệu:} Thu thập dữ liệu từ camera và sensors
+    \item \textbf{Thiết bị:} Các camera được trang bị trên các đèn tín hiệu tại các giao lộ
 
-    \item \textbf{Lớp xử lý:} Xử lý dữ liệu và nhận diện đối tượng
+    \item \textbf{Xử lý biên:} Các agent AI ra quyết định điều khiển pha đèn tại mỗi giao lộ
 
-    \item \textbf{Lớp quyết định:} Các agent AI ra quyết định điều khiển
-
-    \item \textbf{Lớp đồng bộ:} Đồng bộ hóa giữa các giao lộ
-
-    \item \textbf{Lớp điều khiển:} Điều khiển đèn giao thông thực tế
+    \item \textbf{Server trung tâm:} Đồng bộ hóa đèn tín hiệu giữa các giao lộ và điều khiển thời gian của mỗi pha đèn
 \end{itemize}
 
 \subsection{Kiến trúc chi tiết hệ thống}
@@ -45,7 +39,7 @@ Mô tả chi tiết các thành phần và luồng dữ liệu trong hệ thốn
         \item \textbf{Nhận diện phương tiện tham gia giao thông:} Dữ liệu video sẽ được dùng để nhận diện các phương tiện tham gia giao thông cũng như xác định khoảng cách và làn đường mà phương tiện đang di chuyển
         \item \textbf{Các tác nhân DQN :} Các tác nhân ngoài việc điều khiển đèn tín hiệu từng giao lộ thì còn có nhiệm vụ nhận các thông tin từ YOLO và giả lập tình trạng giao thông tại nút giao. Sau đó, gửi các thông tin cần thiết đến centtral server để dự doán và ra quyết định 
     \end{itemize}
-    \item \textbf{Central Server:} Thu thập từ các tác nhân và chạy các mô hình DQN và Sync Agent để ra quyết định. Đồng thời, cung cấp giao diện để quan sát và điều khiển
+    \item \textbf{Central Server:} Thu thập từ các tác nhân và chạy các mô hình \ac{drl} với thuật toán \ac{sac} để ra quyết định điều khiển thời gian của mỗi pha đèn của các giao lộ. Đồng thời, cung cấp giao diện để quan sát và điều khiển.
 \end{enumerate}
 
 \section{Phương pháp mô phỏng dữ liệu từ camera}
@@ -145,7 +139,7 @@ Như minh họa trong hình \ref{fig:sumo_map}, nghiên cứu mô phỏng một 
     \item Làn trong cùng: Chỉ được phép rẽ phải.
 \end{itemize}
 
-\section{Xây dựng mô hình DRL}
+\section{Xây dựng mô hình DRL với thuật toán DQN}
 \subsection{Định nghĩa môi trường (Environment)}
 Trong khuôn khổ của đề tài, môi trường chính là một kịch bản giao thông được giả lập bởi \ac{sumo}. Một lớp (class) `Simulation` trong Python được tạo ra để quản lý và tương tác với môi trường này. Lớp `Simulation` đóng vai trò trung gian, thực
 hiện các công việc sau:
@@ -224,10 +218,10 @@ Không gian hành động được định nghĩa như một tập hợp hữu h
 Trong đó:
 
 \begin{align}
-    a_0 &: \text{North-South Green (NSG): pha đèn xanh đường phía Bắc và Nam đi thẳng} \\
-    a_1 &: \text{North-South Left (NSL): pha đèn xanh đường phía Bắc và Nam rẽ trái} \\
-    a_2 &: \text{East-West Green (EWG): pha đèn xanh đường phía Đông và Tây đi thẳng} \\
-    a_3 &: \text{East-West Left (EWL): pha đèn xanh đường phía Đông và Tây rẽ trái}
+    a_0 &: \text{North-South Green (NSG)} \\
+    a_1 &: \text{North-South Left (NSL)} \\
+    a_2 &: \text{East-West Green (EWG)} \\
+    a_3 &: \text{East-West Left (EWL)}
 \end{align}
 
 Tại mỗi bước thời gian $t$, agent quan sát trạng thái $s_t$ và chọn hành động $a_t \in \mathcal{A}$ dựa trên chính sách $\pi(a_t|s_t)$. Việc ánh xạ từ hành động trừu tượng sang điều khiển đèn tín hiệu được thực hiện thông qua TraCI
@@ -283,16 +277,18 @@ Như thể hiện trong hình, kiến trúc của mạng được xây dựng b�
 
 \subsection{Quá trình huấn luyện}
 \subsubsection{Chiến lược khám phá}
-Trong quá trình huấn luyện mô hình học tăng cường sâu, việc cân bằng giữa khám phá và khai thác là một thách thức then chốt. Nghiên cứu của chúng tôi đã áp dụng chiến lược epsilon-greedy để đảm bảo agent có thể tích cực khám phá trong giai đoạn đầu huấn luyện và tập trung học hỏi ở giai đoạn sau. Cơ chế hoạt động của epsilon-greedy dựa trên việc sinh ra một giá trị ngẫu nhiên trong khoảng [0,1] và so sánh với ngưỡng  $\epsilon$. Tại mỗi bước quyết định, nếu giá trị ngẫu nhiên nhỏ hơn $\epsilon$, agent sẽ chọn một hành động hoàn toàn ngẫu nhiên (khám phá), ngược lại sẽ chọn hành động tối ưu nhất theo mô hình học được (khai thác).
+Trong quá trình huấn luyện mô hình học tăng cường sâu, việc cân bằng giữa khám phá và khai thác là một thách thức then chốt. Nghiên cứu của chúng tôi đã áp dụng chiến lược epsilon-greedy để đảm bảo agent có thể tích cực khám phá trong giai đoạn đầu huấn luyện và tập trung học hỏi ở giai đoạn sau. Cụ thể, chúng tôi sẽ giảm dần đều giá trị $\epsilon$ để khi vào những episode cuối của quá trình huấn luyện giá trị $\epsilon$ sẽ gần bằng 0. Cơ chế hoạt động của epsilon-greedy dựa trên việc sinh ra một giá trị ngẫu nhiên trong khoảng [0,1] và so sánh với ngưỡng  $\epsilon$. Tại mỗi bước quyết định, nếu giá trị ngẫu nhiên nhỏ hơn $\epsilon$, agent sẽ chọn một hành động hoàn toàn ngẫu nhiên (khám phá), ngược lại sẽ chọn hành động tối ưu nhất theo mô hình học được (khai thác).
 
 \subsubsection{Quy trình học trong từng episode}
-Quá trình học trong mỗi episode sẽ bao gồm 3 bước. Thứ nhất là khởi tạo các phương tiện trong giả lập SUMO với số bước giả lập cho trước. Thứ hai, trong mỗi bước giả lập, thực hiện tính tóa reward, lưu trữ trải nghiệm vào Memory, chọn hành động cần thực hiện, và thực thi hành động trong giả lập. Cuối cùng, sau khi đã hoàn thành giả lập thì sẽ bắt đầu huấn luyện từ thông tin trải nghiệm đã lưu trước đó.
+
 \begin{figure}[!htp]
     \centering
     \includegraphics[width=0.7\textwidth]{img/training_episode.png}
     \caption{Sơ đồ quá trình huấn luyện mô hình}
     \label{fig:training_flow}
 \end{figure}
+
+Quá trình học trong mỗi episode sẽ bao gồm 3 bước. Thứ nhất là khởi tạo các phương tiện trong giả lập SUMO với số bước giả lập cho trước. Thứ hai, trong mỗi bước giả lập, thực hiện tính tóan reward, lưu trữ trải nghiệm vào Memory, chọn hành động cần thực hiện, và thực thi hành động trong giả lập. Cuối cùng, sau khi đã hoàn thành giả lập thì sẽ bắt đầu huấn luyện từ thông tin trải nghiệm đã lưu trước đó.
 
 \begin{enumerate}
     \item \textbf{Bước 1:} Các phương tiện được sinh ra ngẫu nhiên trong SUMO bằng cách sử dụng phân phối Weibull với trọng số là 2 để mô phỏng quá trình số lượng phương tiện tăng dần theo thời gian tại các giao lộ.
@@ -318,29 +314,38 @@ Trong đó $n$ là số lượng mẫu, $y_i$ là giá trị thực tế, $\hat{
 Để tối ưu hóa mô hình, chúng tôi sử dụng thuật toán Adam (Adaptive Moment Estimation) - một phương pháp tối ưu hóa gradient tiên tiến. Adam kết hợp ưu điểm của hai thuật toán RMSprop và momentum, cho phép điều chỉnh tốc độ học một cách linh hoạt cho từng tham số. Cấu hình Adam trong nghiên cứu được thiết lập với các tham số tốc độ học (learning rate) là 0.001
 
 
+% \section{Cơ chế trao đổi thông tin giữa tác nhân và Central Server}
+
+% Central Server đóng vai trò trung tâm điều phối dữ liệu, sử dụng kiến trúc client-server thông qua giao tiếp HTTP RESTful API.
+
+% \subsection{Chức năng chính}
+
+% Central Server cung cấp các API chính như sau:
+
+% \begin{itemize}
+% \item \textbf{Agent Registration}: Đăng ký và quản lý các Intersection Agent.
+% \item \textbf{Heartbeat Monitoring}: Theo dõi tín hiệu hoạt động (heartbeat) từ các agent theo chu kỳ 30 giây.
+% \item \textbf{Data Collection}: Thu thập dữ liệu giao thông từ các agent mỗi 10 giây.
+% \item \textbf{Coordination Support}: Hỗ trợ đồng bộ hóa hoạt động giữa Sync Agent và Intersection Agent.
+% \end{itemize}
+
+% \subsection{Cơ chế phát hiện lỗi}
+
+% Việc phát hiện agent bị lỗi được thực hiện dựa trên các tiêu chí sau:
+
+% \begin{itemize}
+% \item Cơ chế \textit{timeout}: nếu không nhận được heartbeat trong vòng 90 giây.
+% \item Tự động thử lại (retry) tối đa 3 lần.
+% \item Kích hoạt chế độ điều khiển dự phòng (fallback control) khi agent không phản hồi.
+% \end{itemize}
+
 \section{Cơ chế trao đổi thông tin giữa tác nhân và Central Server}
 
-Central Server đóng vai trò trung tâm điều phối dữ liệu, sử dụng kiến trúc client-server thông qua giao tiếp HTTP RESTful API.
-
-\subsection{Chức năng chính}
-
-Central Server cung cấp các API chính như sau:
-
+Central Server đóng vai trò trung tâm điều phối dữ liệu, sử dụng kiến trúc client-server thông qua giao tiếp HTTP RESTful API. 
 \begin{itemize}
-\item \textbf{Agent Registration}: Đăng ký và quản lý các Intersection Agent.
-\item \textbf{Heartbeat Monitoring}: Theo dõi tín hiệu hoạt động (heartbeat) từ các agent theo chu kỳ 30 giây.
-\item \textbf{Data Collection}: Thu thập dữ liệu giao thông từ các agent mỗi 10 giây.
-\item \textbf{Coordination Support}: Hỗ trợ đồng bộ hóa hoạt động giữa Sync Agent và Intersection Agent.
-\end{itemize}
-
-\subsection{Cơ chế phát hiện lỗi}
-
-Việc phát hiện agent bị lỗi được thực hiện dựa trên các tiêu chí sau:
-
-\begin{itemize}
-\item Cơ chế \textit{timeout}: nếu không nhận được heartbeat trong vòng 90 giây.
-\item Tự động thử lại (retry) tối đa 3 lần.
-\item Kích hoạt chế độ điều khiển dự phòng (fallback control) khi agent không phản hồi.
+    \item Về chức năng chính, Central Server cung cấp các API để đăng ký và quản lý các Intersection Agent, theo dõi tín hiệu hoạt động (heartbeat) từ các agent theo chu kỳ 30 giây, thu thập dữ liệu giao thông từ các agent mỗi 10 giây, và hỗ trợ đồng bộ hóa hoạt động giữa Sync Agent và Intersection Agent.
+    \item Việc phát hiện agent bị lỗi được thực hiện dựa trên các tiêu chí sau: cơ chế timeout nếu không nhận được heartbeat trong vòng 90 giây, tự động thử lại (retry) tối đa 3 lần, và kích hoạt chế độ điều khiển dự phòng (fallback control) khi agent không phản hồi.
+    \item Các agent liên tục gửi cập nhật trạng thái giao thông hiện tại, bao gồm thông tin về điều kiện giao thông, độ dài hàng chờ, vị trí xe và các chỉ số hiệu suất, đến Central Server thông qua các yêu cầu HTTP POST. Ngoài ra, các agent cũng định kỳ đồng bộ hóa dữ liệu tích lũy của họ với Central Server thông qua phương thức $sync\_with\_server()$.
 \end{itemize}
 
 \section{Cơ chế trao đổi thông tin giữa các tác nhân}
@@ -386,7 +391,7 @@ Hệ thống hỗ trợ cơ chế chống lỗi với các đặc điểm sau:
 \item Cơ chế fallback: chuyển sang sử dụng Central Server khi kết nối trực tiếp thất bại.
 \end{itemize}
 
-\section{Thiết kế hệ thống đồng bộ hóa giao lộ (Sync Agent)}
+\section{Xây dựng mô hình DRl với thuật toán SAC}
 
 Để mở rộng khả năng của hệ thống từ điều khiển giao lộ đơn lẻ sang điều khiển phối hợp nhiều giao lộ, nghiên cứu đã phát triển một thành phần Sync Agent sử dụng thuật toán \ac{sac}. Hệ thống này hoạt động như một lớp điều phối cấp cao, tối ưu hóa việc đồng bộ thời gian tín hiệu giữa các giao lộ để tạo ra "green wave" - hiệu ứng sóng xanh giúp xe cộ di chuyển liên tục qua nhiều giao lộ mà không phải dừng lại.
 
@@ -553,29 +558,29 @@ Với $\tau = 0,001$ được chọn conservative để đảm bảo:
     \item \textbf{Smooth convergence:} Đặc biệt quan trọng với bài toán đa mục tiêu như đồng bộ hóa
 \end{itemize}
 
-\subsubsection{So sánh với các thuật toán khác}
-Bảng \ref{tab:algorithm_comparison} so sánh \ac{sac} với các thuật toán khác cho bài toán đồng bộ hóa:
+% \subsubsection{So sánh với các thuật toán khác}
+% Bảng \ref{tab:algorithm_comparison} so sánh \ac{sac} với các thuật toán khác cho bài toán đồng bộ hóa:
 
-\begin{table}[!htp]
-\centering
-\caption{So sánh các thuật toán cho bài toán đồng bộ hóa giao lộ}
-\label{tab:algorithm_comparison}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Thuật toán} & \textbf{Không gian hành động} & \textbf{Hiệu suất mẫu} & \textbf{Ổn định} & \textbf{Khám phá} \\
-\hline
-DQN & Rời rạc & Trung bình & Tốt & $\epsilon$-greedy \\
-\hline
-DDPG & Liên tục & Trung bình & Kém & Noise-based \\
-\hline
-TD3 & Liên tục & Tốt & Tốt & Noise-based \\
-\hline
-\textbf{SAC} & \textbf{Liên tục} & \textbf{Rất tốt} & \textbf{Rất tốt} & \textbf{Entropy-based} \\
-\hline
-PPO & Cả hai & Tốt & Tốt & Stochastic policy \\
-\hline
-\end{tabular}
-\end{table}
+% \begin{table}[!htp]
+% \centering
+% \caption{So sánh các thuật toán cho bài toán đồng bộ hóa giao lộ}
+% \label{tab:algorithm_comparison}
+% \begin{tabular}{|l|c|c|c|c|}
+% \hline
+% \textbf{Thuật toán} & \textbf{Không gian hành động} & \textbf{Hiệu suất mẫu} & \textbf{Ổn định} & \textbf{Khám phá} \\
+% \hline
+% DQN & Rời rạc & Trung bình & Tốt & $\epsilon$-greedy \\
+% \hline
+% DDPG & Liên tục & Trung bình & Kém & Noise-based \\
+% \hline
+% TD3 & Liên tục & Tốt & Tốt & Noise-based \\
+% \hline
+% \textbf{SAC} & \textbf{Liên tục} & \textbf{Rất tốt} & \textbf{Rất tốt} & \textbf{Entropy-based} \\
+% \hline
+% PPO & Cả hai & Tốt & Tốt & Stochastic policy \\
+% \hline
+% \end{tabular}
+% \end{table}
 
 \subsection{Thuật toán Soft Actor-Critic}
 Sync Agent sử dụng thuật toán SAC với các đặc điểm kỹ thuật sau:
@@ -598,7 +603,7 @@ Tương tự như DQN, việc lựa chọn kiến trúc fully connected cho SAC 
     \item \textbf{Không gian hành động liên tục:} Việc điều chỉnh các giá trị offset yêu cầu output liên tục, phù hợp với Dense layers có hàm kích hoạt phù hợp.
         \item \textbf{Hiệu quả tính toán:} Quan trọng cho Sync Agent vì phải xử lý dữ liệu từ nhiều giao lộ đồng thời trong thời gian thực.
     \end{itemize}
-
+\newpage
 \subsubsection{Hyperparameters tối ưu}
 Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã được xác định trong Bảng \ref{tab:sac_hyperparameters}:
 
@@ -610,7 +615,7 @@ Dựa trên quá trình tinh chỉnh mở rộng, các tham số sau đã đư�
 \hline
 \textbf{Tham số} & \textbf{Giá trị} & \textbf{Mô tả} \\
 \hline
-Tốc độ học & $1 \times 10^{-4}$ & Conservative để đảm bảo ổn định \\
+Tốc độ học & $10^{-4}$ & Conservative để đảm bảo ổn định \\
 \hline
 Hệ số chiết khấu $\gamma$ & 0,95 & Hệ số chiết khấu cho phần thưởng tương lai \\
 \hline
