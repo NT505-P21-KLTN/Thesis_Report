@@ -232,32 +232,25 @@ Các cấu hình được thiết kế với mục đích cụ thể như sau:
 \centering
 \caption{Cấu hình hyperparameters của 10 mô hình DQN baseline}
 \label{tab:base_model_configs}
+\footnotesize % hoặc \footnotesize, \scriptsize tùy ý
 \begin{tabular}{|l|c|c|c|c|c|c|c|}
 \hline
-\textbf{Mô hình} & \textbf{Learning Rate} & \textbf{Batch Size} & \textbf{Gamma} & \textbf{Episodes} & \textbf{Memory Size} & \textbf{Epsilon} & \textbf{Width} \\
+\textbf{Mô hình} & \textbf{ Learning Rate } & \textbf{ Batch Size } & \textbf{ Gamma } & \textbf{ Episodes } & \textbf{ Memory Size } & \textbf{Epsilon} & \textbf{ Width } \\
 \hline
 Original & 0,001 & 32 & 0,95 & 200 & 50000 & 0,9→0,05 & 400 \\
-\hline
 Baseline & 0,0005 & 64 & 0,75 & 150 & 50000 & 0,9→0,05 & 400 \\
-\hline
 Conservative & 0,0001 & 32 & 0,95 & 200 & 50000 & 0,9→0,01 & 400 \\
-\hline
 High Traffic & 0,001 & 128 & 0,95 & 300 & 100000 & 0,9→0,05 & 512 \\
-\hline
 Low Traffic & 0,0005 & 32 & 0,85 & 150 & 25000 & 0,9→0,1 & 256 \\
-\hline
-Balanced & 0,0007 & 64 & 0,9 & 200 & 50000 & 0,9→0,05 & 400 \\
-\hline
+\textbf{Balanced} & \textbf{0,0007} & \textbf{64} & \textbf{0,9} & \textbf{200} & \textbf{50000} & \textbf{0,9→0,05} & \textbf{400} \\
 Medium Batch & 0,001 & 96 & 0,95 & 200 & 50000 & 0,9→0,05 & 400 \\
-\hline
 Moderate Learning & 0,0008 & 64 & 0,9 & 200 & 50000 & 0,9→0,05 & 400 \\
-\hline
 Aggressive & 0,005 & 128 & 0,99 & 300 & 100000 & 0,95→0,01 & 512 \\
-\hline
 High Learning & 0,01 & 256 & 0,99 & 400 & 200000 & 0,95→0,01 & 1024 \\
 \hline
 \end{tabular}
 \end{table*}
+
 
 Các cấu hình được nhóm theo mục đích nghiên cứu:
 \begin{itemize}
@@ -550,15 +543,15 @@ Hình \ref{fig:sync_waiting_time_comparison} cho thấy mô hình phần thưở
 
 \subsubsection{Đường cong học tập}
 
+Hình \ref{fig:sync_learning_curves} minh họa các khuôn mẫu học tập khác biệt giữa hai mô hình: Mô hình phần thưởng dương cho thấy các chu kỳ rõ ràng giữa phản hồi tích cực và tiêu cực, trong khi mô hình phần thưởng âm thể hiện một đường cong học tập ổn định hơn.
+
 \begin{figure}[!htp]
     \centering
     \includegraphics[width=\textwidth]{figures/sync_learning_curves.png}
     \caption{Đường cong học tập của hai mô hình Sync Agent}
     \label{fig:sync_learning_curves}
 \end{figure}
-Hình \ref{fig:sync_learning_curves} minh họa các khuôn mẫu học tập khác biệt
-giữa hai mô hình: Mô hình phần thưởng dương cho thấy các chu kỳ rõ ràng giữa phản hồi tích cực và tiêu cực, trong khi mô hình phần thưởng âm thể hiện một đường cong học tập ổn định hơn.
-
+\newpage
 \subsection{Phân tích kết quả hiệu suất}
 
 \begin{table}[!htp]
@@ -580,6 +573,8 @@ giữa hai mô hình: Mô hình phần thưởng dương cho thấy các chu k�
         \bottomrule
     \end{tabular}
 \end{table}
+
+Dựa trên bảng \ref{tab:sync_performance_comparison}, có thể thấy rằng mỗi mô hình đều có những ưu và nhược điểm. Về phần thưởng, mô hình phần thưởng dương có hiệu suất tốt hơn với phần thưởng tốt nhất là +1.253, phần thưởng cuối cùng là -254 và phần thưởng trung bình là +106. Tuy nhiên, mô hình này có độ lệch chuẩn phần thưởng cao hơn, lên tới 471, cho thấy độ biến động lớn. Về thời gian chờ, mô hình phần thưởng âm có ưu thế hơn. Thời gian chờ trung bình tốt nhất của mô hình này là 141 giây, và thời gian chờ trung bình cuối cùng là 158 giây, ngắn hơn so với mô hình phần thưởng dương. Xét về tính ổn định, mô hình phần thưởng âm cũng có lợi thế hơn. Số tập có cải thiện liên tục ở mô hình này, trong khi mô hình phần thưởng dương chỉ có 97 tập cải thiện. Điều này cho thấy mô hình phần thưởng âm ổn định hơn. Về hiệu suất tối đa, mô hình phần thưởng âm lại vượt trội hơn khi đạt hiệu suất cao nhất ở tập 89, trong khi mô hình phần thưởng dương chỉ đạt hiệu suất cao nhất ở tập 58. Như vậy, mô hình phần thưởng âm có ưu điểm về thời gian chờ trung bình, độ ổn định và có thể đạt hiệu suất cao hơn.
 
 \subsection{Kết quả chi tiết từng mô hình}
 
@@ -771,22 +766,25 @@ Sau khi hoàn thiện phát triển hệ thống Sync Agent, nghiên cứu tiế
     \centering
     \caption{So sánh hiệu suất với phương pháp truyền thống (giai đoạn cuối)}
     \label{tab:traditional_comparison}
-    \begin{tabular}{@{}lccc@{}}
-        \toprule \textbf{Phương pháp} & \textbf{Avg Wait Time (s)} & \textbf{Queue Length}  & \textbf{Cải thiện}      \\
-        \midrule Fixed-time Control   & 45,0                       & 9,5                    & 0\%                      \\
-        Actuated Control              & 42,1                       & 8,7                    & 6,4\%                   \\
-        Optimized Fixed-time          & 39,8                       & 8,1                    & 11,6\%                  \\
-        DQN Single Agent (Balanced)   & 38,5                       & 8,5                    & 14,4\%                  \\
-        \textbf{DQN + Sync Agent}     & \textbf{32,9}              & \textbf{7,3}           & \textbf{26,9\%}         \\
+    \begin{tabular}{@{}lcccc@{}}
+        \toprule
+        \textbf{Phương pháp} & \textbf{Avg Wait Time (s) } & \textbf{ Queue Length } & \textbf{ Cải thiện } & \textbf{ Nguồn } \\
+        \midrule
+        Fixed-time Control & 45,0 & 9,5 & 0\% & \\
+        Actuated Control & 42,1 & 8,7 & 6,4\% & \\
+        Optimized Fixed-time & 39,8 & 8,1 & 11,6\% & \\
+        DQN Single Agent (Balanced) & 38,5 & 8,5 & 14,3\% & \\
+        \textbf{DQN + Sync Agent} & \textbf{32,9} & \textbf{7,3} & \textbf{27,0\%} & \\
         \bottomrule
     \end{tabular}
 \end{table}
+
 
 Kết quả so sánh cho thấy sự vượt trội rõ rệt của hệ thống được đề xuất:
 
 \textbf{Kết quả so sánh sau khi hoàn thiện phương pháp:}
 \begin{itemize}
-    \item Sync Agent đạt hiệu suất vượt trội nhất với cải thiện 26,9\% 
+    \item Sync Agent đạt hiệu suất vượt trội nhất với cải thiện 27.0\% 
     \item Cải thiện thêm 12,5\% so với mô hình \ac{dqn} với 1 tác nhân
     \item Tất cả cải thiện có ý nghĩa thống kê (p < 0,001)
 \end{itemize}
@@ -1065,7 +1063,7 @@ Bên cạnh các chỉ số huấn luyện, nghiên cứu cũng đánh giá hi�
 \end{table}
 
 So sánh hiệu suất giao thông cho thấy hệ thống đồng bộ đạt được cải thiện đáng kể trên tất cả các chỉ số quan trọng.
-
+\newpage
 \subsubsection{Tiến trình training}
 Để hiểu rõ quá trình học tập của Sync Agent, nghiên cứu đã theo dõi chi tiết sự thay đổi của các chỉ số quan trọng qua 150 episodes huấn luyện. Việc phân tích tiến trình này không chỉ xác nhận tính hiệu quả của phương pháp mà còn cung cấp thông tin quan trọng về tốc độ hội tụ và độ ổn định của hệ thống.
 
@@ -1144,12 +1142,21 @@ và 7,7 xe tương ứng. Phần bên phải tóm tắt mức cải thiện đ�
 
 \subsubsection{Đánh giá trên các tình huống khác nhau}
 
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/training_with_baselines.png}
+    \caption{So sánh hiệu suất với baseline qua quá trình huấn luyện}
+    \label{fig:training_with_baselines}
+\end{figure}
+
+Hình \ref{fig:training_with_baselines} thể hiện quá trình cải thiện hiệu suất qua huấn luyện. Đường ngang màu xanh dương (45,0s) và xanh lá (9,5 xe) thể hiện hiệu suất baseline của single intersection. Đường cong cho thấy sync system dần cải thiện và ổn định ở mức 34,3s thời gian chờ và 7,7 xe độ dài hàng đợi.
+
 \begin{table}[!htp]
     \centering
     \caption{Hiệu suất thực tế trên các tình huống giao thông}
     \label{tab:sync_scenarios_actual}
     \begin{tabular}{@{}lcccc@{}}
-        \toprule \textbf{Tình huống} & \textbf{Phương pháp} & \textbf{Thời gian chờ (s)} & \textbf{Độ dài hàng đợi (xe)} & \textbf{Tốc độ (xe/h)} \\
+        \toprule \textbf{Tình huống} & \textbf{Phương pháp} & \textbf{Thời gian chờ (s)} & \textbf{Độ dài hàng đợi (xe)} & \textbf{Mật độ (xe/h)} \\
         \midrule 
         \multirow{2}{*}{Giao thông thấp} & Single Intersection & 31,5 & 6,7 & 400 \\
         & 4-Intersection Sync & 23,2 & 5,4 & 450 \\
@@ -1165,33 +1172,7 @@ và 7,7 xe tương ứng. Phần bên phải tóm tắt mức cải thiện đ�
         \bottomrule
     \end{tabular}
 \end{table}
-
-\begin{table}[!htp]
-    \centering
-    \caption{Tóm tắt cải thiện qua các tình huống}
-    \label{tab:sync_scenarios_summary}
-    \begin{tabular}{@{}lccc@{}}
-        \toprule \textbf{Tình huống} & \textbf{Cải thiện thời gian chờ} & \textbf{Cải thiện độ dài hàng đợi} & \textbf{Cải thiện tốc độ} \\
-        \midrule 
-        Giao thông thấp & 26,3\% & 19,4\% & 12,5\% \\
-        Giao thông trung bình & 27,1\% & 21,1\% & 13,7\% \\
-        Giao thông cao & 33,8\% & 28,6\% & 16,2\% \\
-        Giờ cao điểm & 30,2\% & 25,7\% & 14,7\% \\
-        \midrule
-        \textbf{Average} & \textbf{29,4\%} & \textbf{23,7\%} & \textbf{14,4\%} \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{figure}[!htp]
-    \centering
-    \includegraphics[width=\textwidth]{figures/training_with_baselines.png}
-    \caption{So sánh hiệu suất với baseline qua quá trình huấn luyện}
-    \label{fig:training_with_baselines}
-\end{figure}
-
-Hình \ref{fig:training_with_baselines} thể hiện quá trình cải thiện hiệu suất qua huấn luyện. Đường ngang màu xanh dương (45,0s) và xanh lá (9,5 xe) thể hiện hiệu suất baseline của single intersection. Đường cong cho thấy sync system dần cải thiện và ổn định ở mức 34,3s thời gian chờ và 7,7 xe độ dài hàng đợi.
-
+\newpage
 \subsubsection{Tổng hợp lợi ích}
 
 \begin{figure}[!htp]
@@ -1244,8 +1225,8 @@ Ba hệ thống điều khiển được đánh giá:
         \textbf{Hệ thống} & \textbf{Thời gian chờ} & \textbf{Độ dài hàng đợi} & \textbf{Cải thiện} \\
         \midrule 
         Baseline & 45,0s & 9,5 xe & - \\
-        Single Intersection & 38,5s & 8,5 xe & \textbf{14,4\%} \\
-        Sync System & 32,9s & 7,3 xe & \textbf{26,9\%} \\
+        Single Intersection & 38,5s & 8,5 xe & \textbf{14,3\%} \\
+        Sync System & 32,9s & 7,3 xe & \textbf{27.0\%} \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -1274,6 +1255,9 @@ cải thiện so với tối ưu hóa giao lộ đơn.
 \subsection{Trực quan hóa kết quả đồng nhất}
 
 \subsubsection{Tiến trình huấn luyện tổng thể}
+Hình \ref{fig:comprehensive_training_progress} thể hiện quá trình huấn luyện
+toàn diện với baseline không đổi (đường ngang), single intersection và sync system
+cải thiện theo thời gian, cùng với phân tích reward và loss.
 
 \begin{figure}[!htp]
     \centering
@@ -1282,10 +1266,8 @@ cải thiện so với tối ưu hóa giao lộ đơn.
     \label{fig:comprehensive_training_progress}
 \end{figure}
 
-Hình \ref{fig:comprehensive_training_progress} thể hiện quá trình huấn luyện
-toàn diện với baseline không đổi (đường ngang), single intersection và sync system
-cải thiện theo thời gian, cùng với phân tích reward và loss.
 
+\newpage
 \subsubsection{Phân tích giao lộ cá nhân - Chế độ xem đồng nhất}
 
 \begin{figure}[!htp]
@@ -1304,7 +1286,7 @@ Mỗi giao lộ có màu sắc riêng biệt (Xanh dương, Cam, Đỏ, Tím) v�
     \item \textbf{Giao lộ 3 (Đỏ):} Học chậm với setbacks, hội tụ tại episode 130
     \item \textbf{Giao lộ 4 (Tím):} Rất chậm với nhiều plateau, hội tụ tại episode 140
 \end{itemize}
-
+\newpage
 \subsubsection{Dashboard phân tích hiệu suất}
 
 \begin{figure}[!htp]
@@ -1421,17 +1403,17 @@ Kết quả cung cấp hướng dẫn triển khai dựa trên bằng chứng:
 %     \item \textbf{Giao thông cao:} Tài nguyên đáng kể, huấn luyện chuyên biệt, giám sát liên tục
 % \end{itemize}
 
-\subsection{Mô hình hoàn thiện để triển khai}
+% \subsection{Mô hình hoàn thiện để triển khai}
 
-Nghiên cứu đã tạo ra 5 mô hình TensorFlow sẵn sàng triển khai được tối ưu hóa cho các điều kiện giao thông khác nhau:
+% Nghiên cứu đã tạo ra 5 mô hình TensorFlow sẵn sàng triển khai được tối ưu hóa cho các điều kiện giao thông khác nhau:
 
-\begin{itemize}
-            \item \texttt{single\_intersection\_model.h5} - DQN đa mục đích (cải thiện 14,4\%)
-    \item \texttt{sync\_intersection\_1\_model.h5} - Model giao thông thấp (cải thiện 34,5\%)
-    \item \texttt{sync\_intersection\_2\_model.h5} - Model giao thông trung bình (cải thiện 25,1\%)  
-    \item \texttt{sync\_intersection\_3\_model.h5} - Model giao thông cao (cải thiện 21,1\%)
-    \item \texttt{sync\_intersection\_4\_model.h5} - Model giờ cao điểm (cải thiện 12,4\%)
-\end{itemize}
+% \begin{itemize}
+%             \item \texttt{single\_intersection\_model.h5} - DQN đa mục đích (cải thiện 14,3\%)
+%     \item \texttt{sync\_intersection\_1\_model.h5} - Model giao thông thấp (cải thiện 34,5\%)
+%     \item \texttt{sync\_intersection\_2\_model.h5} - Model giao thông trung bình (cải thiện 25,1\%)  
+%     \item \texttt{sync\_intersection\_3\_model.h5} - Model giao thông cao (cải thiện 21,1\%)
+%     \item \texttt{sync\_intersection\_4\_model.h5} - Model giờ cao điểm (cải thiện 12,4\%)
+% \end{itemize}
 
 \subsection{So sánh với các phương pháp điều khiển giao thông hiện tại}
 
@@ -1499,14 +1481,14 @@ Dữ liệu từ các nghiên cứu khác được chuẩn hóa theo cùng phư�
         \cite{SCOOTSCATSEvaluation2008,AdaptiveTrafficSignals2010} \\
         
         DQN (1 Agent) & 
-        Cải thiện 14,4\% & 
+        Cải thiện 14,3\% & 
         Cải thiện 10,5\% & 
         Không & 
         Thử nghiệm thành công & 
         Nghiên cứu này \\
 
         \textbf{Sync Agent System} & 
-        \textbf{Cải thiện 26,9\%} & 
+        \textbf{Cải thiện 27.0\%} & 
         \textbf{Cải thiện 23,1\%} & 
         \textbf{Đồng bộ hoàn chỉnh} & 
         \textbf{Sẵn sàng triển khai} & 
@@ -1516,4 +1498,4 @@ Dữ liệu từ các nghiên cứu khác được chuẩn hóa theo cùng phư�
     }
 \end{table}
 
-Bảng \ref{tab:final_comparison} cho thấy hệ thống Sync Agent đề xuất trong nghiên cứu đạt hiệu suất cạnh tranh so với các phương pháp điều khiển giao thông hiện có. Cụ thể, mô hình giúp cải thiện 26,9\% thời gian chờ và 23,1\% độ dài hàng đợi, đồng thời đảm bảo mức đồng bộ cao giữa các nút giao. Dù SCATS có thể đạt mức cải thiện cao hơn trong một số trường hợp, mô hình này thường dựa vào cấu hình phức tạp và dữ liệu lịch sử. Trong khi đó, hệ thống Sync Agent hoạt động theo thời gian thực, thích nghi linh hoạt với điều kiện giao thông thay đổi, và dễ dàng triển khai hơn. Điều này khẳng định tiềm năng ứng dụng thực tế và khả năng mở rộng của mô hình trong các hệ thống giao thông thông minh hiện đại.
+Bảng \ref{tab:final_comparison} cho thấy hệ thống Sync Agent đề xuất trong nghiên cứu đạt hiệu suất cạnh tranh so với các phương pháp điều khiển giao thông hiện có. Cụ thể, mô hình giúp cải thiện 27.0\% thời gian chờ và 23,1\% độ dài hàng đợi, đồng thời đảm bảo mức đồng bộ cao giữa các nút giao. Dù SCATS có thể đạt mức cải thiện cao hơn trong một số trường hợp, mô hình này thường dựa vào cấu hình phức tạp và dữ liệu lịch sử. Trong khi đó, hệ thống Sync Agent hoạt động theo thời gian thực, thích nghi linh hoạt với điều kiện giao thông thay đổi, và dễ dàng triển khai hơn. Điều này khẳng định tiềm năng ứng dụng thực tế và khả năng mở rộng của mô hình trong các hệ thống giao thông thông minh hiện đại.
